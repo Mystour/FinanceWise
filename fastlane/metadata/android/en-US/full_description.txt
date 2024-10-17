@@ -1,0 +1,14 @@
+GreenStash is a straightforward, open-source, and privacy-friendly app designed to assist you in effortlessly planning and managing your saving goals, fostering the habit of saving money for better things.
+
+🌟 Features / Highlights:
+• Clean and beautiful UI based on Google's Material-3 Design guidelines.
+• Add images to your savings goals to maintain motivation!
+• Monitor the daily, weekly, or monthly amount required to achieve your goal by the deadline.
+• Track detailed transaction history (withdrawals/deposits).
+• Receive daily, semi-weekly, or weekly reminders for your savings goals based on priority.
+• Supports approximately 100+ local currency symbols.
+• Built-in biometric app lock ensures the safety and security of your financial data.
+• Completely offline functionality; GreenStash operates without requiring internet permission.
+• Compatible with the Material You theme on devices running Android 12+.
+• Available in both light and dark mode.
+
