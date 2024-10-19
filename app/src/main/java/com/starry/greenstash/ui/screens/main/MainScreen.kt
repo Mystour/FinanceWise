@@ -25,17 +25,31 @@
 
 package com.starry.greenstash.ui.screens.main
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
+
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.starry.greenstash.MainActivity
@@ -85,6 +99,33 @@ fun MainScreen(
                 if (shouldHandleShortCut.value) {
                     HandleShortcutIntent(activity.intent, navController)
                 }
+
+                // 添加按钮进行AI分析
+                Spacer(modifier = Modifier.height(16.dp))
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.BottomStart
+                ) {
+                    Button(
+                        onClick = {
+                            val intent = Intent().apply {
+                                setClassName("com.example.diaryapp", "com.example.diaryapp.view.AIActivity")
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            }
+                            try {
+                                activity.startActivity(intent)
+                            } catch (e: ActivityNotFoundException) {
+                                e.printStackTrace()
+                                // 提示用户目标应用未安装或无法找到
+                                Toast.makeText(activity, "目标应用未安装或无法找到", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    ) {
+                        Text("进行AI分析")
+                    }
+                }
             } else {
                 // show app locked screen if user has not authenticated.
                 AppLockedScreen(onAuthRequest = onAuthRequest)
@@ -92,6 +133,7 @@ fun MainScreen(
         }
     }
 }
+
 
 @Composable
 private fun HandleShortcutIntent(intent: Intent, navController: NavController) {
