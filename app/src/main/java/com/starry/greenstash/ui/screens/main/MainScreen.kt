@@ -111,7 +111,7 @@ fun MainScreen(
                     Button(
                         onClick = {
                             val intent = Intent().apply {
-                                setClassName("com.example.diaryapp", "com.example.diaryapp.view.AIActivity")
+                                setClassName("com.ai.financeWise", "com.ai.financeWise.MainActivity")
                                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                             }
                             try {
