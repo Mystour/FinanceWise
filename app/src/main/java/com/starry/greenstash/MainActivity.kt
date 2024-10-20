@@ -39,6 +39,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.ViewModelProvider
+import com.starry.greenstash.database.core.AppDatabase
 import com.starry.greenstash.ui.screens.main.MainScreen
 import com.starry.greenstash.ui.screens.settings.SettingsViewModel
 import com.starry.greenstash.ui.theme.GreenStashTheme
@@ -57,11 +58,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
 
+    private lateinit var appDatabase: AppDatabase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         settingsViewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
         mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
+
+        // 初始化 appDatabase
+        appDatabase = AppDatabase.getInstance(this)
 
         // show splash screen until we figure out start nav destination.
         installSplashScreen().setKeepOnScreenCondition {
@@ -145,11 +151,13 @@ class MainActivity : AppCompatActivity() {
                     currentThemeMode = settingsViewModel.getCurrentTheme(),
                     onAuthRequest = {
                         biometricPrompt.authenticate(promptInfo)
-                    }
+                    },
+                    appDatabase = appDatabase // 传递 appDatabase 参数
                 )
             }
         }
     }
+
 
     private fun updateShortcuts() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {

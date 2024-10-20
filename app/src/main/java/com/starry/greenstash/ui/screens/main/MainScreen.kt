@@ -54,6 +54,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.starry.greenstash.MainActivity
 import com.starry.greenstash.MainViewModel
+import com.starry.greenstash.database.core.AppDatabase
 import com.starry.greenstash.ui.navigation.NormalScreens
 import com.starry.greenstash.ui.navigation.NavGraph
 import com.starry.greenstash.ui.navigation.Screen
@@ -72,6 +73,7 @@ fun MainScreen(
     startDestination: Screen,
     currentThemeMode: ThemeMode,
     onAuthRequest: () -> Unit,
+    appDatabase: AppDatabase,
 ) {
     // fix status bar icon color in dark mode.
     AdjustEdgeToEdge(activity = activity, themeState = currentThemeMode)
@@ -100,32 +102,8 @@ fun MainScreen(
                     HandleShortcutIntent(activity.intent, navController)
                 }
 
-                // 添加按钮进行AI分析
-                Spacer(modifier = Modifier.height(16.dp))
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.BottomStart
-                ) {
-                    Button(
-                        onClick = {
-                            val intent = Intent().apply {
-                                setClassName("com.ai.financeWise", "com.ai.financeWise.MainActivity")
-                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            }
-                            try {
-                                activity.startActivity(intent)
-                            } catch (e: ActivityNotFoundException) {
-                                e.printStackTrace()
-                                // 提示用户目标应用未安装或无法找到
-                                Toast.makeText(activity, "目标应用未安装或无法找到", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    ) {
-                        Text("进行AI分析")
-                    }
-                }
+                // 调用发送数据库数据的按钮
+                SendDatabaseDataButton(activity, appDatabase)
             } else {
                 // show app locked screen if user has not authenticated.
                 AppLockedScreen(onAuthRequest = onAuthRequest)

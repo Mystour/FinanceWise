@@ -23,7 +23,9 @@ import com.starry.greenstash.database.core.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.Serializable
+
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -48,6 +50,8 @@ fun SendDatabaseDataButton(activity: Activity, appDatabase: AppDatabase) {
                     // 查询数据库
                     val goals = appDatabase.getGoalDao().getAllGoals()
 
+                    val json = Json.encodeToString(goals)
+
                     // 切换到主线程以启动活动
                     withContext(Dispatchers.Main) {
                         // 构建意图
@@ -56,7 +60,7 @@ fun SendDatabaseDataButton(activity: Activity, appDatabase: AppDatabase) {
                             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
                             // 将数据放入意图
-                            putExtra("goals", ArrayList(goals))
+                            putExtra("goals", json)
                         }
 
                         try {
