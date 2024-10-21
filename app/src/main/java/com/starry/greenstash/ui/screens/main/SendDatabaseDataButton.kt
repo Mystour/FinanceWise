@@ -48,9 +48,12 @@ fun SendDatabaseDataButton(activity: Activity, appDatabase: AppDatabase) {
             onClick = {
                 coroutineScope.launch(Dispatchers.IO) {
                     // 查询数据库
-                    val goals = appDatabase.getGoalDao().getAllGoals()
+                    val goalsWithTransactions = appDatabase.getGoalDao().getAllGoals()
 
-                    val json = Json.encodeToString(goals)
+                    val jsonGoalsWithTransactions = Json.encodeToString(goalsWithTransactions)
+                    println("JSON: $jsonGoalsWithTransactions")
+
+
 
                     // 切换到主线程以启动活动
                     withContext(Dispatchers.Main) {
@@ -60,7 +63,7 @@ fun SendDatabaseDataButton(activity: Activity, appDatabase: AppDatabase) {
                             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
                             // 将数据放入意图
-                            putExtra("goals", json)
+                            putExtra("goals", jsonGoalsWithTransactions)
                         }
 
                         try {
