@@ -52,6 +52,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.net.URLEncoder
 import javax.inject.Inject
 
 
@@ -139,12 +140,13 @@ class MainViewModel @Inject constructor(
             try {
                 val goalsWithTransactions = appDatabase.getGoalDao().getAllGoals()
                 val jsonGoalsWithTransactions = Json.encodeToString(goalsWithTransactions)
-                println("Fetching and setting params... $jsonGoalsWithTransactions")
+                val encodedGoalsJson = URLEncoder.encode(jsonGoalsWithTransactions , "UTF-8")
+                println("Fetching and setting params... $encodedGoalsJson")
                 withContext(Dispatchers.Main) {
                     println("2 Fetching and setting params...")
-                    setBillAnalyzerParams(jsonGoalsWithTransactions)
+                    setBillAnalyzerParams(encodedGoalsJson)
                 }
-                println("Fetched and set params: $jsonGoalsWithTransactions")
+                println("Fetched and set params: $encodedGoalsJson")
             } catch (e: Exception) {
                 e.printStackTrace()
                 println("Error fetching and setting params: ${e.message}")
