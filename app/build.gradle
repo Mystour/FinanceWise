@@ -87,14 +87,15 @@ dependencies {
     // Android core components.
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.6'
-    implementation 'androidx.activity:activity-compose:1.9.2'
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.8.6"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6"
-    implementation "androidx.navigation:navigation-compose:2.8.2"
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    //noinspection GradleDependency
+    implementation 'androidx.activity:activity-compose:1.9.3'
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation libs.androidx.lifecycle.lifecycle.viewmodel.compose9
+    implementation "androidx.navigation:navigation-compose:2.8.3"
     // Jetpack compose.
-    implementation "androidx.compose.ui:ui"
-    implementation "androidx.compose.ui:ui-tooling-preview"
+    implementation(libs.androidx.compose.ui.ui5)
+    implementation(libs.androidx.compose.ui.ui.tooling.preview5)
     implementation(libs.androidx.material)
     implementation "androidx.compose.animation:animation"
     implementation "androidx.compose.runtime:runtime-livedata"
