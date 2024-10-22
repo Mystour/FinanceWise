@@ -37,6 +37,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.starry.greenstash.database.core.AppDatabase
 import com.starry.greenstash.database.goal.GoalDao
 import com.starry.greenstash.other.WelcomeDataStore
 import com.starry.greenstash.reminder.ReminderManager
@@ -46,16 +47,20 @@ import com.starry.greenstash.ui.navigation.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
+
 
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val welcomeDataStore: WelcomeDataStore,
     private val goalDao: GoalDao,
-    private val reminderManager: ReminderManager
+    private val reminderManager: ReminderManager,
 ) : ViewModel() {
     /**
      * Store app lock status to avoid asking for authentication
@@ -70,6 +75,9 @@ class MainViewModel @Inject constructor(
     private val _startDestination: MutableState<Screen> =
         mutableStateOf(NormalScreens.WelcomeScreen)
     val startDestination: State<Screen> = _startDestination
+
+    // 新增的参数管理
+    private val _billAnalyzerParams: MutableState<String?> = mutableStateOf(null)
 
     companion object {
         // Must be same as the one in AndroidManifest.xml
@@ -106,6 +114,25 @@ class MainViewModel @Inject constructor(
     fun refreshReminders() {
         viewModelScope.launch(Dispatchers.IO) {
             reminderManager.checkAndScheduleReminders(goalDao.getAllGoals())
+        }
+    }
+
+    val billAnalyzerParams: State<String?>
+        get() = _billAnalyzerParams
+
+    // 设置 BillAnalyzerScreen 的参数
+    fun setBillAnalyzerParams(params: String) {
+        _billAnalyzerParams.value = params
+    }
+
+    // 获取数据库中的数据并设置参数
+    fun fetchAndSetBillAnalyzerParams(appDatabase: AppDatabase) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val goalsWithTransactions = appDatabase.getGoalDao().getAllGoals()
+            val jsonGoalsWithTransactions = Json.encodeToString(goalsWithTransactions)
+            withContext(Dispatchers.Main) {
+                setBillAnalyzerParams(jsonGoalsWithTransactions)
+            }
         }
     }
 

@@ -152,7 +152,8 @@ class MainActivity : AppCompatActivity() {
                     onAuthRequest = {
                         biometricPrompt.authenticate(promptInfo)
                     },
-                    appDatabase = appDatabase // 传递 appDatabase 参数
+                    appDatabase = appDatabase,  // 传递 appDatabase 参数
+                    viewModel = mainViewModel
                 )
             }
         }

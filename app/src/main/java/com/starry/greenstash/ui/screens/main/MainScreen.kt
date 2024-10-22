@@ -74,6 +74,7 @@ fun MainScreen(
     currentThemeMode: ThemeMode,
     onAuthRequest: () -> Unit,
     appDatabase: AppDatabase,
+    viewModel: MainViewModel
 ) {
     // fix status bar icon color in dark mode.
     AdjustEdgeToEdge(activity = activity, themeState = currentThemeMode)
@@ -103,7 +104,7 @@ fun MainScreen(
                 }
 
                 // 调用发送数据库数据的按钮
-                SendDatabaseDataButton(activity, appDatabase)
+                SendDatabaseDataButton(navController, appDatabase, viewModel)
             } else {
                 // show app locked screen if user has not authenticated.
                 AppLockedScreen(onAuthRequest = onAuthRequest)
