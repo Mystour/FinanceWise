@@ -124,9 +124,7 @@ class MainViewModel @Inject constructor(
     // 设置 BillAnalyzerScreen 的参数
     private fun setBillAnalyzerParams(params: String) {
         try {
-            println("Start Setting params: $params")
             _billAnalyzerParams.value = params
-            println("Setting params: $params")
         } catch (e: Exception) {
             e.printStackTrace()
             println("Error in setBillAnalyzerParams: ${e.message}")
@@ -141,9 +139,7 @@ class MainViewModel @Inject constructor(
                 val goalsWithTransactions = appDatabase.getGoalDao().getAllGoals()
                 val jsonGoalsWithTransactions = Json.encodeToString(goalsWithTransactions)
                 val encodedGoalsJson = URLEncoder.encode(jsonGoalsWithTransactions , "UTF-8")
-                println("Fetching and setting params... $encodedGoalsJson")
                 withContext(Dispatchers.Main) {
-                    println("2 Fetching and setting params...")
                     setBillAnalyzerParams(encodedGoalsJson)
                 }
                 println("Fetched and set params: $encodedGoalsJson")
