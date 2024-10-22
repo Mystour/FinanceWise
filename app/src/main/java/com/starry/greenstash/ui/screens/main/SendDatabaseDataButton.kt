@@ -63,11 +63,14 @@ fun SendDatabaseDataButton(
         Button(
             onClick = {
                 coroutineScope.launch {
+                    println("Starting fetchAndSetBillAnalyzerParams")
                     viewModel.fetchAndSetBillAnalyzerParams(appDatabase)
                     val params = viewModel.billAnalyzerParams.value
                     if (params != null) {
+                        println("Params: $params")
                         navController.navigate("billAnalyzerScreen/$params")
                     } else {
+                        println("Params is null")
                         Toast.makeText(Activity(), "无法获取数据", Toast.LENGTH_SHORT).show()
                     }
                 }

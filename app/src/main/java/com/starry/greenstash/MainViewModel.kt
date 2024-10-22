@@ -121,17 +121,33 @@ class MainViewModel @Inject constructor(
         get() = _billAnalyzerParams
 
     // 设置 BillAnalyzerScreen 的参数
-    fun setBillAnalyzerParams(params: String) {
-        _billAnalyzerParams.value = params
+    private fun setBillAnalyzerParams(params: String) {
+        try {
+            println("Start Setting params: $params")
+            _billAnalyzerParams.value = params
+            println("Setting params: $params")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            println("Error in setBillAnalyzerParams: ${e.message}")
+        }
     }
 
-    // 获取数据库中的数据并设置参数
-    fun fetchAndSetBillAnalyzerParams(appDatabase: AppDatabase) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val goalsWithTransactions = appDatabase.getGoalDao().getAllGoals()
-            val jsonGoalsWithTransactions = Json.encodeToString(goalsWithTransactions)
-            withContext(Dispatchers.Main) {
-                setBillAnalyzerParams(jsonGoalsWithTransactions)
+    // 获取数据库中的数据并设置参数，suspend用于避免在主线程中执行数据库操作
+    suspend fun fetchAndSetBillAnalyzerParams(appDatabase: AppDatabase) {
+        withContext(Dispatchers.IO) {
+            println("Starting fetchAndSetBillAnalyzerParams")
+            try {
+                val goalsWithTransactions = appDatabase.getGoalDao().getAllGoals()
+                val jsonGoalsWithTransactions = Json.encodeToString(goalsWithTransactions)
+                println("Fetching and setting params... $jsonGoalsWithTransactions")
+                withContext(Dispatchers.Main) {
+                    println("2 Fetching and setting params...")
+                    setBillAnalyzerParams(jsonGoalsWithTransactions)
+                }
+                println("Fetched and set params: $jsonGoalsWithTransactions")
+            } catch (e: Exception) {
+                e.printStackTrace()
+                println("Error fetching and setting params: ${e.message}")
             }
         }
     }
