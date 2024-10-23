@@ -1,4 +1,4 @@
-package com.starry.greenstash.ui.screens.main
+package com.starry.greenstash.ui.components
 
 import android.app.Activity
 import android.widget.Toast
@@ -16,15 +16,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.starry.greenstash.MainViewModel
 import com.starry.greenstash.database.core.AppDatabase
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 @Composable
 fun SendDatabaseDataButton(
