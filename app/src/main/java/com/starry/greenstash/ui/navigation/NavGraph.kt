@@ -33,7 +33,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.starry.greenstash.ui.screens.analysis.BillAnalyzerScreen
+import com.starry.greenstash.ui.screens.analysis.composables.BillAnalyzerScreen
 import com.starry.greenstash.ui.screens.archive.composables.ArchiveScreen
 import com.starry.greenstash.ui.screens.backups.composables.BackupScreen
 import com.starry.greenstash.ui.screens.dwscreen.composables.DWScreen
