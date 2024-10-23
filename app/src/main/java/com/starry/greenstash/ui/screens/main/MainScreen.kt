@@ -41,8 +41,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.starry.greenstash.MainActivity
 import com.starry.greenstash.MainViewModel
-import com.starry.greenstash.database.core.AppDatabase
-import com.starry.greenstash.ui.components.SendDatabaseDataButton
 import com.starry.greenstash.ui.navigation.NormalScreens
 import com.starry.greenstash.ui.navigation.NavGraph
 import com.starry.greenstash.ui.navigation.Screen
@@ -61,8 +59,6 @@ fun MainScreen(
     startDestination: Screen,
     currentThemeMode: ThemeMode,
     onAuthRequest: () -> Unit,
-    appDatabase: AppDatabase,
-    viewModel: MainViewModel
 ) {
     // fix status bar icon color in dark mode.
     AdjustEdgeToEdge(activity = activity, themeState = currentThemeMode)
@@ -90,9 +86,6 @@ fun MainScreen(
                 if (shouldHandleShortCut.value) {
                     HandleShortcutIntent(activity.intent, navController)
                 }
-
-                // 调用发送数据库数据的按钮
-//                SendDatabaseDataButton(navController, appDatabase, viewModel)
             } else {
                 // show app locked screen if user has not authenticated.
                 AppLockedScreen(onAuthRequest = onAuthRequest)

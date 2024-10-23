@@ -1,6 +1,5 @@
 package com.starry.greenstash.ui.screens.analysis
 
-import android.content.Context
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -9,13 +8,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import com.starry.greenstash.ui.components.BillInput
-import com.starry.greenstash.ui.components.TopAppBar
+import com.starry.greenstash.ui.screens.analysis.composables.BillInput
+import com.starry.greenstash.ui.screens.analysis.composables.TopAppBar
 import com.google.ai.client.generativeai.GenerativeModel
 import io.noties.markwon.Markwon
 import kotlinx.coroutines.launch

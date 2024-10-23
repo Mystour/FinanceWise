@@ -1,4 +1,4 @@
-package com.starry.greenstash.ui.components
+package com.starry.greenstash.ui.screens.analysis.composables
 
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable

@@ -1,4 +1,4 @@
-package com.starry.greenstash.ui.components
+package com.starry.greenstash.ui.screens.home.composables
 
 import android.app.Activity
 import android.widget.Toast
@@ -17,16 +17,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import com.starry.greenstash.MainViewModel
-import com.starry.greenstash.database.core.AppDatabase
 import com.starry.greenstash.ui.screens.home.HomeViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun SendDatabaseDataButton(
     navController: NavController,
-//    appDatabase: AppDatabase,
     viewModel: HomeViewModel
 ) {
     val coroutineScope = rememberCoroutineScope()

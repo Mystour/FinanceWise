@@ -1,4 +1,4 @@
-package com.starry.greenstash.ui.components
+package com.starry.greenstash.ui.screens.analysis.composables
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
