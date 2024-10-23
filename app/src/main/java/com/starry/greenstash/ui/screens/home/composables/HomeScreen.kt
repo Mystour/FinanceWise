@@ -268,7 +268,6 @@ fun HomeScreen(navController: NavController) {
                             )
                         }
 
-//                        SendDatabaseDataButton(navController, appDatabase, viewModel)
                         SendDatabaseDataButton(navController, viewModel)
                     }
                 }

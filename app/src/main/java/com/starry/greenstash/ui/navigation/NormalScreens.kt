@@ -48,6 +48,9 @@ sealed class NormalScreens : Screen() {
     @Serializable
     data object GoalCardStyleScreen
 
+    @Serializable
+    data object VisualFinance : NormalScreens() // Add VisualFinance screen
+
 
     // Goal Achieved Screen
     @Serializable

@@ -45,6 +45,7 @@ import com.starry.greenstash.ui.screens.settings.composables.AboutScreen
 import com.starry.greenstash.ui.screens.settings.composables.GoalCardStyle
 import com.starry.greenstash.ui.screens.settings.composables.OSLScreen
 import com.starry.greenstash.ui.screens.settings.composables.SettingsScreen
+import com.starry.greenstash.ui.screens.visualfinance.composables.VisualScreen
 import com.starry.greenstash.ui.screens.welcome.composables.WelcomeScreen
 
 
@@ -177,6 +178,16 @@ fun NavGraph(
             popExitTransition = { popExitTransition() },
         ) {
             AboutScreen(navController = navController)
+        }
+
+        // Visual Finance Screen
+        composable<NormalScreens.VisualFinance>(
+            enterTransition = { enterTransition() },
+            exitTransition = { exitTransition() },
+            popEnterTransition = { popEnterTransition() },
+            popExitTransition = { popExitTransition() }
+        ) {
+            VisualScreen() // 调用 VisualScreen
         }
 
         /** Bill Analyzer Screen */
