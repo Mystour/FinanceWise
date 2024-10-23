@@ -18,11 +18,7 @@ import kotlinx.coroutines.launch
 import com.starry.greenstash.BuildConfig
 import com.google.gson.Gson
 
-//import com.ai.financeWise.data.AppDatabase
-//import com.ai.financeWise.data.Bill
-
 @Composable
-//fun BillAnalyzerScreen(appDatabase: AppDatabase, goals: String?) {
 fun BillAnalyzerScreen(goals: String?) {
     val context = LocalContext.current // 获取 Context
     val coroutineScope = rememberCoroutineScope()
