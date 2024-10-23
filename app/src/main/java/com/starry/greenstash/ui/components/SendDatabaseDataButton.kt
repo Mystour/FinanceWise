@@ -16,16 +16,18 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.starry.greenstash.MainViewModel
 import com.starry.greenstash.database.core.AppDatabase
+import com.starry.greenstash.ui.screens.home.HomeViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun SendDatabaseDataButton(
-    navController: NavHostController,
-    appDatabase: AppDatabase,
-    viewModel: MainViewModel
+    navController: NavController,
+//    appDatabase: AppDatabase,
+    viewModel: HomeViewModel
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -36,30 +38,11 @@ fun SendDatabaseDataButton(
             .padding(16.dp),
         contentAlignment = Alignment.BottomStart
     ) {
-//        Button(
-//            onClick = {
-//                coroutineScope.launch(Dispatchers.IO) {
-//                    // 查询数据库
-//                    val goalsWithTransactions = appDatabase.getGoalDao().getAllGoals()
-//
-//                    val jsonGoalsWithTransactions = Json.encodeToString(goalsWithTransactions)
-//                    println("JSON: $jsonGoalsWithTransactions")
-//
-//                    // 切换到主线程以导航
-//                    withContext(Dispatchers.Main) {
-//                        // 导航到 BillAnalyzerScreen 并传递数据
-//                        navController.navigate("billAnalyzerScreen/${jsonGoalsWithTransactions}")
-//                    }
-//                }
-//            }
-//        ) {
-//            Text("进行AI分析")
-//        }
         Button(
             onClick = {
                 coroutineScope.launch {
                     println("Starting fetchAndSetBillAnalyzerParams")
-                    viewModel.fetchAndSetBillAnalyzerParams(appDatabase)
+                    viewModel.fetchAndSetBillAnalyzerParams()
                     val params = viewModel.billAnalyzerParams.value
                     if (params != null) {
                         println("Params: $params")

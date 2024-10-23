@@ -78,7 +78,7 @@ class MainViewModel @Inject constructor(
     val startDestination: State<Screen> = _startDestination
 
     // 新增的参数管理
-    private val _billAnalyzerParams: MutableState<String?> = mutableStateOf(null)
+//    private val _billAnalyzerParams: MutableState<String?> = mutableStateOf(null)
 
     companion object {
         // Must be same as the one in AndroidManifest.xml
@@ -118,37 +118,37 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    val billAnalyzerParams: State<String?>
-        get() = _billAnalyzerParams
-
-    // 设置 BillAnalyzerScreen 的参数
-    private fun setBillAnalyzerParams(params: String) {
-        try {
-            _billAnalyzerParams.value = params
-        } catch (e: Exception) {
-            e.printStackTrace()
-            println("Error in setBillAnalyzerParams: ${e.message}")
-        }
-    }
-
-    // 获取数据库中的数据并设置参数，suspend用于避免在主线程中执行数据库操作
-    suspend fun fetchAndSetBillAnalyzerParams(appDatabase: AppDatabase) {
-        withContext(Dispatchers.IO) {
-            println("Starting fetchAndSetBillAnalyzerParams")
-            try {
-                val goalsWithTransactions = appDatabase.getGoalDao().getAllGoals()
-                val jsonGoalsWithTransactions = Json.encodeToString(goalsWithTransactions)
-                val encodedGoalsJson = URLEncoder.encode(jsonGoalsWithTransactions , "UTF-8")
-                withContext(Dispatchers.Main) {
-                    setBillAnalyzerParams(encodedGoalsJson)
-                }
-                println("Fetched and set params: $encodedGoalsJson")
-            } catch (e: Exception) {
-                e.printStackTrace()
-                println("Error fetching and setting params: ${e.message}")
-            }
-        }
-    }
+//    val billAnalyzerParams: State<String?>
+//        get() = _billAnalyzerParams
+//
+//    // 设置 BillAnalyzerScreen 的参数
+//    private fun setBillAnalyzerParams(params: String) {
+//        try {
+//            _billAnalyzerParams.value = params
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//            println("Error in setBillAnalyzerParams: ${e.message}")
+//        }
+//    }
+//
+//    // 获取数据库中的数据并设置参数，suspend用于避免在主线程中执行数据库操作
+//    suspend fun fetchAndSetBillAnalyzerParams(appDatabase: AppDatabase) {
+//        withContext(Dispatchers.IO) {
+//            println("Starting fetchAndSetBillAnalyzerParams")
+//            try {
+//                val goalsWithTransactions = appDatabase.getGoalDao().getAllGoals()
+//                val jsonGoalsWithTransactions = Json.encodeToString(goalsWithTransactions)
+//                val encodedGoalsJson = URLEncoder.encode(jsonGoalsWithTransactions , "UTF-8")
+//                withContext(Dispatchers.Main) {
+//                    setBillAnalyzerParams(encodedGoalsJson)
+//                }
+//                println("Fetched and set params: $encodedGoalsJson")
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//                println("Error fetching and setting params: ${e.message}")
+//            }
+//        }
+//    }
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)
     fun buildDynamicShortcuts(

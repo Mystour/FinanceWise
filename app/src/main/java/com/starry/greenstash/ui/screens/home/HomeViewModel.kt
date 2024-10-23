@@ -31,6 +31,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.starry.greenstash.database.core.AppDatabase
 import com.starry.greenstash.database.goal.Goal
 import com.starry.greenstash.database.goal.GoalDao
 import com.starry.greenstash.reminder.ReminderManager
@@ -41,6 +42,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import java.net.URLEncoder
 import javax.inject.Inject
 
 enum class SearchBarState { OPENED, CLOSED }
@@ -72,6 +77,8 @@ class HomeViewModel @Inject constructor(
     val filterFlowData: State<FilterFlowData> = _filterFlowData
 
     private val filterFlow = MutableStateFlow(filterFlowData.value)
+
+    private val _billAnalyzerParams: MutableState<String?> = mutableStateOf(null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val goalsListFlow = filterFlow.flatMapLatest { ffData ->
@@ -171,6 +178,38 @@ class HomeViewModel @Inject constructor(
     fun onboardingTapTargetsShown() {
         preferenceUtil.putBoolean(PreferenceUtil.HOME_SCREEN_ONBOARDING_BOOL, false)
         _showOnboardingTapTargets.value = false
+    }
+
+    val billAnalyzerParams: State<String?>
+        get() = _billAnalyzerParams
+
+    // 设置 BillAnalyzerScreen 的参数
+    private fun setBillAnalyzerParams(params: String) {
+        try {
+            _billAnalyzerParams.value = params
+        } catch (e: Exception) {
+            e.printStackTrace()
+            println("Error in setBillAnalyzerParams: ${e.message}")
+        }
+    }
+
+    // 获取数据库中的数据并设置参数，suspend用于避免在主线程中执行数据库操作
+    suspend fun fetchAndSetBillAnalyzerParams() {
+        withContext(Dispatchers.IO) {
+            println("Starting fetchAndSetBillAnalyzerParams")
+            try {
+                val goalsWithTransactions = goalDao.getAllGoals()
+                val jsonGoalsWithTransactions = Json.encodeToString(goalsWithTransactions)
+                val encodedGoalsJson = URLEncoder.encode(jsonGoalsWithTransactions , "UTF-8")
+                withContext(Dispatchers.Main) {
+                    setBillAnalyzerParams(encodedGoalsJson)
+                }
+                println("Fetched and set params: $encodedGoalsJson")
+            } catch (e: Exception) {
+                e.printStackTrace()
+                println("Error fetching and setting params: ${e.message}")
+            }
+        }
     }
 
 }
