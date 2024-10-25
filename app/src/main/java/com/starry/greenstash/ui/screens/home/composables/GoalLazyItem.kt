@@ -129,6 +129,16 @@ fun GoalLazyColumnItem(
                         )
                     }
                 },
+
+                onAnalyzeBillClick = {
+                    localView.weakHapticFeedback()
+                    navController.navigate(
+                        NormalScreens.VisualFinance(
+                            goalId = item.goal.goalId.toString()
+                        )
+                    )
+                },
+
                 onInfoClicked = {
                     localView.weakHapticFeedback()
                     navController.navigate(
@@ -212,6 +222,14 @@ fun GoalLazyColumnItem(
                             )
                         )
                     }
+                },
+                onAnalyzeBillClick = {
+                    localView.weakHapticFeedback()
+                    navController.navigate(
+                        NormalScreens.VisualFinance(
+                            goalId = item.goal.goalId.toString()
+                        )
+                    )
                 },
                 onInfoClicked = {
                     localView.weakHapticFeedback()

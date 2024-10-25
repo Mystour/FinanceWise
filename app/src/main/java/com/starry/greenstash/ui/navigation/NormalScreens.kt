@@ -40,6 +40,9 @@ sealed class NormalScreens : Screen() {
     data class GoalInfoScreen(val goalId: String)
 
     @Serializable
+    data class VisualFinance(val goalId: String) // Add VisualFinance screen
+
+    @Serializable
     data object AboutScreen
 
     @Serializable
@@ -47,9 +50,6 @@ sealed class NormalScreens : Screen() {
 
     @Serializable
     data object GoalCardStyleScreen
-
-    @Serializable
-    data object VisualFinance : NormalScreens() // Add VisualFinance screen
 
 
     // Goal Achieved Screen

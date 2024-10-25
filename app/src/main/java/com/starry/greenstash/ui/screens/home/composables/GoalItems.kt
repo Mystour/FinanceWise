@@ -168,82 +168,90 @@ fun GoalItemClassic(
             }
 
             /** Goal Buttons */
-            Row(modifier = Modifier.padding(3.dp)) {
-                if (isGoalCompleted) {
-                    TextButton(
-                        onClick = { onArchivedClicked() },
-                        modifier = Modifier.padding(end = 2.dp)
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.archive_button).uppercase(),
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontFamily = greenstashFont
-                        )
-                    }
-                } else {
-                    TextButton(
-                        onClick = { onDepositClicked() },
-                        modifier = Modifier.padding(end = 2.dp)
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.deposit_button).uppercase(),
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontFamily = greenstashFont
-                        )
-                    }
-                }
-                TextButton(
-                    onClick = { onWithdrawClicked() },
+            Column(
+                modifier = Modifier.padding(3.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically // 垂直居中对齐
                 ) {
-                    Text(
-                        text = stringResource(id = R.string.withdraw_button).uppercase(),
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontFamily = greenstashFont
-                    )
+                    if (isGoalCompleted) {
+                        TextButton(
+                            onClick = { onArchivedClicked() },
+                            modifier = Modifier.padding(end = 2.dp)
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.archive_button).uppercase(),
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontFamily = greenstashFont
+                            )
+                        }
+                    } else {
+                        TextButton(
+                            onClick = { onDepositClicked() },
+                            modifier = Modifier.padding(end = 2.dp)
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.deposit_button).uppercase(),
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontFamily = greenstashFont
+                            )
+                        }
+                    }
+                    TextButton(
+                        onClick = { onWithdrawClicked() },
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.withdraw_button).uppercase(),
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontFamily = greenstashFont
+                        )
+                    }
+
+                    TextButton(onClick = onAnalyzeBillClick) { // 使用 TextButton
+                        Text(
+                            text = "识别账单",
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontFamily = greenstashFont
+                        )
+                    }
                 }
 
-                TextButton(onClick = onAnalyzeBillClick) { // 使用 TextButton
-                    Text(
-                        text = "识别账单",
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontFamily = greenstashFont
-                    )
-                }
+                Spacer(modifier = Modifier.height(8.dp)) // 添加一些垂直间距
 
-                Spacer(
-                    modifier = Modifier
-                        .weight(1f)
-                )
-
-                IconButton(onClick = onInfoClicked) {
-                    Icon(
-                        modifier = Modifier.size(21.dp),
-                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_goal_info),
-                        contentDescription = stringResource(id = R.string.info_button_description),
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-                IconButton(onClick = onEditClicked) {
-                    Icon(
-                        modifier = Modifier.size(21.dp),
-                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_goal_edit),
-                        contentDescription = stringResource(id = R.string.edit_button_description),
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-                IconButton(onClick = onDeleteClicked) {
-                    Icon(
-                        modifier = Modifier.size(21.dp),
-                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_goal_delete),
-                        contentDescription = stringResource(id = R.string.delete_button_description),
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically // 垂直居中对齐
+                ) {
+                    IconButton(onClick = onInfoClicked) {
+                        Icon(
+                            modifier = Modifier.size(21.dp),
+                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_goal_info),
+                            contentDescription = stringResource(id = R.string.info_button_description),
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    IconButton(onClick = onEditClicked) {
+                        Icon(
+                            modifier = Modifier.size(21.dp),
+                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_goal_edit),
+                            contentDescription = stringResource(id = R.string.edit_button_description),
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    IconButton(onClick = onDeleteClicked) {
+                        Icon(
+                            modifier = Modifier.size(21.dp),
+                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_goal_delete),
+                            contentDescription = stringResource(id = R.string.delete_button_description),
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
             }
+
         }
     }
 }
