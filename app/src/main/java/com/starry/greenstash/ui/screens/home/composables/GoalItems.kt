@@ -97,6 +97,7 @@ fun GoalItemClassic(
     isGoalCompleted: Boolean,
     onDepositClicked: () -> Unit,
     onWithdrawClicked: () -> Unit,
+    onAnalyzeBillClick: () -> Unit, // 添加点击事件回调
     onInfoClicked: () -> Unit,
     onEditClicked: () -> Unit,
     onDeleteClicked: () -> Unit,
@@ -204,6 +205,15 @@ fun GoalItemClassic(
                     )
                 }
 
+                TextButton(onClick = onAnalyzeBillClick) { // 使用 TextButton
+                    Text(
+                        text = "识别账单",
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontFamily = greenstashFont
+                    )
+                }
+
                 Spacer(
                     modifier = Modifier
                         .weight(1f)
@@ -250,6 +260,7 @@ fun GoalItemCompact(
     isGoalCompleted: Boolean,
     onDepositClicked: () -> Unit,
     onWithdrawClicked: () -> Unit,
+    onAnalyzeBillClick: () -> Unit,
     onInfoClicked: () -> Unit,
     onEditClicked: () -> Unit,
     onDeleteClicked: () -> Unit,
@@ -441,6 +452,19 @@ fun GoalItemCompact(
                                         tint = MaterialTheme.colorScheme.onSecondaryContainer
                                     )
                                 }
+
+                                TextButton(onClick = onAnalyzeBillClick,
+                                    modifier = Modifier
+                                        .padding(top = 4.dp)) {
+                                    Text(
+                                        text = "识别账单",
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                        fontFamily = greenstashFont,
+                                        fontSize = 10.sp
+                                    )
+                                }
+
                             }
 
                         }
@@ -523,6 +547,7 @@ fun GoalItemsPV() {
             isGoalCompleted = false,
             onDepositClicked = { },
             onWithdrawClicked = { },
+            onAnalyzeBillClick = { },
             onInfoClicked = { },
             onEditClicked = { },
             onDeleteClicked = { },
@@ -540,6 +565,7 @@ fun GoalItemsPV() {
             isGoalCompleted = true,
             onDepositClicked = {},
             onWithdrawClicked = {},
+            onAnalyzeBillClick = {},
             onInfoClicked = {},
             onEditClicked = {},
             onDeleteClicked = {},
