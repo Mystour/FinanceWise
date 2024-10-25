@@ -11,6 +11,7 @@ import com.starry.greenstash.BuildConfig
 import com.google.ai.client.generativeai.GenerativeModel
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
+import timber.log.Timber
 
 class VisualViewModel : ViewModel() {
     private val generativeModel by lazy {
@@ -46,23 +47,26 @@ class VisualViewModel : ViewModel() {
             val analysis = response.text ?: "无法分析图片"
             callback(analysis)
         } catch (e: Exception) {
+            Timber.e(e, "分析图片时发生错误")
             callback("分析出错: ${e.message}")
         }
     }
 
     private fun createAnalysisPrompt(bitmap: Bitmap): String {
-
         val byteArrayOutputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
-        val byteArray = byteArrayOutputStream.toByteArray()
-        val base64Image = Base64.encodeToString(byteArray, Base64.NO_WRAP)
+        try {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+            val byteArray = byteArrayOutputStream.toByteArray()
+            val base64Image = Base64.encodeToString(byteArray, Base64.NO_WRAP)
 
+            return """
+                请分析以下图片的内容，并尽可能详细地描述图片中的物品、场景、人物等信息，并推测图片背后的故事或含义。
 
-        return """
-            请分析以下图片的内容，并尽可能详细地描述图片中的物品、场景、人物等信息，并推测图片背后的故事或含义。
-
-            图片（Base64 编码）：
-            $base64Image 
-        """.trimIndent()
+                图片（Base64 编码）：
+                $base64Image 
+            """.trimIndent()
+        } finally {
+            byteArrayOutputStream.close()
+        }
     }
 }

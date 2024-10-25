@@ -142,6 +142,8 @@ dependencies {
     implementation(libs.markwon.core)
     implementation(libs.gson)
 
+    implementation(libs.timber)
+
     // Oreo back-ports for API 24 (N)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     // Testing components.

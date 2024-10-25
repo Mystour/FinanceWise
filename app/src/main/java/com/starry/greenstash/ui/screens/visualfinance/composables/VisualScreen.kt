@@ -18,10 +18,10 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.starry.greenstash.ui.screens.visualfinance.VisualViewModel
 import com.starry.greenstash.utils.ImageUtils
-import coil.compose.rememberAsyncImagePainter
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,7 +40,6 @@ fun VisualScreen() {
         }
     }
 
-
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
@@ -50,7 +49,6 @@ fun VisualScreen() {
             Toast.makeText(context, "未获得必要的图片访问权限", Toast.LENGTH_SHORT).show()
         }
     }
-
 
     Column(
         modifier = Modifier
@@ -70,17 +68,20 @@ fun VisualScreen() {
             Text("选择图片")
         }
 
-
         displayedImage?.let { bitmap ->  // Display image if available
+            val imagePainter = rememberAsyncImagePainter(
+                model = ImageRequest.Builder(context)
+                    .data(bitmap.asImageBitmap())
+                    .build()
+            )
             Image(
-                painter = rememberAsyncImagePainter(model = bitmap.asImageBitmap()),
+                painter = imagePainter,
                 contentDescription = "Selected Image",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
             )
         }
-
 
         Button(onClick = {
             selectedImage?.let { uri ->
@@ -98,6 +99,5 @@ fun VisualScreen() {
         if (viewModel.analysisResult.isNotEmpty()) {
             Text(viewModel.analysisResult)
         }
-
     }
 }
