@@ -9,7 +9,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.starry.greenstash.BuildConfig
 import com.google.ai.client.generativeai.GenerativeModel
+import com.google.ai.client.generativeai.type.content
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonNull.content
 import java.io.ByteArrayOutputStream
 import timber.log.Timber
 
@@ -42,31 +44,18 @@ class VisualViewModel : ViewModel() {
         callback: (String) -> Unit
     ) {
         try {
-            val prompt = createAnalysisPrompt(bitmap)
-            val response = generativeModel.generateContent(prompt)
+            val prompt = "请分析以下图片的内容，并尽可能详细地描述图片中的物品、场景、人物等信息，并推测图片背后的故事或含义。"
+            Timber.d("Generated prompt: $prompt")
+            val response = generativeModel.generateContent(content { image(bitmap); text(prompt) })
+            Timber.d("Received response: $response")
             val analysis = response.text ?: "无法分析图片"
             callback(analysis)
         } catch (e: Exception) {
             Timber.e(e, "分析图片时发生错误")
+            Timber.e("Error details: ${e.localizedMessage}")
+            Timber.e("Stack trace: ${e.stackTraceToString()}")
             callback("分析出错: ${e.message}")
         }
     }
 
-    private fun createAnalysisPrompt(bitmap: Bitmap): String {
-        val byteArrayOutputStream = ByteArrayOutputStream()
-        try {
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
-            val byteArray = byteArrayOutputStream.toByteArray()
-            val base64Image = Base64.encodeToString(byteArray, Base64.NO_WRAP)
-
-            return """
-                请分析以下图片的内容，并尽可能详细地描述图片中的物品、场景、人物等信息，并推测图片背后的故事或含义。
-
-                图片（Base64 编码）：
-                $base64Image 
-            """.trimIndent()
-        } finally {
-            byteArrayOutputStream.close()
-        }
-    }
 }
