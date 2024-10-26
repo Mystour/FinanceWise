@@ -69,13 +69,8 @@ fun VisualScreen() {
         }
 
         displayedImage?.let { bitmap ->  // Display image if available
-            val imagePainter = rememberAsyncImagePainter(
-                model = ImageRequest.Builder(context)
-                    .data(bitmap.asImageBitmap())
-                    .build()
-            )
             Image(
-                painter = imagePainter,
+                bitmap = bitmap.asImageBitmap(), // 直接使用 bitmap.asImageBitmap()
                 contentDescription = "Selected Image",
                 modifier = Modifier
                     .fillMaxWidth()
