@@ -19,7 +19,7 @@ import io.noties.markwon.Markwon
 fun BillAnalyzerScreen(goals: String?) {
     val viewModel: BillAnalyzerViewModel = viewModel()
     val context = LocalContext.current // 获取 Context
-    val coroutineScope = rememberCoroutineScope()
+    rememberCoroutineScope()
 
     LaunchedEffect(goals) {
         viewModel.initializeBillText(goals)

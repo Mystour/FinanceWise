@@ -1,18 +1,15 @@
 package com.starry.greenstash.ui.screens.visualfinance
 
 import android.graphics.Bitmap
-import android.util.Base64
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.starry.greenstash.BuildConfig
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.content
+import com.starry.greenstash.BuildConfig
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.JsonNull.content
-import java.io.ByteArrayOutputStream
 import timber.log.Timber
 
 class VisualViewModel : ViewModel() {

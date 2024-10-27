@@ -79,10 +79,13 @@ class BillAnalyzerViewModel : ViewModel() {
         callback: (String) -> Unit
     ) {
         try {
-            val prompt = createAnalysisPrompt(billText) // 使用格式化后的账单文本创建提示词
-            val response = generativeModel.generateContent(prompt)
-            val analysis = response.text ?: "无法分析账单"
-            callback(analysis)
+            val prompt = createAnalysisPrompt(billText)
+            val response = generativeModel.generateContentStream(prompt)  // 使用流式 API 来实现分片返回
+            var analysis = ""
+            response.collect { chunk ->
+                analysis += chunk.text
+                callback(analysis) // 实时更新 analysisResult
+            }
         } catch (e: Exception) {
             callback("分析出错: ${e.message}")
         }
