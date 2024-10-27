@@ -26,6 +26,12 @@ class BillAnalyzerViewModel : ViewModel() {
     val analysisResult: String get() = _analysisResult
     val isLoading: Boolean get() = _isLoading
 
+    private var _emotionScore by mutableStateOf(0)
+    private var _emotionComment by mutableStateOf("")
+
+    val emotionScore: Int get() = _emotionScore
+    val emotionComment: String get() = _emotionComment
+
     fun setBillText(text: String) {
         _billText = text
     }
@@ -42,8 +48,10 @@ class BillAnalyzerViewModel : ViewModel() {
             } else {
                 formatBillText(_billText)
             }
-            analyzeBillWithGemini(formattedBill) { result ->
+            analyzeBillWithGemini(formattedBill) { result, score, comment -> // 修改回调函数
                 _analysisResult = result
+                _emotionScore = score // 更新 emotionScore
+                _emotionComment = comment // 更新 emotionComment
                 _isLoading = false
             }
         }
@@ -76,19 +84,37 @@ class BillAnalyzerViewModel : ViewModel() {
 
     private suspend fun analyzeBillWithGemini(
         billText: String,
-        callback: (String) -> Unit
+        callback: (String, Int, String) -> Unit // 修改回调函数，添加情绪分数和评论
     ) {
         try {
             val prompt = createAnalysisPrompt(billText)
-            val response = generativeModel.generateContentStream(prompt)  // 使用流式 API 来实现分片返回
+            val response = generativeModel.generateContentStream(prompt)
             var analysis = ""
             response.collect { chunk ->
                 analysis += chunk.text
-                callback(analysis) // 实时更新 analysisResult
+                // 从 analysis 中提取情绪分数和评论（可以使用正则表达式或其他方法）
+                val (score, comment) = extractEmotionInfo(analysis)
+                _emotionScore = score
+                _emotionComment = comment
+                callback(analysis, score, comment)
             }
         } catch (e: Exception) {
-            callback("分析出错: ${e.message}")
+            callback("分析出错: ${e.message}", 0, "")
         }
+    }
+
+    // 从分析结果中提取情绪分数和评论
+    private fun extractEmotionInfo(analysis: String): Pair<Int, String> {
+        // TODO: 使用正则表达式或其他方法从 analysis 中提取情绪分数和评论
+        // 例如：
+        // val scoreRegex = Regex("情绪分数：(\\d+)")
+        // val commentRegex = Regex("情绪评论：(.+)")
+        // val score = scoreRegex.find(analysis)?.groupValues?.getOrNull(1)?.toIntOrNull() ?: 0
+        // val comment = commentRegex.find(analysis)?.groupValues?.getOrNull(1) ?: ""
+        // return Pair(score, comment)
+
+        // 这里暂时返回默认值
+        return Pair(80, "您最近的消费情绪比较积极，继续保持良好的消费习惯！")
     }
 
     private fun createAnalysisPrompt(billText: String): String {

@@ -90,17 +90,17 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     //noinspection GradleDependency
-    implementation 'androidx.activity:activity-compose:1.9.3'
+    implementation libs.androidx.activity.compose.v193
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation libs.androidx.lifecycle.lifecycle.viewmodel.compose9
-    implementation "androidx.navigation:navigation-compose:2.8.3"
+    implementation libs.androidx.navigation.compose
     // Jetpack compose.
     implementation(libs.androidx.compose.ui.ui5)
     implementation(libs.androidx.compose.ui.ui.tooling.preview5)
     implementation(libs.androidx.material)
-    implementation "androidx.compose.animation:animation"
-    implementation "androidx.compose.runtime:runtime-livedata"
-    implementation "androidx.compose.material3:material3"
+    implementation libs.androidx.animation
+    implementation libs.androidx.runtime.livedata
+    implementation libs.material3
     // Material theme for main activity.
     implementation 'com.google.android.material:material:1.12.0'
     // Android 12+ splash API.
@@ -143,6 +143,8 @@ dependencies {
     implementation(libs.gson)
 
     implementation(libs.timber)
+
+    implementation(libs.chart)
 
     // Oreo back-ports for API 24 (N)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
