@@ -54,22 +54,28 @@ fun BillAnalyzerScreen(goals: String?) {
 
             if (viewModel.isLoading) {
                 CircularProgressIndicator()
+            } else {
+                // 分析结束后才显示图表和评论
+                if (viewModel.analysisResult.isNotBlank()) { // 检查 analysisResult 是否为空
+                    EmotionChart(emotionScore = viewModel.emotionScore)
+                    Text(text = viewModel.emotionComment)
+                }
+
+                // 使用 Markwon 渲染 Markdown 文本
+                val markwon = Markwon.create(context)
+                val spanned = markwon.toMarkdown(viewModel.analysisResult)
+
+                // 使用 AnnotatedString 显示 Markdown 内容，并自定义样式
+                val annotatedString = buildAnnotatedString {
+                    append(spanned)
+                    // 可以在这里添加更多自定义样式，例如标题加粗等
+                }
+
+                Text(
+                    text = annotatedString,
+                    modifier = Modifier.padding(16.dp)
+                )
             }
-
-            // 使用 Markwon 渲染 Markdown 文本
-            val markwon = Markwon.create(context)
-            val spanned = markwon.toMarkdown(viewModel.analysisResult)
-
-            // 使用 AnnotatedString 显示 Markdown 内容，并自定义样式
-            val annotatedString = buildAnnotatedString {
-                append(spanned)
-                // 可以在这里添加更多自定义样式，例如标题加粗等
-            }
-
-            Text(
-                text = annotatedString,
-                modifier = Modifier.padding(16.dp)
-            )
         }
     }
 }
