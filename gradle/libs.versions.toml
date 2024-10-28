@@ -1,9 +1,17 @@
 [versions]
+aboutlibrariesCompose = "11.1.3"
 activityComposeVersion = "1.9.3"
 agp = "8.6.1"
+biometric = "1.1.0"
 calendar = "1.3.0"
+coilCompose = "2.7.0"
 composeBomVersion = "2024.10.00"
 core = "1.3.0"
+coreSplashscreen = "1.0.1"
+coreVersion = "1.1.2"
+customactivityoncrash = "2.4.0"
+datastorePreferences = "1.1.1"
+dateTime = "1.3.0"
 desugar_jdk_libs = "2.1.2"
 hiltAndroid = "2.52"
 hiltNavigationCompose = "1.2.0"
@@ -20,36 +28,50 @@ generativeai = "0.9.0"
 constraintlayout = "2.1.4"
 appcompat = "1.7.0"
 googleAndroidLibrariesMapsplatformSecretsGradlePlugin = "2.0.1"
+lottieCompose = "6.4.0"
 markwon = "4.6.2"
+materialIconsExtended = "1.7.4"
+materialVersion = "1.12.0"
 navigationCompose = "2.8.3"
 roomCommon = "2.6.1"
 roomKtx = "2.6.1"
 kotlinx-serialization = "1.7.3"
 gson = "2.10.1"
 compose = "1.7.4"  # 请根据实际需要选择合适的版本
+roomTesting = "2.6.1"
 timber = "5.0.1"
 chart = "v3.1.0"
 material = "1.7.4"
 material3 = "1.3.0"
 
 [libraries]
+aboutlibraries-compose = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutlibrariesCompose" }
+aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutlibrariesCompose" }
 androidx-activity-compose-v193 = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
 androidx-animation = { module = "androidx.compose.animation:animation" }
+androidx-biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
 androidx-compose-bom-v20240902 = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
 androidx-compose-ui-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose" }
 androidx-compose-ui-ui-tooling-preview5 = { module = "androidx.compose.ui:ui-tooling-preview" }
 androidx-compose-ui-ui5 = { module = "androidx.compose.ui:ui" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltCompiler" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-lifecycle-lifecycle-viewmodel-compose9 = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
 androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-material = { module = "androidx.compose.material:material", version.ref = "material" }
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
+androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "roomTesting" }
 androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 calendar = { module = "com.maxkeppeler.sheets-compose-dialogs:calendar", version.ref = "calendar" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 core = { module = "com.maxkeppeler.sheets-compose-dialogs:core", version.ref = "core" }
+customactivityoncrash = { module = "cat.ereza:customactivityoncrash", version.ref = "customactivityoncrash" }
+date-time = { module = "com.maxkeppeler.sheets-compose-dialogs:date-time", version.ref = "dateTime" }
 desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -66,12 +88,15 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 generativeai = { group = "com.google.ai.client.generativeai", name = "generativeai", version.ref = "generativeai" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 markwon-core = { group = "io.noties.markwon", name = "core", version.ref = "markwon" }
 androidx-room-common = { group = "androidx.room", name = "room-common", version.ref = "roomCommon" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+material = { module = "com.google.android.material:material", version.ref = "materialVersion" }
 material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+taptargetcompose-core = { module = "com.pierfrancescosoffritti.taptargetcompose:core", version.ref = "coreVersion" }
 ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
