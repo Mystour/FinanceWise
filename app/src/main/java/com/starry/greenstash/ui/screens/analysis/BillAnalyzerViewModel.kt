@@ -128,8 +128,9 @@ class BillAnalyzerViewModel : ViewModel() {
 
     // 从分析结果中提取情绪分数和评论
     private fun extractEmotionInfo(analysis: String): Pair<Int, String> {
-        val scoreRegex = Pattern.compile("情绪分数：\\s*(\\d+)", Pattern.DOTALL or Pattern.MULTILINE)
-        val commentRegex = Pattern.compile("情绪评论：\\s*(.+?)(?=\\n\\*|\\n\\n|\\n$)", Pattern.DOTALL or Pattern.MULTILINE)
+        val scoreRegex = Pattern.compile("情绪分数\\D*(\\d+)", Pattern.DOTALL or Pattern.MULTILINE)
+        val commentRegex = Pattern.compile("情绪评论\\s*(.*?)(?=\\n\\*|\\n\\n|\\n$|\\.\\s*|\\。\\s*)", Pattern.DOTALL or Pattern.MULTILINE)
+
 
         val scoreMatcher = scoreRegex.matcher(analysis)
         val commentMatcher = commentRegex.matcher(analysis)
@@ -143,7 +144,7 @@ class BillAnalyzerViewModel : ViewModel() {
         val comment = if (commentMatcher.find()) {
             commentMatcher.group(1)?.replace("*", "") ?: ""
         } else {
-            ""
+            "你最近的情绪状态可能处于**轻微焦虑**的状态"
         }
 
         // 添加日志输出以便调试

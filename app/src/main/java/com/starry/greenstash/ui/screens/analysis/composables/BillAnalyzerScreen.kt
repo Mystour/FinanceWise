@@ -86,7 +86,7 @@ fun BillAnalyzerScreen(goals: String?, viewModel: BillAnalyzerViewModel = viewMo
                         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                     ) {
                        Text(
-                           text = "$emotionScore 分： $cleanedComment",
+                           text = "$emotionScore 分 $cleanedComment",
                            style = MaterialTheme.typography.bodyMedium,
                            textAlign = TextAlign.Justify,
                            modifier = Modifier.padding(16.dp)
