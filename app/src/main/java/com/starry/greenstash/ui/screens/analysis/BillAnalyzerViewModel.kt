@@ -1,13 +1,10 @@
 package com.starry.greenstash.ui.screens.analysis
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.ai.client.generativeai.GenerativeModel
-import com.starry.greenstash.BuildConfig
 import com.google.gson.Gson
+import com.starry.greenstash.BuildConfig
 import kotlinx.coroutines.launch
 
 class BillAnalyzerViewModel : ViewModel() {
@@ -115,7 +112,7 @@ class BillAnalyzerViewModel : ViewModel() {
             response.collect { chunk ->
                 analysis += chunk.text
                 // 从 analysis 中提取情绪分数和评论（可以使用正则表达式或其他方法）
-                val (score, comment) = extractEmotionInfo(analysis)
+                val (score, comment) = extractEmotionInfo()
                 _emotionScore = score
                 _emotionComment = comment
                 callback(analysis, score, comment)
@@ -126,7 +123,7 @@ class BillAnalyzerViewModel : ViewModel() {
     }
 
     // 从分析结果中提取情绪分数和评论
-    private fun extractEmotionInfo(analysis: String): Pair<Int, String> {
+    private fun extractEmotionInfo(): Pair<Int, String> {
         // TODO: 使用正则表达式或其他方法从 analysis 中提取情绪分数和评论
         // 例如：
         // val scoreRegex = Regex("情绪分数：(\\d+)")
