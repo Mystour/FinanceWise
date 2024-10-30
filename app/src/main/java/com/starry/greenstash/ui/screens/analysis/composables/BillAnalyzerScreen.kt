@@ -11,13 +11,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.tooling.preview.Preview
 import com.starry.greenstash.ui.screens.analysis.BillAnalyzerViewModel
 import io.noties.markwon.Markwon
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BillAnalyzerScreen(goals: String?) {
-    val viewModel: BillAnalyzerViewModel = viewModel()
+fun BillAnalyzerScreen(goals: String?, viewModel: BillAnalyzerViewModel = viewModel()) {
     val context = LocalContext.current // 获取 Context
     rememberCoroutineScope()
 
@@ -79,3 +79,19 @@ fun BillAnalyzerScreen(goals: String?) {
         }
     }
 }
+
+@Preview(showBackground = true, apiLevel = 34)
+@Composable
+fun BillAnalyzerScreenPreview() {
+    // 创建预览专用的 ViewModel 实例
+    val previewViewModel = BillAnalyzerViewModel().apply {
+        setBillText("示例账单文本")
+        setAnalysisResult("分析结果")
+        setEmotionScore(75)
+        setEmotionComment("这是一个情绪评论")
+        setIsLoading(false)
+    }
+
+    BillAnalyzerScreen(goals = "示例账单文本", viewModel = previewViewModel)
+}
+

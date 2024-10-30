@@ -18,22 +18,44 @@ class BillAnalyzerViewModel : ViewModel() {
         )
     }
 
-    private var _billText by mutableStateOf("")
-    private var _analysisResult by mutableStateOf("")
-    private var _isLoading by mutableStateOf(false)
+    private var _billText = ""
+    val billText: String
+        get() = _billText
 
-    val billText: String get() = _billText
-    val analysisResult: String get() = _analysisResult
-    val isLoading: Boolean get() = _isLoading
+    private var _analysisResult = ""
+    val analysisResult: String
+        get() = _analysisResult
 
-    private var _emotionScore by mutableStateOf(0)
-    private var _emotionComment by mutableStateOf("")
+    private var _emotionScore = 0
+    val emotionScore: Int
+        get() = _emotionScore
 
-    val emotionScore: Int get() = _emotionScore
-    val emotionComment: String get() = _emotionComment
+    private var _emotionComment = ""
+    val emotionComment: String
+        get() = _emotionComment
+
+    private var _isLoading = false
+    val isLoading: Boolean
+        get() = _isLoading
 
     fun setBillText(text: String) {
         _billText = text
+    }
+
+    fun setAnalysisResult(result: String) {
+        _analysisResult = result
+    }
+
+    fun setEmotionScore(score: Int) {
+        _emotionScore = score
+    }
+
+    fun setEmotionComment(comment: String) {
+        _emotionComment = comment
+    }
+
+    fun setIsLoading(isLoading: Boolean) {
+        _isLoading = isLoading
     }
 
     fun initializeBillText(goals: String?) {
