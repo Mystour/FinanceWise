@@ -22,7 +22,7 @@ import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.PercentFormatter
 
 @Composable
-fun EmotionChart(emotionScore: Int) {
+fun EmotionChart(emotionScore: Int, modifier: Modifier = Modifier) {
     val entries = listOf(
         PieEntry(emotionScore.toFloat(), "情绪评分"),
         PieEntry((100 - emotionScore).toFloat(), "") // 补充剩余部分
@@ -33,7 +33,7 @@ fun EmotionChart(emotionScore: Int) {
     )
     val isPreview = LocalInspectionMode.current
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier) {
         AndroidView(
             factory = { context ->
                 createPieChart(context, entries, colors.map { it.toArgb() }, isPreview)
@@ -105,3 +105,4 @@ private fun createPieChart(
 fun EmotionChartPreview() {
     EmotionChart(emotionScore = 75)
 }
+

@@ -57,7 +57,12 @@ fun BillAnalyzerScreen(goals: String?, viewModel: BillAnalyzerViewModel = viewMo
             } else {
                 // 分析结束后才显示图表和评论
                 if (viewModel.analysisResult.isNotBlank()) { // 检查 analysisResult 是否为空
-                    EmotionChart(emotionScore = viewModel.emotionScore)
+                    EmotionChart(
+                        emotionScore = viewModel.emotionScore,
+                        modifier = Modifier
+                            .height(300.dp) // 设置高度为 300dp
+                            .fillMaxWidth() // 占据整个宽度
+                    )
                     Text(text = viewModel.emotionComment)
                 }
 
@@ -80,6 +85,7 @@ fun BillAnalyzerScreen(goals: String?, viewModel: BillAnalyzerViewModel = viewMo
     }
 }
 
+
 @Preview(showBackground = true, apiLevel = 34)
 @Composable
 fun BillAnalyzerScreenPreview() {
@@ -87,7 +93,7 @@ fun BillAnalyzerScreenPreview() {
     val previewViewModel = BillAnalyzerViewModel().apply {
         setBillText("示例账单文本")
         setAnalysisResult("分析结果")
-        setEmotionScore(75)
+        setEmotionScore(80)
         setEmotionComment("这是一个情绪评论")
         setIsLoading(false)
     }
