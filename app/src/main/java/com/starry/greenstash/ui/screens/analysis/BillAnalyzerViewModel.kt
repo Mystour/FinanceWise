@@ -7,6 +7,7 @@ import com.google.ai.client.generativeai.GenerativeModel
 import com.google.gson.Gson
 import com.starry.greenstash.BuildConfig
 import kotlinx.coroutines.launch
+import java.util.regex.Pattern
 
 class BillAnalyzerViewModel : ViewModel() {
     private val generativeModel by lazy {
@@ -68,10 +69,16 @@ class BillAnalyzerViewModel : ViewModel() {
             } else {
                 formatBillText(_billText.value)
             }
-            analyzeBillWithGemini(formattedBill) { result, score, comment -> // 修改回调函数
+
+            // 第一步：生成包含情绪分数和评论的初步分析结果
+            val initialAnalysis = generateInitialAnalysis(formattedBill)
+            val (score, comment) = extractEmotionInfo(initialAnalysis)
+            setEmotionScore(score)
+            setEmotionComment(comment)
+
+            // 第二步：生成详细的分析内容
+            generateDetailedAnalysis(formattedBill) { result ->
                 setAnalysisResult(result)
-                setEmotionScore(score) // 更新 emotionScore
-                setEmotionComment(comment) // 更新 emotionComment
                 setIsLoading(false)
             }
         }
@@ -102,42 +109,69 @@ class BillAnalyzerViewModel : ViewModel() {
         }
     }
 
-    private suspend fun analyzeBillWithGemini(
-        billText: String,
-        callback: (String, Int, String) -> Unit // 修改回调函数，添加情绪分数和评论
-    ) {
-        try {
-            val prompt = createAnalysisPrompt(billText)
-            val response = generativeModel.generateContentStream(prompt)
-            var analysis = ""
-            response.collect { chunk ->
-                analysis += chunk.text
-                // 从 analysis 中提取情绪分数和评论（可以使用正则表达式或其他方法）
-                val (score, comment) = extractEmotionInfo()
-                setEmotionScore(score)
-                setEmotionComment(comment)
-                callback(analysis, score, comment)
-            }
-        } catch (e: Exception) {
-            callback("分析出错: ${e.message}", 0, "")
+    private suspend fun generateInitialAnalysis(billText: String): String {
+        val prompt = createInitialAnalysisPrompt(billText)
+        val response = generativeModel.generateContent(prompt)
+        println("Gemini Response: ${response.text}")
+        return response.text ?: ""
+    }
+
+    private suspend fun generateDetailedAnalysis(billText: String, callback: (String) -> Unit) {
+        val prompt = createDetailedAnalysisPrompt(billText)
+        val response = generativeModel.generateContentStream(prompt)
+        var analysis = ""
+        response.collect { chunk ->
+            analysis += chunk.text
+            callback(analysis)
         }
     }
 
     // 从分析结果中提取情绪分数和评论
-    private fun extractEmotionInfo(): Pair<Int, String> {
-        // TODO: 使用正则表达式或其他方法从 analysis 中提取情绪分数和评论
-        // 例如：
-        // val scoreRegex = Regex("情绪分数：(\\d+)")
-        // val commentRegex = Regex("情绪评论：(.+)")
-        // val score = scoreRegex.find(analysis)?.groupValues?.getOrNull(1)?.toIntOrNull() ?: 0
-        // val comment = commentRegex.find(analysis)?.groupValues?.getOrNull(1) ?: ""
-        // return Pair(score, comment)
+    private fun extractEmotionInfo(analysis: String): Pair<Int, String> {
+        val scoreRegex = Pattern.compile("情绪分数：\\s*(\\d+)", Pattern.DOTALL or Pattern.MULTILINE)
+        val commentRegex = Pattern.compile("情绪评论：\\s*(.+?)(?=\\n\\*|\\n\\n|\\n$)", Pattern.DOTALL or Pattern.MULTILINE)
 
-        // 这里暂时返回默认值
-        return Pair(80, "您最近的消费情绪比较积极，继续保持良好的消费习惯！")
+        val scoreMatcher = scoreRegex.matcher(analysis)
+        val commentMatcher = commentRegex.matcher(analysis)
+
+        val score = if (scoreMatcher.find()) {
+            scoreMatcher.group(1)?.toIntOrNull() ?: 0
+        } else {
+            80
+        }
+
+        val comment = if (commentMatcher.find()) {
+            commentMatcher.group(1) ?: ""
+        } else {
+            ""
+        }
+
+        // 添加日志输出以便调试
+        println("Extracted Score: $score")
+        println("Extracted Comment: $comment")
+
+        return Pair(score, comment)
     }
 
-    private fun createAnalysisPrompt(billText: String): String {
+
+
+    private fun createInitialAnalysisPrompt(billText: String): String {
+        return """
+            以下是我最近一个月的账单信息：
+
+            $billText
+
+            请帮我分析一下我最近一个月的消费情况和情绪：
+
+            1. 我的整体消费水平如何？
+            2. 我在哪些方面的消费占比最高？
+            3. 根据我的消费情况，推断我最近可能的情绪状态，例如我是否感到焦虑、压力大，或者消费过度？
+
+            请在分析结果中明确指出情绪分数（0-100分）和情绪评论。
+        """.trimIndent()
+    }
+
+    private fun createDetailedAnalysisPrompt(billText: String): String {
         return """
             以下是我最近一个月的账单信息：
 
