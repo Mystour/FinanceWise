@@ -2,6 +2,8 @@ package com.starry.greenstash.ui.screens.analysis.composables
 
 import android.content.Context
 import android.graphics.Typeface
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -26,21 +28,22 @@ fun EmotionChart(emotionScore: Int) {
     )
     val colors = listOf(Color(0xFF6200EE), Color.LightGray)
 
-    AndroidView(
-        factory = { context ->
-            createRingPieChart(context, entries, colors.map { it.toArgb() }, emotionScore)
-        },
-        modifier = Modifier
-            .height(200.dp)
-            .padding(16.dp)
-    )
+    Box(modifier = Modifier.fillMaxSize()) {
+        AndroidView(
+            factory = { context ->
+                createPieChart(context, entries, colors.map { it.toArgb() })
+            },
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        )
+    }
 }
 
-private fun createRingPieChart(
+private fun createPieChart(
     context: Context,
     entries: List<PieEntry>,
-    colors: List<Int>,
-    emotionScore: Int
+    colors: List<Int>
 ): PieChart {
     val chart = PieChart(context)
     val tf = Typeface.DEFAULT // 使用系统默认字体
@@ -51,14 +54,8 @@ private fun createRingPieChart(
     dataSet.valueTextSize = 14f
     dataSet.valueTextColor = Color.Red.toArgb()
     dataSet.valueTypeface = tf
-    dataSet.valueLinePart1Length = 0.4f
-    dataSet.valueLinePart2Length = 0.4f
-    dataSet.valueLinePart1OffsetPercentage = 80f
-    dataSet.valueLineColor = Color.Gray.toArgb()
-    dataSet.yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
     dataSet.sliceSpace = 0f
     dataSet.selectionShift = 5f
-    dataSet.setUsingSliceColorAsValueLineColor(false) // 设置Y轴描述线和填充区域的颜色不一致
 
     val pieData = PieData(dataSet)
     pieData.setValueFormatter(PercentFormatter(chart))
@@ -66,31 +63,33 @@ private fun createRingPieChart(
     pieData.setValueTextColor(Color.Red.toArgb())
     pieData.setValueTypeface(tf) // 使用系统默认字体
 
-    chart.setDrawHoleEnabled(true)
-    chart.holeRadius = 85f // 设置环的宽度
-    chart.setTransparentCircleAlpha(0) // 完全透明
-    chart.setDrawCenterText(true)
-    chart.centerText = "情绪评分\n$emotionScore"
-    chart.setCenterTextSize(18f)
-    chart.setCenterTextTypeface(tf) // 使用系统默认字体
-    chart.setDrawEntryLabels(false)
+    chart.setDrawHoleEnabled(false) // 不绘制中心空洞
+    chart.setDrawCenterText(false)
+    chart.setDrawEntryLabels(true)
     chart.description.isEnabled = false
-    chart.legend.isEnabled = false
+    chart.legend.isEnabled = true
+    chart.legend.verticalAlignment = Legend.LegendVerticalAlignment.TOP
+    chart.legend.horizontalAlignment = Legend.LegendHorizontalAlignment.RIGHT
+    chart.legend.orientation = Legend.LegendOrientation.VERTICAL
+    chart.legend.setDrawInside(false)
+    chart.legend.textSize = 14f
+    chart.legend.typeface = tf
     chart.setExtraOffsets(20f, 8f, 75f, 8f)
     chart.setBackgroundColor(Color.Transparent.toArgb())
     chart.dragDecelerationFrictionCoef = 0.75f
 
-    // 设置图例
-    val legend = chart.legend
-    legend.isEnabled = false // 关闭图例
-
     chart.data = pieData
     chart.invalidate()
+
+    // 添加调试信息
+    println("Entries: $entries")
+    println("Colors: $colors")
+
     return chart
 }
 
 @Preview(showBackground = true, apiLevel = 34)
 @Composable
 fun EmotionChartPreview() {
-   EmotionChart(emotionScore = 75)
+    EmotionChart(emotionScore = 75)
 }
