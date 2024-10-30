@@ -27,7 +27,7 @@ class BillAnalyzerViewModel : ViewModel() {
 
     private val _emotionScore = mutableIntStateOf(0)
     val emotionScore: Int
-        get() = _emotionScore.value
+        get() = _emotionScore.intValue
 
     private val _emotionComment = mutableStateOf("")
     val emotionComment: String
@@ -46,7 +46,7 @@ class BillAnalyzerViewModel : ViewModel() {
     }
 
     fun setEmotionScore(score: Int) {
-        _emotionScore.value = score
+        _emotionScore.intValue = score
     }
 
     fun setEmotionComment(comment: String) {
@@ -141,7 +141,7 @@ class BillAnalyzerViewModel : ViewModel() {
         }
 
         val comment = if (commentMatcher.find()) {
-            commentMatcher.group(1) ?: ""
+            commentMatcher.group(1)?.replace("*", "") ?: ""
         } else {
             ""
         }
@@ -152,6 +152,7 @@ class BillAnalyzerViewModel : ViewModel() {
 
         return Pair(score, comment)
     }
+
 
 
 
