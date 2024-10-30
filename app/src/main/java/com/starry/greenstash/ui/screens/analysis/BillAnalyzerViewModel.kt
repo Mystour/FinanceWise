@@ -1,5 +1,6 @@
 package com.starry.greenstash.ui.screens.analysis
 
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.ai.client.generativeai.GenerativeModel
@@ -15,44 +16,44 @@ class BillAnalyzerViewModel : ViewModel() {
         )
     }
 
-    private var _billText = ""
+    private val _billText = mutableStateOf("")
     val billText: String
-        get() = _billText
+        get() = _billText.value
 
-    private var _analysisResult = ""
+    private val _analysisResult = mutableStateOf("")
     val analysisResult: String
-        get() = _analysisResult
+        get() = _analysisResult.value
 
-    private var _emotionScore = 0
+    private val _emotionScore = mutableIntStateOf(0)
     val emotionScore: Int
-        get() = _emotionScore
+        get() = _emotionScore.value
 
-    private var _emotionComment = ""
+    private val _emotionComment = mutableStateOf("")
     val emotionComment: String
-        get() = _emotionComment
+        get() = _emotionComment.value
 
-    private var _isLoading = false
+    private val _isLoading = mutableStateOf(false)
     val isLoading: Boolean
-        get() = _isLoading
+        get() = _isLoading.value
 
     fun setBillText(text: String) {
-        _billText = text
+        _billText.value = text
     }
 
     fun setAnalysisResult(result: String) {
-        _analysisResult = result
+        _analysisResult.value = result
     }
 
     fun setEmotionScore(score: Int) {
-        _emotionScore = score
+        _emotionScore.value = score
     }
 
     fun setEmotionComment(comment: String) {
-        _emotionComment = comment
+        _emotionComment.value = comment
     }
 
     fun setIsLoading(isLoading: Boolean) {
-        _isLoading = isLoading
+        _isLoading.value = isLoading
     }
 
     fun initializeBillText(goals: String?) {
@@ -61,17 +62,17 @@ class BillAnalyzerViewModel : ViewModel() {
 
     fun analyzeBill() {
         viewModelScope.launch {
-            _isLoading = true
-            val formattedBill = if (isJson(_billText)) {
-                _billText // 如果是 JSON 格式，不进行格式化
+            setIsLoading(true)
+            val formattedBill = if (isJson(_billText.value)) {
+                _billText.value // 如果是 JSON 格式，不进行格式化
             } else {
-                formatBillText(_billText)
+                formatBillText(_billText.value)
             }
             analyzeBillWithGemini(formattedBill) { result, score, comment -> // 修改回调函数
-                _analysisResult = result
-                _emotionScore = score // 更新 emotionScore
-                _emotionComment = comment // 更新 emotionComment
-                _isLoading = false
+                setAnalysisResult(result)
+                setEmotionScore(score) // 更新 emotionScore
+                setEmotionComment(comment) // 更新 emotionComment
+                setIsLoading(false)
             }
         }
     }
@@ -113,8 +114,8 @@ class BillAnalyzerViewModel : ViewModel() {
                 analysis += chunk.text
                 // 从 analysis 中提取情绪分数和评论（可以使用正则表达式或其他方法）
                 val (score, comment) = extractEmotionInfo()
-                _emotionScore = score
-                _emotionComment = comment
+                setEmotionScore(score)
+                setEmotionComment(comment)
                 callback(analysis, score, comment)
             }
         } catch (e: Exception) {

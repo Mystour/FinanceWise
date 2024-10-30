@@ -15,15 +15,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.starry.greenstash.ui.screens.analysis.BillAnalyzerViewModel
 import io.noties.markwon.Markwon
 
+import kotlinx.coroutines.*
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BillAnalyzerScreen(goals: String?, viewModel: BillAnalyzerViewModel = viewModel()) {
     val context = LocalContext.current // 获取 Context
-    rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(goals) {
-        viewModel.initializeBillText(goals)
-        println("billText: ${viewModel.billText}")
+        scope.launch(Dispatchers.IO) {
+            viewModel.initializeBillText(goals)
+            withContext(Dispatchers.Main) {
+                println("billText: ${viewModel.billText}")
+            }
+        }
     }
 
     Scaffold(
@@ -45,7 +51,9 @@ fun BillAnalyzerScreen(goals: String?, viewModel: BillAnalyzerViewModel = viewMo
 
             Button(
                 onClick = {
-                    viewModel.analyzeBill()
+                    scope.launch(Dispatchers.IO) {
+                        viewModel.analyzeBill()
+                    }
                 },
                 enabled = viewModel.billText.isNotBlank()
             ) {
@@ -84,6 +92,7 @@ fun BillAnalyzerScreen(goals: String?, viewModel: BillAnalyzerViewModel = viewMo
         }
     }
 }
+
 
 
 @Preview(showBackground = true, apiLevel = 34)
