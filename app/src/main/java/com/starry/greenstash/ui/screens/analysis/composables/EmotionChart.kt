@@ -1,66 +1,96 @@
-   package com.starry.greenstash.ui.screens.analysis.composables
+package com.starry.greenstash.ui.screens.analysis.composables
 
-   import android.content.Context
-   import androidx.compose.foundation.layout.height
-   import androidx.compose.foundation.layout.padding
-   import androidx.compose.runtime.Composable
-   import androidx.compose.ui.Modifier
-   import androidx.compose.ui.graphics.Color
-   import androidx.compose.ui.graphics.toArgb
-   import androidx.compose.ui.viewinterop.AndroidView
-   import androidx.compose.ui.unit.dp
-   import com.github.mikephil.charting.charts.PieChart
-   import com.github.mikephil.charting.components.Legend
-   import com.github.mikephil.charting.data.PieData
-   import com.github.mikephil.charting.data.PieDataSet
-   import com.github.mikephil.charting.data.PieEntry
-   import com.github.mikephil.charting.utils.ColorTemplate
+import android.content.Context
+import android.graphics.Typeface
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.formatter.PercentFormatter
 
-   // 情绪评分图表
-   @Composable
-   fun EmotionChart(emotionScore: Int) {
-       val entries = listOf(
-           PieEntry(emotionScore.toFloat(), "情绪评分"),
-           PieEntry((100 - emotionScore).toFloat(), "") // 补充剩余部分
-       )
+@Composable
+fun EmotionChart(emotionScore: Int) {
+    val entries = listOf(
+        PieEntry(emotionScore.toFloat(), "情绪评分"),
+        PieEntry((100 - emotionScore).toFloat(), "") // 补充剩余部分
+    )
+    val colors = listOf(Color(0xFF6200EE), Color.LightGray)
 
-       val dataSet = PieDataSet(entries, "")
-       dataSet.colors = listOf(Color(0xFF6200EE).toArgb(), Color(0x00000000).toArgb()) // 设置环形图颜色
-       dataSet.sliceSpace = 3f // 设置饼图切片之间的间距
-       dataSet.xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE // 设置值的位置
-       dataSet.yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+    AndroidView(
+        factory = { context ->
+            createRingPieChart(context, entries, colors.map { it.toArgb() }, emotionScore)
+        },
+        modifier = Modifier
+            .height(200.dp)
+            .padding(16.dp)
+    )
+}
 
-       val pieData = PieData(dataSet)
+private fun createRingPieChart(
+   context: Context,
+   entries: List<PieEntry>,
+   colors: List<Int>,
+   emotionScore: Int
+): PieChart {
+   val chart = PieChart(context)
+   val tf = Typeface.createFromAsset(context.assets, "OpenSans-Regular.ttf")
 
-       AndroidView(
-           factory = { context ->
-               createAndConfigurePieChart(context, pieData, emotionScore)
-           },
-           modifier = Modifier
-               .height(200.dp)
-               .padding(16.dp)
-       )
-   }
+   val dataSet = PieDataSet(entries, "")
+   dataSet.colors = colors
+   dataSet.setDrawValues(true)
+   dataSet.valueTextSize = 14f
+   dataSet.valueTextColor = Color.Red.toArgb()
+   dataSet.valueTypeface = tf
+   dataSet.valueLinePart1Length = 0.4f
+   dataSet.valueLinePart2Length = 0.4f
+   dataSet.valueLinePart1OffsetPercentage = 80f
+   dataSet.valueLineColor = Color.Gray.toArgb()
+   dataSet.yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+   dataSet.sliceSpace = 0f
+   dataSet.selectionShift = 5f
 
-   private fun createAndConfigurePieChart(context: Context, pieData: PieData, emotionScore: Int): PieChart {
-       val chart = PieChart(context)
-       chart.setUsePercentValues(false) // 不使用百分比显示
-       chart.description.isEnabled = false // 关闭描述
-       chart.setExtraOffsets(5f, 10f, 5f, 5f) // 设置额外偏移
-       chart.dragDecelerationFrictionCoef = 0.95f // 设置拖动减速摩擦系数
-       chart.isDrawHoleEnabled = true // 开启中心孔
-       chart.setHoleColor(Color(0x00000000).toArgb()) // 设置中心孔颜色
-       chart.setTransparentCircleColor(Color(0x00000000).toArgb()) // 设置透明圆圈颜色
-       chart.setTransparentCircleAlpha(110) // 设置透明圆圈透明度
-       chart.holeRadius = 58f // 设置中心孔半径
-       chart.transparentCircleRadius = 61f // 设置透明圆圈半径
-       chart.setDrawCenterText(true) // 开启中心文字
-       chart.centerText = "情绪评分\n$emotionScore" // 设置中心文字
-       chart.setCenterTextSize(14f) // 设置中心文字大小
-       chart.setDrawEntryLabels(false) // 关闭标签
-       chart.legend.isEnabled = false // 关闭图例
-       chart.data = pieData // 设置数据
-       chart.invalidate() // 刷新图表
-       return chart
-   }
-   
+   val pieData = PieData(dataSet)
+   pieData.setValueFormatter(PercentFormatter(chart))
+   pieData.setValueTextSize(14f)
+   pieData.setValueTextColor(Color.Red.toArgb())
+   pieData.setValueTypeface(tf) // 修复这里
+
+   chart.setDrawHoleEnabled(true)
+   chart.holeRadius = 65f // 设置环的宽度
+   chart.setTransparentCircleAlpha(0) // 完全透明
+   chart.setDrawCenterText(true)
+   chart.centerText = "情绪评分\n$emotionScore"
+   chart.setCenterTextSize(18f)
+   chart.setCenterTextTypeface(tf)
+   chart.setDrawEntryLabels(false)
+   chart.description.isEnabled = false
+   chart.legend.isEnabled = false
+   chart.setExtraOffsets(20f, 8f, 75f, 8f)
+   chart.setBackgroundColor(Color.Transparent.toArgb())
+   chart.dragDecelerationFrictionCoef = 0.75f
+
+   // 设置图例
+   val legend = chart.legend
+   legend.isEnabled = false //关闭图例
+
+   chart.data = pieData
+   chart.invalidate()
+   return chart
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun EmotionChartPreview() {
+    EmotionChart(emotionScore = 75)
+}

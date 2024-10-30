@@ -36,7 +36,7 @@ fun BillAnalyzerScreen(goals: String?) {
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
             BillInput(
                 billText = viewModel.billText,
