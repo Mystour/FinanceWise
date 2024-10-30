@@ -40,7 +40,7 @@ fun EmotionChart(emotionScore: Int, modifier: Modifier = Modifier) {
             },
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(32.dp) // 增加 padding 以增大图表尺寸
         )
     }
 }
@@ -81,7 +81,7 @@ private fun createPieChart(
     chart.legend.textSize = 14f
     chart.legend.typeface = tf
     chart.setExtraOffsets(20f, 8f, 75f, 8f)
-    chart.setBackgroundColor(Color.White.toArgb())
+    chart.setBackgroundColor(Color.Transparent.toArgb()) // 设置背景为透明
     chart.dragDecelerationFrictionCoef = 0.75f
 
     // 检查是否处于预览模式
@@ -100,9 +100,8 @@ private fun createPieChart(
     return chart
 }
 
-@Preview(showBackground = true, apiLevel = 34)
+@Preview(showBackground = false, apiLevel = 34) // 去掉背景
 @Composable
 fun EmotionChartPreview() {
     EmotionChart(emotionScore = 75)
 }
-
