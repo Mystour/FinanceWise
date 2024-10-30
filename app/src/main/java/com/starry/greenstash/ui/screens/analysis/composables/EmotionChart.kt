@@ -28,7 +28,7 @@ fun EmotionChart(emotionScore: Int, modifier: Modifier = Modifier) {
         PieEntry((100 - emotionScore).toFloat(), "") // 补充剩余部分
     )
     val colors = listOf(
-        Color(0xFF6200EE), // 紫色
+        Color(0xFFB39DDB), // 淡紫色
         Color(0xFFE0E0E0)  // 浅灰色
     )
     val isPreview = LocalInspectionMode.current
@@ -62,6 +62,14 @@ private fun createPieChart(
     dataSet.valueTypeface = tf
     dataSet.sliceSpace = 3f
     dataSet.selectionShift = 5f
+
+    // 设置标签在外侧显示
+    dataSet.xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+    dataSet.yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+    dataSet.valueLinePart1Length = 0.6f
+    dataSet.valueLinePart2Length = 0.4f
+    dataSet.valueLineColor = Color.Black.toArgb()
+    dataSet.valueLinePart1OffsetPercentage = 30f
 
     val pieData = PieData(dataSet)
     pieData.setValueFormatter(PercentFormatter(chart))
@@ -100,7 +108,7 @@ private fun createPieChart(
     return chart
 }
 
-@Preview(showBackground = false, apiLevel = 34) // 去掉背景
+@Preview(showBackground = true, apiLevel = 34) // 去掉背景
 @Composable
 fun EmotionChartPreview() {
     EmotionChart(emotionScore = 75)
