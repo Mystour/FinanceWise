@@ -1,5 +1,6 @@
 package com.starry.greenstash.ui.screens.analysis.composables
 
+import android.text.method.LinkMovementMethod
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,10 +25,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.text.toSpanned
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.starry.greenstash.ui.screens.analysis.BillAnalyzerViewModel
 import io.noties.markwon.Markwon
@@ -113,22 +119,50 @@ fun BillAnalyzerScreen(goals: String?, viewModel: BillAnalyzerViewModel = viewMo
                     }
                 }
 
-                // 使用 Markwon 渲染 Markdown 文本
+                // 使用 Markwon 处理 Markdown 文本
                 val markwon = Markwon.create(context)
                 val spanned = remember(viewModel.analysisResult) {
                     markwon.toMarkdown(viewModel.analysisResult)
                 }
 
-                // 使用 AnnotatedString 显示 Markdown 内容，并自定义样式
+                // 使用 buildAnnotatedString 添加自定义样式
                 val annotatedString = remember(spanned) {
                     buildAnnotatedString {
-                        append(spanned.toString())
-                        // 可以在这里添加更多自定义样式，例如标题加粗等
+                        val markdownText = spanned.toString()
+                        var currentIndex = 0
+
+                        while (currentIndex < markdownText.length) {
+                            val titleStart = markdownText.indexOf("## ", currentIndex)
+                            if (titleStart == -1) {
+                                append(markdownText.substring(currentIndex))
+                                break
+                            }
+
+                            append(markdownText.substring(currentIndex, titleStart))
+                            val titleEnd = markdownText.indexOf('\n', titleStart)
+                            if (titleEnd == -1) {
+                                append(markdownText.substring(titleStart))
+                                break
+                            }
+
+                            pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                            append(markdownText.substring(titleStart + 3, titleEnd))
+                            pop()
+                            currentIndex = titleEnd + 1
+                        }
                     }
                 }
 
-                Text(
-                    text = annotatedString,
+                // 使用 AndroidView 组件显示 AnnotatedString 对象
+                AndroidView(
+                    factory = { context ->
+                        androidx.appcompat.widget.AppCompatTextView(context).apply {
+                            movementMethod = LinkMovementMethod.getInstance()
+                        }
+                    },
+                    update = { textView ->
+                        textView.text = annotatedString.toSpanned()
+                    },
                     modifier = Modifier.padding(16.dp)
                 )
             }
