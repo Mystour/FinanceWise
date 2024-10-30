@@ -14,7 +14,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.tooling.preview.Preview
 import com.starry.greenstash.ui.screens.analysis.BillAnalyzerViewModel
 import io.noties.markwon.Markwon
-
 import kotlinx.coroutines.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -22,6 +21,7 @@ import kotlinx.coroutines.*
 fun BillAnalyzerScreen(goals: String?, viewModel: BillAnalyzerViewModel = viewModel()) {
     val context = LocalContext.current // 获取 Context
     val scope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(goals) {
         scope.launch(Dispatchers.IO) {
@@ -40,7 +40,7 @@ fun BillAnalyzerScreen(goals: String?, viewModel: BillAnalyzerViewModel = viewMo
                 .padding(innerPadding)
                 .fillMaxSize()
                 .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
@@ -90,10 +90,18 @@ fun BillAnalyzerScreen(goals: String?, viewModel: BillAnalyzerViewModel = viewMo
                 )
             }
         }
+
+        // 监听分析结果的变化并自动滚动
+        LaunchedEffect(viewModel.analysisResult) {
+            if (viewModel.analysisResult.isNotBlank()) {
+                scope.launch {
+                    delay(300) // 延迟一段时间，确保内容已经渲染完成
+                    scrollState.animateScrollTo(scrollState.maxValue)
+                }
+            }
+        }
     }
 }
-
-
 
 @Preview(showBackground = true, apiLevel = 34)
 @Composable
@@ -109,4 +117,3 @@ fun BillAnalyzerScreenPreview() {
 
     BillAnalyzerScreen(goals = "示例账单文本", viewModel = previewViewModel)
 }
-
