@@ -37,60 +37,60 @@ fun EmotionChart(emotionScore: Int) {
 }
 
 private fun createRingPieChart(
-   context: Context,
-   entries: List<PieEntry>,
-   colors: List<Int>,
-   emotionScore: Int
+    context: Context,
+    entries: List<PieEntry>,
+    colors: List<Int>,
+    emotionScore: Int
 ): PieChart {
-   val chart = PieChart(context)
-   val tf = Typeface.createFromAsset(context.assets, "OpenSans-Regular.ttf")
+    val chart = PieChart(context)
+    val tf = Typeface.DEFAULT // 使用系统默认字体
 
-   val dataSet = PieDataSet(entries, "")
-   dataSet.colors = colors
-   dataSet.setDrawValues(true)
-   dataSet.valueTextSize = 14f
-   dataSet.valueTextColor = Color.Red.toArgb()
-   dataSet.valueTypeface = tf
-   dataSet.valueLinePart1Length = 0.4f
-   dataSet.valueLinePart2Length = 0.4f
-   dataSet.valueLinePart1OffsetPercentage = 80f
-   dataSet.valueLineColor = Color.Gray.toArgb()
-   dataSet.yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
-   dataSet.sliceSpace = 0f
-   dataSet.selectionShift = 5f
+    val dataSet = PieDataSet(entries, "")
+    dataSet.colors = colors
+    dataSet.setDrawValues(true)
+    dataSet.valueTextSize = 14f
+    dataSet.valueTextColor = Color.Red.toArgb()
+    dataSet.valueTypeface = tf
+    dataSet.valueLinePart1Length = 0.4f
+    dataSet.valueLinePart2Length = 0.4f
+    dataSet.valueLinePart1OffsetPercentage = 80f
+    dataSet.valueLineColor = Color.Gray.toArgb()
+    dataSet.yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+    dataSet.sliceSpace = 0f
+    dataSet.selectionShift = 5f
+    dataSet.setUsingSliceColorAsValueLineColor(false) // 设置Y轴描述线和填充区域的颜色不一致
 
-   val pieData = PieData(dataSet)
-   pieData.setValueFormatter(PercentFormatter(chart))
-   pieData.setValueTextSize(14f)
-   pieData.setValueTextColor(Color.Red.toArgb())
-   pieData.setValueTypeface(tf) // 修复这里
+    val pieData = PieData(dataSet)
+    pieData.setValueFormatter(PercentFormatter(chart))
+    pieData.setValueTextSize(14f)
+    pieData.setValueTextColor(Color.Red.toArgb())
+    pieData.setValueTypeface(tf) // 使用系统默认字体
 
-   chart.setDrawHoleEnabled(true)
-   chart.holeRadius = 65f // 设置环的宽度
-   chart.setTransparentCircleAlpha(0) // 完全透明
-   chart.setDrawCenterText(true)
-   chart.centerText = "情绪评分\n$emotionScore"
-   chart.setCenterTextSize(18f)
-   chart.setCenterTextTypeface(tf)
-   chart.setDrawEntryLabels(false)
-   chart.description.isEnabled = false
-   chart.legend.isEnabled = false
-   chart.setExtraOffsets(20f, 8f, 75f, 8f)
-   chart.setBackgroundColor(Color.Transparent.toArgb())
-   chart.dragDecelerationFrictionCoef = 0.75f
+    chart.setDrawHoleEnabled(true)
+    chart.holeRadius = 85f // 设置环的宽度
+    chart.setTransparentCircleAlpha(0) // 完全透明
+    chart.setDrawCenterText(true)
+    chart.centerText = "情绪评分\n$emotionScore"
+    chart.setCenterTextSize(18f)
+    chart.setCenterTextTypeface(tf) // 使用系统默认字体
+    chart.setDrawEntryLabels(false)
+    chart.description.isEnabled = false
+    chart.legend.isEnabled = false
+    chart.setExtraOffsets(20f, 8f, 75f, 8f)
+    chart.setBackgroundColor(Color.Transparent.toArgb())
+    chart.dragDecelerationFrictionCoef = 0.75f
 
-   // 设置图例
-   val legend = chart.legend
-   legend.isEnabled = false //关闭图例
+    // 设置图例
+    val legend = chart.legend
+    legend.isEnabled = false // 关闭图例
 
-   chart.data = pieData
-   chart.invalidate()
-   return chart
+    chart.data = pieData
+    chart.invalidate()
+    return chart
 }
 
-
-@Preview(showBackground = true)
+@Preview(showBackground = true, apiLevel = 34)
 @Composable
 fun EmotionChartPreview() {
-    EmotionChart(emotionScore = 75)
+   EmotionChart(emotionScore = 75)
 }
