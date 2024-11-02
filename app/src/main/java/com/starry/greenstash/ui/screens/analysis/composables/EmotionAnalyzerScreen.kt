@@ -25,6 +25,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.toSpanned
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.starry.greenstash.R
 import com.starry.greenstash.ui.screens.analysis.EmotionAnalyzerViewModel
 import io.noties.markwon.Markwon
 import kotlinx.coroutines.Dispatchers
@@ -58,7 +60,7 @@ fun BillAnalyzerScreen(goals: String?, viewModel: EmotionAnalyzerViewModel = vie
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("账单情绪分析") }) }
+        topBar = { TopAppBar(title = stringResource(id = R.string.emotion_analysis_title)) }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -82,7 +84,7 @@ fun BillAnalyzerScreen(goals: String?, viewModel: EmotionAnalyzerViewModel = vie
                 },
                 enabled = viewModel.billText.isNotBlank()
             ) {
-                Text("分析账单")
+                Text(stringResource(id = R.string.emotion_analysis_button))
             }
 
             if (viewModel.isLoading) {

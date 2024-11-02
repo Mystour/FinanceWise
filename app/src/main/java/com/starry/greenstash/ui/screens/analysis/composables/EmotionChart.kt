@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -20,11 +21,12 @@ import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.PercentFormatter
+import com.starry.greenstash.R
 
 @Composable
 fun EmotionChart(emotionScore: Int, modifier: Modifier = Modifier) {
     val entries = listOf(
-        PieEntry(emotionScore.toFloat(), "情绪评分"),
+        PieEntry(emotionScore.toFloat(), stringResource(id = R.string.emotion_score)),
         PieEntry((100 - emotionScore).toFloat(), "") // 补充剩余部分
     )
     val colors = listOf(

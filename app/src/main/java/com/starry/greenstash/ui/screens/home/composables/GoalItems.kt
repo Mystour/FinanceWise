@@ -212,7 +212,7 @@ fun GoalItemClassic(
 
                     TextButton(onClick = onAnalyzeBillClick) { // 使用 TextButton
                         Text(
-                            text = "识别账单",
+                            text = stringResource(id = R.string.recognition_button),
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurface,
                             fontFamily = greenstashFont

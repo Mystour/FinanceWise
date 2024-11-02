@@ -50,6 +50,44 @@
     <string name="new_goal_onboarding_desc">点击浮动操作按钮创建一个新的储蓄目标。</string>
     <string name="home_search_label">搜索此处…</string>
     <string name="search_goal_not_found">404: 目标未发现！</string>>
+    <string name="emotion_analysis_button">情绪分析</string>
+
+    <!-- Emotion Analysis Screen -->
+    <string name="emotion_analysis_title">账单情绪分析</string>
+    <string name="emotion_analysis_desc">
+        我们使用人工智能来分析你输入的文本，并为你提供一个情感评分
+    </string>
+    <string name="content_hint">账单内容</string>
+    <string name="emotion_score">情绪评分</string>
+    <string name="initial_analysis_prompt">
+        以下是我最近一个月的账单信息：
+
+        %1$s
+
+        请帮我分析一下我最近一个月的消费情况和情绪：
+
+        1. 我的整体消费水平如何？
+        2. 我在哪些方面的消费占比最高？
+        3. 根据我的消费情况，推断我最近可能的情绪状态，例如我是否感到焦虑、压力大，或者消费过度？
+
+        请在分析结果中明确指出情绪分数（0-100分）和情绪评论。
+    </string>
+    <string name="detailed_analysis_prompt">
+        以下是我最近一个月的账单信息：
+
+        %1$s
+
+        请帮我分析一下我最近一个月的消费情况和情绪：
+
+        1. 我的整体消费水平如何？
+        2. 我在哪些方面的消费占比最高？
+        3. 根据我的消费情况，推断我最近可能的情绪状态，例如我是否感到焦虑、压力大，或者消费过度？
+        4. 根据我的消费情况和情绪分析，请给我一些具体的建议，帮助我更好地管理我的财务，例如如何减少不必要的开支，如何制定合理的预算，如何进行储蓄和投资？
+        5. 请帮我制定一个未来一个月的消费规划，根据我的目标和目前的消费状态，制定一个合理且具有挑战性的消费计划来实现最近的那个目标（从goal字段获取，尤其关注title和additionalNotes，一般能够得到准确的目标），并计算距离我实现目标还需要多久，能否在预期时间内完成目标。
+    </string>
+    <string name="default_emotion_comment">你最近的情绪状态可能处于**轻微焦虑**的状态</string>
+    <string name="score_pattern">情绪分数\\D*(\\d+)</string>
+    <string name="comment_pattern">情绪评论\\s*(.*?)(?=\\n\\*|\\n\\n|\\n$|\\.\\s*|。\\s*)</string>
 
     <!-- Deposit & Withdraw Screen -->
     <string name="deposit_screen_title">很棒！存入多少</string>
@@ -70,6 +108,7 @@
     <string name="goal_already_achieved">您已经实现了此目标。</string>
     <string name="withdraw_button">取钱</string>
     <string name="withdraw_button_error">您尚未存入任何金额。</string>
+    <string name="recognition_button">账单识别</string>
     <string name="archive_button">存档</string>
     <string name="goal_archive_confirmation">该目标已完成！您要将其存档吗？</string>
     <string name="goal_archive_success">已成功存档。</string>

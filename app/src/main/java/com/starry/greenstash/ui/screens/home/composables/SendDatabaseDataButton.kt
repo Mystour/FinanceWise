@@ -15,8 +15,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.starry.greenstash.R
 import com.starry.greenstash.ui.screens.home.HomeViewModel
 import kotlinx.coroutines.launch
 
@@ -50,7 +52,7 @@ fun SendDatabaseDataButton(
                 }
             }
         ) {
-            Text("情绪分析")
+            Text(text = stringResource(id = R.string.emotion_analysis_button))
         }
     }
 }
