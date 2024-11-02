@@ -60,34 +60,39 @@
     <string name="content_hint" tools:ignore="MissingTranslation">The Bill Content</string>
     <string name="emotion_score" tools:ignore="MissingTranslation">Emotion Score</string>
     <string name="initial_analysis_prompt" tools:ignore="MissingTranslation">
-        以下是我最近一个月的账单信息：
+        Here is my billing information for the past month:
 
         %1$s
 
-        请帮我分析一下我最近一个月的消费情况和情绪：
+        Please help me analyze my spending and emotional state over the past month:
 
-        1. 我的整体消费水平如何？
-        2. 我在哪些方面的消费占比最高？
-        3. 根据我的消费情况，推断我最近可能的情绪状态，例如我是否感到焦虑、压力大，或者消费过度？
+        1. How is my overall spending level?
+        2. In which areas do I spend the most?
+        3. Based on my spending, infer my recent emotional state, such as whether I feel anxious, stressed, or overspending?
 
-        请在分析结果中明确指出情绪分数（0-100分）和情绪评论。
+        Please clearly indicate the emotional score (0-100 points) and the emotional comment in the analysis results.
     </string>
+
     <string name="detailed_analysis_prompt" tools:ignore="MissingTranslation">
-        以下是我最近一个月的账单信息：
+        Here is my billing information for the past month:
 
         %1$s
 
-        请帮我分析一下我最近一个月的消费情况和情绪：
+        Please help me analyze my spending and emotional state over the past month:
 
-        1. 我的整体消费水平如何？
-        2. 我在哪些方面的消费占比最高？
-        3. 根据我的消费情况，推断我最近可能的情绪状态，例如我是否感到焦虑、压力大，或者消费过度？
-        4. 根据我的消费情况和情绪分析，请给我一些具体的建议，帮助我更好地管理我的财务，例如如何减少不必要的开支，如何制定合理的预算，如何进行储蓄和投资？
-        5. 请帮我制定一个未来一个月的消费规划，根据我的目标和目前的消费状态，制定一个合理且具有挑战性的消费计划来实现最近的那个目标（从goal字段获取，尤其关注title和additionalNotes，一般能够得到准确的目标），并计算距离我实现目标还需要多久，能否在预期时间内完成目标。
+        1. How is my overall spending level?
+        2. In which areas do I spend the most?
+        3. Based on my spending, infer my recent emotional state, such as whether I feel anxious, stressed, or overspending?
+        4. Based on my spending and emotional analysis, please provide some specific suggestions to help me better manage my finances, such as how to reduce unnecessary expenses, how to set a reasonable budget, and how to save and invest.
+        5. Please help me create a spending plan for the next month. Based on my goals and current spending status, create a reasonable and challenging spending plan to achieve the nearest goal (obtained from the goal field, focusing on the title and additionalNotes, which usually provide accurate goals), and calculate how long it will take to achieve the goal and whether it can be completed within the expected time.
     </string>
-    <string name="default_emotion_comment" tools:ignore="MissingTranslation">你最近的情绪状态可能处于**轻微焦虑**的状态</string>
-    <string name="score_pattern" tools:ignore="MissingTranslation">情绪分数\\D*(\\d+)</string>
-    <string name="comment_pattern" tools:ignore="MissingTranslation">情绪评论\\s*(.*?)(?=\\n\\*|\\n\\n|\\n$|\\.\\s*|。\\s*)</string>
+
+    <string name="default_emotion_comment" tools:ignore="MissingTranslation">Your recent emotional state may be **mildly anxious**.</string>
+
+    <string name="score_pattern" tools:ignore="MissingTranslation">Emotional Score\\D*(\\d+)</string>
+
+    <string name="comment_pattern" tools:ignore="MissingTranslation">Emotional Comment\\s*(.*?)(?=\\n\\*|\\n\\n|\\n$|\\.\\s*|。\\s*)</string>
+
 
     <!-- Deposit & Withdraw Screen -->
     <string name="deposit_screen_title">Awesome! Enter amount</string>

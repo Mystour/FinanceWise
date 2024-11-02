@@ -43,10 +43,18 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.ViewModelProvider // 导入 ViewModelProvider
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BillAnalyzerScreen(goals: String?, viewModel: EmotionAnalyzerViewModel = viewModel()) {
-    val context = LocalContext.current // 获取 Context
+fun BillAnalyzerScreen(goals: String?) {
+    val context = LocalContext.current
+    val viewModel: EmotionAnalyzerViewModel = viewModel(
+        factory = EmotionAnalyzerViewModelFactory(context) // 使用 Factory 创建 ViewModel
+    )
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
 
@@ -184,8 +192,10 @@ fun BillAnalyzerScreen(goals: String?, viewModel: EmotionAnalyzerViewModel = vie
 @Preview(showBackground = true, apiLevel = 34)
 @Composable
 fun BillAnalyzerScreenPreview() {
-    // 创建预览专用的 ViewModel 实例
-    val previewViewModel = EmotionAnalyzerViewModel().apply {
+    val context = LocalContext.current
+    // 为预览创建 mock 的 ViewModel
+    EmotionAnalyzerViewModel(context).apply {
+        // 设置示例数据
         setBillText("示例账单文本")
         setAnalysisResult("## 分析结果\n**这是加粗的文本**\n这是普通文本")
         setEmotionScore(80)
@@ -193,5 +203,5 @@ fun BillAnalyzerScreenPreview() {
         setIsLoading(false)
     }
 
-    BillAnalyzerScreen(goals = "示例账单文本", viewModel = previewViewModel)
+    BillAnalyzerScreen(goals = "示例账单文本") // 注意这里不再传入 ViewModel
 }

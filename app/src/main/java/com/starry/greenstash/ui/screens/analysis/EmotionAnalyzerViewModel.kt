@@ -1,15 +1,17 @@
 package com.starry.greenstash.ui.screens.analysis
 
+import android.content.Context
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.gson.Gson
 import com.starry.greenstash.BuildConfig
+import com.starry.greenstash.R
 import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 
-class EmotionAnalyzerViewModel : ViewModel() {
+class EmotionAnalyzerViewModel(private val context: Context) : ViewModel() {
     private val generativeModel by lazy {
         GenerativeModel(
             modelName = "gemini-1.5-flash",
@@ -65,7 +67,7 @@ class EmotionAnalyzerViewModel : ViewModel() {
         viewModelScope.launch {
             setIsLoading(true)
             val formattedBill = if (isJson(_billText.value)) {
-                _billText.value // 如果是 JSON 格式，不进行格式化
+                _billText.value
             } else {
                 formatBillText(_billText.value)
             }
@@ -94,9 +96,9 @@ class EmotionAnalyzerViewModel : ViewModel() {
 
         return try {
             val response = generativeModel.generateContent(prompt)
-            response.text ?: billText // 如果 Gemini 无法格式化，则返回原始文本
+            response.text ?: billText
         } catch (e: Exception) {
-            billText // 如果出现错误，则返回原始文本
+            billText
         }
     }
 
@@ -126,10 +128,13 @@ class EmotionAnalyzerViewModel : ViewModel() {
         }
     }
 
-    // 从分析结果中提取情绪分数和评论
     private fun extractEmotionInfo(analysis: String): Pair<Int, String> {
-        val scoreRegex = Pattern.compile("情绪分数\\D*(\\d+)", Pattern.DOTALL or Pattern.MULTILINE)
-        val commentRegex = Pattern.compile("情绪评论\\s*(.*?)(?=\\n\\*|\\n\\n|\\n$|\\.\\s*|。\\s*)", Pattern.DOTALL or Pattern.MULTILINE)
+        val scorePattern = context.getString(R.string.score_pattern)
+        val commentPattern = context.getString(R.string.comment_pattern)
+
+
+        val scoreRegex = Pattern.compile(scorePattern, Pattern.DOTALL or Pattern.MULTILINE)
+        val commentRegex = Pattern.compile(commentPattern, Pattern.DOTALL or Pattern.MULTILINE)
 
 
         val scoreMatcher = scoreRegex.matcher(analysis)
@@ -138,54 +143,28 @@ class EmotionAnalyzerViewModel : ViewModel() {
         val score = if (scoreMatcher.find()) {
             scoreMatcher.group(1)?.toIntOrNull() ?: 0
         } else {
-            80
+            80 // 默认分数
         }
 
         val comment = if (commentMatcher.find()) {
             commentMatcher.group(1)?.replace("*", "") ?: ""
         } else {
-            "你最近的情绪状态可能处于**轻微焦虑**的状态"
+            context.getString(R.string.default_emotion_comment)
         }
 
-        // 添加日志输出以便调试
         println("Extracted Score: $score")
         println("Extracted Comment: $comment")
 
         return Pair(score, comment)
     }
 
-
-
-
     private fun createInitialAnalysisPrompt(billText: String): String {
-        return """
-            以下是我最近一个月的账单信息：
-
-            $billText
-
-            请帮我分析一下我最近一个月的消费情况和情绪：
-
-            1. 我的整体消费水平如何？
-            2. 我在哪些方面的消费占比最高？
-            3. 根据我的消费情况，推断我最近可能的情绪状态，例如我是否感到焦虑、压力大，或者消费过度？
-
-            请在分析结果中明确指出情绪分数（0-100分）和情绪评论。
-        """.trimIndent()
+        val initialPrompt = context.getString(R.string.initial_analysis_prompt)
+        return String.format(initialPrompt, billText)
     }
 
     private fun createDetailedAnalysisPrompt(billText: String): String {
-        return """
-            以下是我最近一个月的账单信息：
-
-            $billText
-
-            请帮我分析一下我最近一个月的消费情况和情绪：
-
-            1. 我的整体消费水平如何？
-            2. 我在哪些方面的消费占比最高？
-            3. 根据我的消费情况，推断我最近可能的情绪状态，例如我是否感到焦虑、压力大，或者消费过度？
-            4. 根据我的消费情况和情绪分析，请给我一些具体的建议，帮助我更好地管理我的财务，例如如何减少不必要的开支，如何制定合理的预算，如何进行储蓄和投资？
-            5. 请帮我制定一个未来一个月的消费规划，根据我的目标和目前的消费状态，制定一个合理且具有挑战性的消费计划来实现最近的那个目标（从goal字段获取，尤其关注title和additionalNotes，一般能够得到准确的目标），并计算距离我实现目标还需要多久，能否在预期时间内完成目标。
-        """.trimIndent()
+        val detailedPrompt = context.getString(R.string.detailed_analysis_prompt)
+        return String.format(detailedPrompt, billText)
     }
 }
