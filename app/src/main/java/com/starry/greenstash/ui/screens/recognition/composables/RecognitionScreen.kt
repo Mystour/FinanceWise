@@ -25,7 +25,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.TextStyle
-
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.starry.greenstash.R
@@ -121,18 +120,21 @@ fun VisualScreen() {
             Text(viewModel.analysisResult)
         }
 
-        // 在最下端添加灰色小字的说明
-        Spacer(modifier = Modifier.weight(1f)) // 确保说明文本在最底部
-        Text(
-            text = "滑动屏幕以查看更多内容",
-            style = TextStyle(
-                fontSize = 12.sp,
-                color = Color.Gray
-            ),
+        // 使用 Box 布局来包裹 Text 组件，并将其对齐到 Box 的底部中心
+        Box(
             modifier = Modifier
-                .align(Alignment.End)
-                .padding(bottom = 8.dp)
-        )
+                .fillMaxSize()
+                .padding(bottom = 8.dp),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            Text(
+                text = "滑动屏幕以查看更多内容",
+                style = TextStyle(
+                    fontSize = 12.sp,
+                    color = Color.Gray
+                )
+            )
+        }
     }
 }
 
