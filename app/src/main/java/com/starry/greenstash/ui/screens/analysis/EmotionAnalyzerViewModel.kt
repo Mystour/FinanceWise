@@ -9,7 +9,7 @@ import com.starry.greenstash.BuildConfig
 import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 
-class BillAnalyzerViewModel : ViewModel() {
+class EmotionAnalyzerViewModel : ViewModel() {
     private val generativeModel by lazy {
         GenerativeModel(
             modelName = "gemini-1.5-flash",

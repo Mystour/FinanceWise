@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.toSpanned
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.starry.greenstash.ui.screens.analysis.BillAnalyzerViewModel
+import com.starry.greenstash.ui.screens.analysis.EmotionAnalyzerViewModel
 import io.noties.markwon.Markwon
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -43,7 +43,7 @@ import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BillAnalyzerScreen(goals: String?, viewModel: BillAnalyzerViewModel = viewModel()) {
+fun BillAnalyzerScreen(goals: String?, viewModel: EmotionAnalyzerViewModel = viewModel()) {
     val context = LocalContext.current // 获取 Context
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
@@ -183,7 +183,7 @@ fun BillAnalyzerScreen(goals: String?, viewModel: BillAnalyzerViewModel = viewMo
 @Composable
 fun BillAnalyzerScreenPreview() {
     // 创建预览专用的 ViewModel 实例
-    val previewViewModel = BillAnalyzerViewModel().apply {
+    val previewViewModel = EmotionAnalyzerViewModel().apply {
         setBillText("示例账单文本")
         setAnalysisResult("## 分析结果\n**这是加粗的文本**\n这是普通文本")
         setEmotionScore(80)

@@ -50,7 +50,7 @@ fun SendDatabaseDataButton(
                 }
             }
         ) {
-            Text("进行AI分析")
+            Text("情绪分析")
         }
     }
 }
