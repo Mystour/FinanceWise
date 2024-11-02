@@ -87,12 +87,7 @@ class EmotionAnalyzerViewModel(private val context: Context) : ViewModel() {
     }
 
     private suspend fun formatBillText(billText: String): String {
-        val prompt = """
-            请将以下账单文本转换为规范的表格格式，包含以下列：日期、项目、金额、地点（如果可以提取）。
-
-            账单文本：
-            $billText
-        """.trimIndent()
+        val prompt = context.getString(R.string.format_bill_text_prompt, billText)
 
         return try {
             val response = generativeModel.generateContent(prompt)
@@ -101,6 +96,7 @@ class EmotionAnalyzerViewModel(private val context: Context) : ViewModel() {
             billText
         }
     }
+
 
     private fun isJson(text: String): Boolean {
         return try {

@@ -72,7 +72,6 @@
 
         Please clearly indicate the emotional score (0-100 points) and the emotional comment in the analysis results.
     </string>
-
     <string name="detailed_analysis_prompt" tools:ignore="MissingTranslation">
         Here is my billing information for the past month:
 
@@ -86,11 +85,14 @@
         4. Based on my spending and emotional analysis, please provide some specific suggestions to help me better manage my finances, such as how to reduce unnecessary expenses, how to set a reasonable budget, and how to save and invest.
         5. Please help me create a spending plan for the next month. Based on my goals and current spending status, create a reasonable and challenging spending plan to achieve the nearest goal (obtained from the goal field, focusing on the title and additionalNotes, which usually provide accurate goals), and calculate how long it will take to achieve the goal and whether it can be completed within the expected time.
     </string>
+    <string name="format_bill_text_prompt" tools:ignore="MissingTranslation">
+        Please convert the following billing text into a standardized table format with the following columns: Date, Item, Amount, Location (if extractable).
 
+        Billing Text:
+        %1$s
+    </string>
     <string name="default_emotion_comment" tools:ignore="MissingTranslation">Your recent emotional state may be **mildly anxious**.</string>
-
     <string name="score_pattern" tools:ignore="MissingTranslation">Emotional Score\\D*(\\d+)</string>
-
     <string name="comment_pattern" tools:ignore="MissingTranslation">Emotional Comment\\s*(.*?)(?=\\n\\*|\\n\\n|\\n$|\\.\\s*|。\\s*)</string>
 
 

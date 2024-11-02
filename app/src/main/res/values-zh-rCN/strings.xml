@@ -85,6 +85,12 @@
         4. 根据我的消费情况和情绪分析，请给我一些具体的建议，帮助我更好地管理我的财务，例如如何减少不必要的开支，如何制定合理的预算，如何进行储蓄和投资？
         5. 请帮我制定一个未来一个月的消费规划，根据我的目标和目前的消费状态，制定一个合理且具有挑战性的消费计划来实现最近的那个目标（从goal字段获取，尤其关注title和additionalNotes，一般能够得到准确的目标），并计算距离我实现目标还需要多久，能否在预期时间内完成目标。
     </string>
+    <string name="format_bill_text_prompt">
+        请将以下账单文本转换为规范的表格格式，包含以下列：日期、项目、金额、地点（如果可以提取）。
+
+        账单文本：
+        %1$s
+    </string>
     <string name="default_emotion_comment">你最近的情绪状态可能处于**轻微焦虑**的状态</string>
     <string name="score_pattern">情绪分数\\D*(\\d+)</string>
     <string name="comment_pattern">情绪评论\\s*(.*?)(?=\\n\\*|\\n\\n|\\n$|\\.\\s*|。\\s*)</string>

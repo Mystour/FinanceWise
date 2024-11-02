@@ -17,7 +17,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -42,10 +41,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.ViewModelProvider // 导入 ViewModelProvider
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -198,7 +193,7 @@ fun BillAnalyzerScreenPreview() {
         setBillText("示例账单文本")
         setAnalysisResult("## 分析结果\n**这是加粗的文本**\n这是普通文本")
         setEmotionScore(80)
-        setEmotionComment("这是一个情绪评论")
+        setEmotionComment("：这是一个情绪评论")
         setIsLoading(false)
     }
 
