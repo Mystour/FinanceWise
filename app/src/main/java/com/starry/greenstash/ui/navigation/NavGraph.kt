@@ -33,7 +33,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.starry.greenstash.ui.screens.analysis.composables.BillAnalyzerScreen
+import com.starry.greenstash.ui.screens.emotion.composables.BillAnalyzerScreen
 import com.starry.greenstash.ui.screens.archive.composables.ArchiveScreen
 import com.starry.greenstash.ui.screens.backups.composables.BackupScreen
 import com.starry.greenstash.ui.screens.dwscreen.composables.DWScreen
@@ -45,7 +45,7 @@ import com.starry.greenstash.ui.screens.settings.composables.AboutScreen
 import com.starry.greenstash.ui.screens.settings.composables.GoalCardStyle
 import com.starry.greenstash.ui.screens.settings.composables.OSLScreen
 import com.starry.greenstash.ui.screens.settings.composables.SettingsScreen
-import com.starry.greenstash.ui.screens.visualfinance.composables.VisualScreen
+import com.starry.greenstash.ui.screens.recognition.composables.VisualScreen
 import com.starry.greenstash.ui.screens.welcome.composables.WelcomeScreen
 
 

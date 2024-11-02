@@ -1,4 +1,4 @@
-package com.starry.greenstash.ui.screens.analysis.composables
+package com.starry.greenstash.ui.screens.emotion.composables
 
 import android.content.Context
 import android.graphics.Typeface

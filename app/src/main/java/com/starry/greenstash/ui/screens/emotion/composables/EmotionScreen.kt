@@ -1,4 +1,4 @@
-package com.starry.greenstash.ui.screens.analysis.composables
+package com.starry.greenstash.ui.screens.emotion.composables
 
 import android.text.method.LinkMovementMethod
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -35,17 +36,16 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.toSpanned
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.starry.greenstash.R
-import com.starry.greenstash.ui.screens.analysis.EmotionAnalyzerViewModel
+import com.starry.greenstash.ui.screens.emotion.EmotionViewModel
 import io.noties.markwon.Markwon
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BillAnalyzerScreen(goals: String?, viewModel: EmotionAnalyzerViewModel = viewModel(factory = EmotionAnalyzerViewModelFactory(LocalContext.current))) {
+fun BillAnalyzerScreen(goals: String?, viewModel: EmotionViewModel = viewModel(factory = EmotionViewModelFactory(LocalContext.current))) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
@@ -120,6 +120,23 @@ fun BillAnalyzerScreen(goals: String?, viewModel: EmotionAnalyzerViewModel = vie
                     }
                 }
 
+                // 显示描述
+                val description = stringResource(id = R.string.emotion_analysis_desc)
+                val annotatedDescription = buildAnnotatedString {
+                    append(description)
+                    // 可以在这里添加更多的样式，例如加粗某些部分
+                    // pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                    // append("重要部分")
+                    // pop()
+                }
+
+                Text(
+                    text = annotatedDescription,
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Justify,
+                    modifier = Modifier.padding(16.dp)
+                )
+
                 // 使用 Markwon 处理 Markdown 文本
                 val markwon = Markwon.create(context)
                 val spanned = remember(viewModel.analysisResult) {
@@ -181,14 +198,13 @@ fun BillAnalyzerScreen(goals: String?, viewModel: EmotionAnalyzerViewModel = vie
     }
 }
 
-
 @Preview(showBackground = true, apiLevel = 34)
 @Composable
 fun BillAnalyzerScreenPreview() {
     val context = LocalContext.current
 
-    // 创建一个模拟的 EmotionAnalyzerViewModel
-    val previewViewModel = EmotionAnalyzerViewModel(context).apply {
+    // 创建一个模拟的 EmotionViewModel
+    val previewViewModel = EmotionViewModel(context).apply {
         // 使用公共方法设置状态
         setBillText("示例账单文本")
         setAnalysisResult("## 分析结果\n**这是加粗的文本**\n这是普通文本")

@@ -1,4 +1,4 @@
-package com.starry.greenstash.ui.screens.visualfinance
+package com.starry.greenstash.ui.screens.recognition
 
 import android.graphics.Bitmap
 import androidx.compose.runtime.getValue
@@ -12,7 +12,7 @@ import com.starry.greenstash.BuildConfig
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class VisualViewModel : ViewModel() {
+class RecognitionViewModel : ViewModel() {
     private val generativeModel by lazy {
         GenerativeModel(
             modelName = "gemini-1.5-flash",

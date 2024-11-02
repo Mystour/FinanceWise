@@ -55,7 +55,7 @@
     <!-- Emotion Analysis Screen -->
     <string name="emotion_analysis_title">账单情绪分析</string>
     <string name="emotion_analysis_desc">
-        我们使用人工智能来分析你输入的文本，并为你提供一个情感评分
+        我们使用人工智能来分析你的交易历史，并为你提供一个情绪评分
     </string>
     <string name="content_hint">账单内容</string>
     <string name="emotion_score">情绪评分</string>
@@ -102,6 +102,13 @@
     <string name="deposit_successful">存钱成功！</string>
     <string name="withdraw_successful">取钱成功！</string>
     <string name="withdraw_overflow_error">取出金额多于当前存入的金额！</string>
+
+    <string name="bill_recognition_title">账单识别</string>
+    <string name="bill_recognition_desc">
+        我们将使用AI来分析您上传的图片，并提取出账单信息自动填入到您的交易记录中。
+    </string>
+    <string name="select_image_button">选择图片</string>
+    <string name="analyze_image_button">分析图片</string>
 
     <!-- Congratulations Screen -->
     <string name="goal_achieved_heading">恭喜 🥳</string>

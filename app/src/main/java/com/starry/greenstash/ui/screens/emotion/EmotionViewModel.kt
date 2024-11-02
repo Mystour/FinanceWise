@@ -1,4 +1,4 @@
-package com.starry.greenstash.ui.screens.analysis
+package com.starry.greenstash.ui.screens.emotion
 
 import android.content.Context
 import androidx.compose.runtime.*
@@ -11,7 +11,7 @@ import com.starry.greenstash.R
 import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 
-class EmotionAnalyzerViewModel(private val context: Context) : ViewModel() {
+class EmotionViewModel(private val context: Context) : ViewModel() {
     private val generativeModel by lazy {
         GenerativeModel(
             modelName = "gemini-1.5-flash",

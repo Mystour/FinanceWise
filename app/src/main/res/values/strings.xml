@@ -55,7 +55,7 @@
     <!-- Emotion Analysis Screen -->
     <string name="emotion_analysis_title" tools:ignore="MissingTranslation">Bill Emotion Analysis</string>
     <string name="emotion_analysis_desc" tools:ignore="MissingTranslation">
-        We use AI to analyze the text you enter and provide you with a sentiment score
+        We use AI to analyze your transaction history and provide you with a sentiment score
     </string>
     <string name="content_hint" tools:ignore="MissingTranslation">The Bill Content</string>
     <string name="emotion_score" tools:ignore="MissingTranslation">Emotion Score</string>
@@ -104,6 +104,14 @@
     <string name="deposit_successful">Deposited Successfully!</string>
     <string name="withdraw_successful">Withdrawn Successfully!</string>
     <string name="withdraw_overflow_error">Amount is more than current deposited amount!</string>
+
+    <!-- Bill Recognition Screen -->
+    <string name="bill_recognition_title" tools:ignore="MissingTranslation">Bill Recognition</string>
+    <string name="bill_recognition_desc" tools:ignore="MissingTranslation">
+        We will use AI to analyze the images you upload and extract the billing information to automatically fill in your transaction history.
+    </string>
+    <string name="select_image_button" tools:ignore="MissingTranslation">Select Image</string>
+    <string name="analyze_image_button" tools:ignore="MissingTranslation">Analyze Image</string>
 
     <!-- Congratulations Screen -->
     <string name="goal_achieved_heading">Congratulations 🥳</string>
