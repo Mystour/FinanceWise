@@ -59,6 +59,8 @@
     </string>
     <string name="content_hint" tools:ignore="MissingTranslation">The Bill Content</string>
     <string name="emotion_score" tools:ignore="MissingTranslation">Emotion Score</string>
+    <string name="score_text" formatted="false" tools:ignore="MissingTranslation">%1$d points %2$s</string>
+
     <string name="initial_analysis_prompt" tools:ignore="MissingTranslation">
         Here is my billing information for the past month:
 

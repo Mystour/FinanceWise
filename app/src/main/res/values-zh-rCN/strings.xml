@@ -59,6 +59,7 @@
     </string>
     <string name="content_hint">账单内容</string>
     <string name="emotion_score">情绪评分</string>
+    <string name="score_text" formatted="false">%1$d 分 %2$s</string>
     <string name="initial_analysis_prompt">
         以下是我最近一个月的账单信息：
 
