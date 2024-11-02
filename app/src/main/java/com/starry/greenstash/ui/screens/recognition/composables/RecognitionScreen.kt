@@ -66,6 +66,14 @@ fun VisualScreen() {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
 
+        // 显示标题
+        Text(
+            text = stringResource(id = R.string.bill_recognition_title),
+            style = MaterialTheme.typography.headlineLarge,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(vertical = 16.dp)
+        )
+
         // 显示描述
         val description = stringResource(id = R.string.bill_recognition_desc)
         val annotatedDescription = buildAnnotatedString {
@@ -75,13 +83,6 @@ fun VisualScreen() {
             // append("重要部分")
             // pop()
         }
-
-        Text(
-            text = annotatedDescription,
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Justify,
-            modifier = Modifier.padding(16.dp)
-        )
 
         Button(onClick = {
             permissionLauncher.launch(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -120,15 +121,18 @@ fun VisualScreen() {
             Text(viewModel.analysisResult)
         }
 
+        // 使用 Spacer 来确保 description 在底部显示
+        Spacer(modifier = Modifier.weight(1f))
+
         // 使用 Box 布局来包裹 Text 组件，并将其对齐到 Box 的底部中心
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(bottom = 8.dp),
             contentAlignment = Alignment.BottomCenter
         ) {
             Text(
-                text = "滑动屏幕以查看更多内容",
+                text = description,
                 style = TextStyle(
                     fontSize = 12.sp,
                     color = Color.Gray
