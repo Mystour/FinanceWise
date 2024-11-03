@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
-    <string name="app_name" translatable="false">GreenStash</string>
+    <string name="app_name" translatable="false">FinanceWise</string>
 
     <!-- Other Strings -->
     <string name="confirm">Подтвердить</string>
