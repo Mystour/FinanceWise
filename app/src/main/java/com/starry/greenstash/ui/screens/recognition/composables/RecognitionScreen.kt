@@ -45,7 +45,7 @@ import com.starry.greenstash.utils.ImageUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VisualScreen() {
+fun RecognitionScreen() {
     val viewModel: RecognitionViewModel = viewModel()
     val context = LocalContext.current
 
@@ -159,6 +159,6 @@ fun VisualScreen() {
 // 预览功能
 @Preview(showBackground = true)
 @Composable
-fun VisualScreenPreview() {
-    VisualScreen()
+fun RecognitionScreenPreview() {
+    RecognitionScreen()
 }

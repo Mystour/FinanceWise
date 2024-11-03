@@ -2,6 +2,7 @@ package com.starry.greenstash.ui.screens.emotion.composables
 
 import android.text.method.LinkMovementMethod
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,15 +24,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.toSpanned
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -130,12 +134,22 @@ fun BillAnalyzerScreen(goals: String?, viewModel: EmotionViewModel = viewModel(f
                     // pop()
                 }
 
-                Text(
-                    text = annotatedDescription,
-                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
-                    textAlign = TextAlign.Justify,
-                    modifier = Modifier.padding(16.dp)
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    contentAlignment = Alignment.BottomCenter
+                ) {
+                    Text(
+                        text = annotatedDescription,
+                        style = TextStyle(
+                            fontSize = 12.sp,
+                            color = Color.Gray
+                        ),
+                        textAlign = TextAlign.Justify,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
 
                 // 使用 Markwon 处理 Markdown 文本
                 val markwon = Markwon.create(context)
