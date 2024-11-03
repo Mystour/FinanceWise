@@ -1,5 +1,6 @@
 package com.starry.greenstash.ui.screens.recognition
 
+import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,10 +10,11 @@ import androidx.lifecycle.viewModelScope
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.content
 import com.starry.greenstash.BuildConfig
+import com.starry.greenstash.R
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class RecognitionViewModel : ViewModel() {
+class RecognitionViewModel(private val context: Context) : ViewModel() {
     private val generativeModel by lazy {
         GenerativeModel(
             modelName = "gemini-1.5-flash",
@@ -41,7 +43,8 @@ class RecognitionViewModel : ViewModel() {
         callback: (String) -> Unit
     ) {
         try {
-            val prompt = "请分析以下图片的内容，并尽可能详细地描述图片中的物品、场景、人物等信息，并推测图片背后的故事或含义。"
+            // 从资源文件中读取提示文本
+            val prompt = context.getString(R.string.initial_recognition_prompt)
             Timber.d("Generated prompt: $prompt")
             val response = generativeModel.generateContent(content { image(bitmap); text(prompt) })
             Timber.d("Received response: $response")
@@ -54,5 +57,4 @@ class RecognitionViewModel : ViewModel() {
             callback("分析出错: ${e.message}")
         }
     }
-
 }

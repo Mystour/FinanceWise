@@ -103,12 +103,16 @@
     <string name="withdraw_successful">取钱成功！</string>
     <string name="withdraw_overflow_error">取出金额多于当前存入的金额！</string>
 
+    <!-- Bill Recognition Screen -->
     <string name="bill_recognition_title">账单识别</string>
     <string name="bill_recognition_desc">
         我们将使用AI来分析您上传的图片，并提取出账单信息自动填入到您的交易记录中。
     </string>
     <string name="select_image_button">选择图片</string>
     <string name="analyze_image_button">分析图片</string>
+    <string name="initial_recognition_prompt">
+        请分析以下图片的内容，并尽可能详细地描述图片中的物品、场景、人物等信息，并推测图片背后的故事或含义。
+    </string>
 
     <!-- Congratulations Screen -->
     <string name="goal_achieved_heading">恭喜 🥳</string>
