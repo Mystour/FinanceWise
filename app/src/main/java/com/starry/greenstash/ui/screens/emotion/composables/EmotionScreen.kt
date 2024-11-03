@@ -132,7 +132,7 @@ fun BillAnalyzerScreen(goals: String?, viewModel: EmotionViewModel = viewModel(f
 
                 Text(
                     text = annotatedDescription,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
                     textAlign = TextAlign.Justify,
                     modifier = Modifier.padding(16.dp)
                 )
