@@ -51,6 +51,7 @@
     <string name="home_search_label">搜索此处…</string>
     <string name="search_goal_not_found">404: 目标未发现！</string>>
     <string name="emotion_analysis_button">情绪分析</string>
+    <string name="emotion_analysis_button_error">无法获取数据!</string>
 
     <!-- Emotion Analysis Screen -->
     <string name="emotion_analysis_title">账单情绪分析</string>

@@ -51,6 +51,7 @@
     <string name="home_search_label">Search here…</string>
     <string name="search_goal_not_found">404: Goal not found!</string>>
     <string name="emotion_analysis_button" tools:ignore="MissingTranslation">Emotion Analysis</string>
+    <string name="emotion_analysis_button_error" tools:ignore="MissingTranslation">Data not available!</string>
 
     <!-- Emotion Analysis Screen -->
     <string name="emotion_analysis_title" tools:ignore="MissingTranslation">Bill Emotion Analysis</string>

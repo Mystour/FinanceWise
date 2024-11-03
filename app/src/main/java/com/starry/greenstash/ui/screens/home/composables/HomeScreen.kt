@@ -25,6 +25,7 @@
 
 package com.starry.greenstash.ui.screens.home.composables
 
+import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.keyframes
@@ -268,7 +269,8 @@ fun HomeScreen(navController: NavController) {
                             )
                         }
 
-                        SendDatabaseDataButton(navController, viewModel)
+                        // 传递 activity 参数
+                        SendDatabaseDataButton(navController, viewModel, activity = context as Activity)
                     }
                 }
             }
@@ -276,6 +278,7 @@ fun HomeScreen(navController: NavController) {
 
     }
 }
+
 
 
 @Composable

@@ -25,9 +25,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun SendDatabaseDataButton(
     navController: NavController,
-    viewModel: HomeViewModel
+    viewModel: HomeViewModel,
+    activity: Activity // 添加 activity 参数
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val errorMessage = stringResource(id = R.string.emotion_analysis_button_error) // 提前获取字符串资源
 
     Spacer(modifier = Modifier.height(16.dp))
     Box(
@@ -47,7 +49,7 @@ fun SendDatabaseDataButton(
                         navController.navigate("billAnalyzerScreen/$params")
                     } else {
                         println("Params is null")
-                        Toast.makeText(Activity(), "无法获取数据", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(activity, errorMessage, Toast.LENGTH_SHORT).show()
                     }
                 }
             }
