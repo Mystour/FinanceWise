@@ -211,7 +211,6 @@ fun BillAnalyzerScreen(goals: String?, viewModel: EmotionViewModel = viewModel(f
     }
 }
 
-
 @Preview(showBackground = true, apiLevel = 34)
 @Composable
 fun BillAnalyzerScreenPreview() {
@@ -229,4 +228,9 @@ fun BillAnalyzerScreenPreview() {
 
     // 使用预览提供的 ViewModel
     BillAnalyzerScreen(goals = "Sample bill text", viewModel = previewViewModel)
+
+    // 调试信息
+    val description = stringResource(id = R.string.emotion_analysis_desc)
+    println("Description: $description")
 }
+
