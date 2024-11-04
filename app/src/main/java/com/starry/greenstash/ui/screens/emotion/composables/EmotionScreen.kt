@@ -123,33 +123,6 @@ fun BillAnalyzerScreen(goals: String?, viewModel: EmotionViewModel = viewModel(f
                     }
                 }
 
-                // 显示描述
-                val description = stringResource(id = R.string.emotion_analysis_desc)
-                val annotatedDescription = buildAnnotatedString {
-                    append(description)
-                    // 可以在这里添加更多的样式，例如加粗某些部分
-                    // pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-                    // append("重要部分")
-                    // pop()
-                }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                    contentAlignment = Alignment.BottomCenter
-                ) {
-                    Text(
-                        text = annotatedDescription,
-                        style = TextStyle(
-                            fontSize = 12.sp,
-                            color = Color.Gray
-                        ),
-                        textAlign = TextAlign.Justify,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
-
                 // 使用 Markwon 处理 Markdown 文本
                 val markwon = Markwon.create(context)
                 val spanned = remember(viewModel.analysisResult) {
@@ -197,19 +170,47 @@ fun BillAnalyzerScreen(goals: String?, viewModel: EmotionViewModel = viewModel(f
                     modifier = Modifier.padding(16.dp)
                 )
             }
-        }
 
-        // 监听分析结果的变化并自动滚动
-        LaunchedEffect(viewModel.analysisResult) {
-            if (viewModel.analysisResult.isNotBlank()) {
-                scope.launch {
-                    delay(300) // 延迟一段时间，确保内容已经渲染完成
-                    scrollState.animateScrollTo(scrollState.maxValue)
+            // 显示描述
+            val description = stringResource(id = R.string.emotion_analysis_desc)
+            val annotatedDescription = buildAnnotatedString {
+                append(description)
+                // 可以在这里添加更多的样式，例如加粗某些部分
+                // pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                // append("重要部分")
+                // pop()
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                Text(
+                    text = annotatedDescription,
+                    style = TextStyle(
+                        fontSize = 12.sp,
+                        color = Color.Gray
+                    ),
+                    textAlign = TextAlign.Justify,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+
+            // 监听分析结果的变化并自动滚动
+            LaunchedEffect(viewModel.analysisResult) {
+                if (viewModel.analysisResult.isNotBlank()) {
+                    scope.launch {
+                        delay(300) // 延迟一段时间，确保内容已经渲染完成
+                        scrollState.animateScrollTo(scrollState.maxValue)
+                    }
                 }
             }
         }
     }
 }
+
 
 @Preview(showBackground = true, apiLevel = 34)
 @Composable
@@ -219,13 +220,13 @@ fun BillAnalyzerScreenPreview() {
     // 创建一个模拟的 EmotionViewModel
     val previewViewModel = EmotionViewModel(context).apply {
         // 使用公共方法设置状态
-        setBillText("示例账单文本")
-        setAnalysisResult("## 分析结果\n**这是加粗的文本**\n这是普通文本")
+        setBillText("Sample bill text")
+        setAnalysisResult("## Analysis results\n**This is bold text** \nThis is plain text")
         setEmotionScore(80)
-        setEmotionComment("：这是一个情绪评论")
+        setEmotionComment(": This is an emotional comment")
         setIsLoading(false)
     }
 
     // 使用预览提供的 ViewModel
-    BillAnalyzerScreen(goals = "示例账单文本", viewModel = previewViewModel)
+    BillAnalyzerScreen(goals = "Sample bill text", viewModel = previewViewModel)
 }
