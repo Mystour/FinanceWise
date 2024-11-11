@@ -33,7 +33,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.starry.greenstash.ui.screens.emotion.composables.BillAnalyzerScreen
+import com.starry.greenstash.ui.screens.emotion.composables.EmotionScreen
 import com.starry.greenstash.ui.screens.archive.composables.ArchiveScreen
 import com.starry.greenstash.ui.screens.backups.composables.BackupScreen
 import com.starry.greenstash.ui.screens.dwscreen.composables.DWScreen
@@ -193,7 +193,7 @@ fun NavGraph(
         /** Bill Analyzer Screen */
         composable("billAnalyzerScreen/{goals}") { backStackEntry ->
             val goalsJson = backStackEntry.arguments?.getString("goals")
-            BillAnalyzerScreen(goalsJson)
+            EmotionScreen(goalsJson)
         }
 
     }

@@ -48,7 +48,7 @@ import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BillAnalyzerScreen(goals: String?, viewModel: EmotionViewModel = viewModel(factory = EmotionViewModelFactory(LocalContext.current))) {
+fun EmotionScreen(goals: String?, viewModel: EmotionViewModel = viewModel(factory = EmotionViewModelFactory(LocalContext.current))) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
@@ -227,7 +227,7 @@ fun BillAnalyzerScreenPreview() {
     }
 
     // 使用预览提供的 ViewModel
-    BillAnalyzerScreen(goals = "Sample bill text", viewModel = previewViewModel)
+    EmotionScreen(goals = "Sample bill text", viewModel = previewViewModel)
 
     // 调试信息
     val description = stringResource(id = R.string.emotion_analysis_desc)
