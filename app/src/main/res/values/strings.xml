@@ -98,8 +98,9 @@
     <string name="score_pattern" tools:ignore="MissingTranslation">Emotional Score\\D*(\\d+)</string>
     <string name="comment_pattern" tools:ignore="MissingTranslation">Emotional Comment\\s*(.*?)(?=\\n\\*|\\n\\n|\\n$|\\.\\s*|。\\s*)</string>
 
-    <string name="search_placeholder" tools:ignore="MissingTranslation">Search here…</string>
+    <string name="search_placeholder" tools:ignore="MissingTranslation">Filter here…</string>
     <string name="add_to_analysis" tools:ignore="MissingTranslation">Search here…</string>
+    <string name="reset_filter" tools:ignore="MissingTranslation">Reset</string>
 
 
     <!-- Deposit & Withdraw Screen -->

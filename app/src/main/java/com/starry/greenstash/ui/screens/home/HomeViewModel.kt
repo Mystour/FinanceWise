@@ -78,8 +78,6 @@ class HomeViewModel @Inject constructor(
 
     private val filterFlow = MutableStateFlow(filterFlowData.value)
 
-    private val _billAnalyzerParams: MutableState<String?> = mutableStateOf(null)
-
     @OptIn(ExperimentalCoroutinesApi::class)
     private val goalsListFlow = filterFlow.flatMapLatest { ffData ->
 
@@ -179,37 +177,4 @@ class HomeViewModel @Inject constructor(
         preferenceUtil.putBoolean(PreferenceUtil.HOME_SCREEN_ONBOARDING_BOOL, false)
         _showOnboardingTapTargets.value = false
     }
-
-    val billAnalyzerParams: State<String?>
-        get() = _billAnalyzerParams
-
-    // 设置 BillAnalyzerScreen 的参数
-    private fun setBillAnalyzerParams(params: String) {
-        try {
-            _billAnalyzerParams.value = params
-        } catch (e: Exception) {
-            e.printStackTrace()
-            println("Error in setBillAnalyzerParams: ${e.message}")
-        }
-    }
-
-    // 获取数据库中的数据并设置参数，suspend用于避免在主线程中执行数据库操作
-    suspend fun fetchAndSetBillAnalyzerParams() {
-        withContext(Dispatchers.IO) {
-            println("Starting fetchAndSetBillAnalyzerParams")
-            try {
-                val goalsWithTransactions = goalDao.getAllGoals()
-                val jsonGoalsWithTransactions = Json.encodeToString(goalsWithTransactions)
-                val encodedGoalsJson = URLEncoder.encode(jsonGoalsWithTransactions , "UTF-8")
-                withContext(Dispatchers.Main) {
-                    setBillAnalyzerParams(encodedGoalsJson)
-                }
-                println("Fetched and set params: $encodedGoalsJson")
-            } catch (e: Exception) {
-                e.printStackTrace()
-                println("Error fetching and setting params: ${e.message}")
-            }
-        }
-    }
-
 }

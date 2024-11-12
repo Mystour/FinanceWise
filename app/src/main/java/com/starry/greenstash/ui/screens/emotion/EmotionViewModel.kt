@@ -60,6 +60,10 @@ class EmotionViewModel @Inject constructor(
     val searchText: String
         get() = _searchText.value
 
+    init {
+        loadGoals()
+    }
+
     fun setBillText(text: String) {
         _billText.value = text
     }
@@ -82,6 +86,7 @@ class EmotionViewModel @Inject constructor(
 
     fun setSearchText(text: String) {
         _searchText.value = text
+        filterGoals(text)
     }
 
     fun loadGoals() {
@@ -196,7 +201,6 @@ class EmotionViewModel @Inject constructor(
         return String.format(detailedPrompt, billText)
     }
 
-    // 添加新的函数
     fun getDefaultCurrency(): String {
         return preferenceUtil.getString(PreferenceUtil.DEFAULT_CURRENCY_STR, "")!!
     }
@@ -204,14 +208,6 @@ class EmotionViewModel @Inject constructor(
     fun getDateFormatPattern(): String {
         return preferenceUtil.getString(PreferenceUtil.DATE_FORMAT_STR, "")!!
     }
-
-    private val _filterState = mutableStateOf("Option 1")
-    val filterState: String get() = _filterState.value
-
-    fun updateFilterState(newValue: String) {
-        _filterState.value = newValue
-    }
-
 
     fun filterGoals(query: String) {
         // 根据查询过滤目标
@@ -224,4 +220,15 @@ class EmotionViewModel @Inject constructor(
     fun addGoalToAnalysis(goal: GoalWithTransactions) {
         // 将目标加入分析
     }
+
+    fun reset() {
+        _billText.value = ""
+        _analysisResult.value = ""
+        _emotionScore.intValue = 0
+        _emotionComment.value = ""
+        _isLoading.value = false
+        _goals.value = emptyList()
+        _searchText.value = ""
+    }
 }
+
