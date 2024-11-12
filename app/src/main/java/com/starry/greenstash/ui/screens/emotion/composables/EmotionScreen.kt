@@ -8,10 +8,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,6 +32,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,6 +47,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.google.gson.Gson
 import com.starry.greenstash.R
 import com.starry.greenstash.database.core.GoalWithTransactions
 import com.starry.greenstash.ui.screens.emotion.EmotionViewModel
@@ -87,12 +93,21 @@ fun EmotionScreen(
                         placeholder = { Text(stringResource(id = R.string.search_placeholder)) },
                         modifier = Modifier
                             .fillMaxWidth(0.5f)
-                            .padding(horizontal = 8.dp)
+                            .padding(horizontal = 8.dp),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                viewModel.filterGoals(searchQuery.value)
+                            }
+                        )
                     )
 
                     // 添加重置筛选条件的按钮
                     IconButton(
                         onClick = {
+                            searchQuery.value = ""
                             viewModel.reset()
                         }
                     ) {
@@ -245,6 +260,8 @@ fun EmotionScreen(
                     .heightIn(max = 500.dp) // 限制 LazyColumn 的最大高度
             ) {
                 items(goalsState.value) { goal ->
+                    val gson = Gson()
+                    val isAdded = viewModel.billText.contains(gson.toJson(goal))
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -259,12 +276,16 @@ fun EmotionScreen(
                         )
                         IconButton(
                             onClick = {
-                                viewModel.addGoalToAnalysis(goal)
+                                if (isAdded) {
+                                    viewModel.removeGoalFromAnalysis(goal)
+                                } else {
+                                    viewModel.addGoalToAnalysis(goal)
+                                }
                             }
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = stringResource(id = R.string.add_to_analysis)
+                                imageVector = if (isAdded) Icons.Filled.Remove else Icons.Default.Add,
+                                contentDescription = if (isAdded) stringResource(id = R.string.remove_from_analysis) else stringResource(id = R.string.add_to_analysis)
                             )
                         }
                     }

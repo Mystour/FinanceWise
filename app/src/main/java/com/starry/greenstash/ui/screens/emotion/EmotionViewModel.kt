@@ -218,17 +218,42 @@ class EmotionViewModel @Inject constructor(
     }
 
     fun addGoalToAnalysis(goal: GoalWithTransactions) {
-        // 将目标加入分析
+        // 将目标转换为 JSON 格式
+        val gson = Gson()
+        val goalJson = gson.toJson(goal)
+
+        // 定义颜色标记
+        val colorStart = "<span style='color: blue;'>"
+        val colorEnd = "</span>"
+
+        // 将 JSON 字符串添加到 _billText 中
+        val coloredGoalJson = "$colorStart$goalJson$colorEnd"
+        _billText.value = "${_billText.value}\n$coloredGoalJson"
+    }
+
+    fun removeGoalFromAnalysis(goal: GoalWithTransactions) {
+        // 将目标转换为 JSON 格式
+        val gson = Gson()
+        val goalJson = gson.toJson(goal)
+
+        // 从 _billText 中移除目标
+        _billText.value = _billText.value.replace(goalJson, "")
     }
 
     fun reset() {
+        // 重置搜索文本
+        _searchText.value = ""
+
+        // 重置情绪分析结果
         _billText.value = ""
         _analysisResult.value = ""
         _emotionScore.intValue = 0
         _emotionComment.value = ""
+
+        // 重置加载状态
         _isLoading.value = false
-        _goals.value = emptyList()
-        _searchText.value = ""
+
+        // 重新加载所有目标
+        loadGoals()
     }
 }
-

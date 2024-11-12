@@ -100,6 +100,7 @@
 
     <string name="search_placeholder" tools:ignore="MissingTranslation">Filter here…</string>
     <string name="add_to_analysis" tools:ignore="MissingTranslation">Search here…</string>
+    <string name="remove_from_analysis" tools:ignore="MissingTranslation">Remove</string>
     <string name="reset_filter" tools:ignore="MissingTranslation">Reset</string>
 
 
