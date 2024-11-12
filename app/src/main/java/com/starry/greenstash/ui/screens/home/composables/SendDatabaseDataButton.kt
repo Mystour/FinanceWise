@@ -12,23 +12,19 @@ import androidx.compose.material.Button
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.starry.greenstash.R
-import com.starry.greenstash.ui.screens.home.HomeViewModel
-import kotlinx.coroutines.launch
+import com.starry.greenstash.ui.navigation.NormalScreens
 
 @Composable
 fun SendDatabaseDataButton(
     navController: NavController,
-    viewModel: HomeViewModel,
     activity: Activity // 添加 activity 参数
 ) {
-    val coroutineScope = rememberCoroutineScope()
     val errorMessage = stringResource(id = R.string.emotion_analysis_button_error) // 提前获取字符串资源
 
     Spacer(modifier = Modifier.height(16.dp))
@@ -40,18 +36,7 @@ fun SendDatabaseDataButton(
     ) {
         Button(
             onClick = {
-                coroutineScope.launch {
-                    println("Starting fetchAndSetBillAnalyzerParams")
-                    viewModel.fetchAndSetBillAnalyzerParams()
-                    val params = viewModel.billAnalyzerParams.value
-                    if (params != null) {
-                        println("Params: $params")
-                        navController.navigate("billAnalyzerScreen/$params")
-                    } else {
-                        println("Params is null")
-                        Toast.makeText(activity, errorMessage, Toast.LENGTH_SHORT).show()
-                    }
-                }
+                navController.navigate(NormalScreens.EmotionScreen)
             }
         ) {
             Text(text = stringResource(id = R.string.emotion_analysis_button))

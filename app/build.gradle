@@ -16,7 +16,7 @@ android {
     compileSdk 35
 
     defaultConfig {
-        applicationId "com.starry.greenstash.debug"
+        applicationId "com.starry.greenstash.debugv2"
         minSdk 24
         targetSdk 35
         versionCode 391

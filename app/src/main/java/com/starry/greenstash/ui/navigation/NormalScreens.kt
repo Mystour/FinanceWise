@@ -43,6 +43,9 @@ sealed class NormalScreens : Screen() {
     data class VisualFinance(val goalId: String) // Add VisualFinance screen
 
     @Serializable
+    data object EmotionScreen
+
+    @Serializable
     data object AboutScreen
 
     @Serializable

@@ -270,7 +270,7 @@ fun HomeScreen(navController: NavController) {
                         }
 
                         // 传递 activity 参数
-                        SendDatabaseDataButton(navController, viewModel, activity = context as Activity)
+                        SendDatabaseDataButton(navController, activity = context as Activity)
                     }
                 }
             }

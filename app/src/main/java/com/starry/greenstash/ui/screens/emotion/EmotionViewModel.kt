@@ -8,10 +8,23 @@ import com.google.ai.client.generativeai.GenerativeModel
 import com.google.gson.Gson
 import com.starry.greenstash.BuildConfig
 import com.starry.greenstash.R
+import com.starry.greenstash.database.core.GoalWithTransactions
+import com.starry.greenstash.database.goal.GoalDao // 导入正确的 DAO
+import com.starry.greenstash.utils.PreferenceUtil
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import java.util.regex.Pattern
 
-class EmotionViewModel(private val context: Context) : ViewModel() {
+@HiltViewModel
+class EmotionViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val goalDao: GoalDao,
+    private val preferenceUtil: PreferenceUtil
+) : ViewModel() {
     private val generativeModel by lazy {
         GenerativeModel(
             modelName = "gemini-1.5-flash",
@@ -39,6 +52,14 @@ class EmotionViewModel(private val context: Context) : ViewModel() {
     val isLoading: Boolean
         get() = _isLoading.value
 
+    private val _goals = MutableStateFlow<List<GoalWithTransactions>>(emptyList())
+    val goals: StateFlow<List<GoalWithTransactions>>
+        get() = _goals
+
+    private val _searchText = mutableStateOf("")
+    val searchText: String
+        get() = _searchText.value
+
     fun setBillText(text: String) {
         _billText.value = text
     }
@@ -59,8 +80,15 @@ class EmotionViewModel(private val context: Context) : ViewModel() {
         _isLoading.value = isLoading
     }
 
-    fun initializeBillText(goals: String?) {
-        setBillText(goals ?: "")
+    fun setSearchText(text: String) {
+        _searchText.value = text
+    }
+
+    fun loadGoals() {
+        viewModelScope.launch {
+            val goalsList = goalDao.getAllGoals() // 使用 GoalDao 的方法
+            _goals.value = goalsList
+        }
     }
 
     fun analyzeBill() {
@@ -96,7 +124,6 @@ class EmotionViewModel(private val context: Context) : ViewModel() {
             billText
         }
     }
-
 
     private fun isJson(text: String): Boolean {
         return try {
@@ -159,7 +186,6 @@ class EmotionViewModel(private val context: Context) : ViewModel() {
         return Pair(score, comment)
     }
 
-
     private fun createInitialAnalysisPrompt(billText: String): String {
         val initialPrompt = context.getString(R.string.initial_analysis_prompt)
         return String.format(initialPrompt, billText)
@@ -168,5 +194,14 @@ class EmotionViewModel(private val context: Context) : ViewModel() {
     private fun createDetailedAnalysisPrompt(billText: String): String {
         val detailedPrompt = context.getString(R.string.detailed_analysis_prompt)
         return String.format(detailedPrompt, billText)
+    }
+
+    // 添加新的函数
+    fun getDefaultCurrency(): String {
+        return preferenceUtil.getString(PreferenceUtil.DEFAULT_CURRENCY_STR, "")!!
+    }
+
+    fun getDateFormatPattern(): String {
+        return preferenceUtil.getString(PreferenceUtil.DATE_FORMAT_STR, "")!!
     }
 }

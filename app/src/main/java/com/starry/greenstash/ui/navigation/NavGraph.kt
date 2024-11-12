@@ -190,11 +190,14 @@ fun NavGraph(
             RecognitionScreen() // 调用 RecognitionScreen
         }
 
-        /** Bill Analyzer Screen */
-        composable("billAnalyzerScreen/{goals}") { backStackEntry ->
-            val goalsJson = backStackEntry.arguments?.getString("goals")
-            EmotionScreen(goalsJson)
+        /** Emotion Screen */
+        composable<NormalScreens.EmotionScreen>(
+            enterTransition = { enterTransition() },
+            popExitTransition = { popExitTransition() },
+        ) {
+            EmotionScreen(navController = navController)
         }
+
 
     }
 }
