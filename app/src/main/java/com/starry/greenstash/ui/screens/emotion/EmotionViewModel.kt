@@ -204,4 +204,24 @@ class EmotionViewModel @Inject constructor(
     fun getDateFormatPattern(): String {
         return preferenceUtil.getString(PreferenceUtil.DATE_FORMAT_STR, "")!!
     }
+
+    private val _filterState = mutableStateOf("Option 1")
+    val filterState: String get() = _filterState.value
+
+    fun updateFilterState(newValue: String) {
+        _filterState.value = newValue
+    }
+
+
+    fun filterGoals(query: String) {
+        // 根据查询过滤目标
+        val filteredGoals = _goals.value.filter { goal ->
+            goal.goal.title.contains(query, ignoreCase = true)
+        }
+        _goals.value = filteredGoals
+    }
+
+    fun addGoalToAnalysis(goal: GoalWithTransactions) {
+        // 将目标加入分析
+    }
 }

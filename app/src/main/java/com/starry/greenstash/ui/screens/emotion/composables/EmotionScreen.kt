@@ -1,34 +1,20 @@
 package com.starry.greenstash.ui.screens.emotion.composables
 
+import android.content.Context
 import android.text.method.LinkMovementMethod
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -47,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.toSpanned
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionResult
@@ -58,10 +44,6 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.starry.greenstash.R
 import com.starry.greenstash.database.core.GoalWithTransactions
 import com.starry.greenstash.ui.screens.emotion.EmotionViewModel
-import androidx.compose.material3.OutlinedTextField
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.starry.greenstash.database.goal.Goal
-import com.starry.greenstash.database.transaction.Transaction
 import com.starry.greenstash.ui.theme.greenstashFont
 import io.noties.markwon.Markwon
 import kotlinx.coroutines.CoroutineScope
@@ -74,35 +56,55 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmotionScreen(
-    viewModel: EmotionViewModel = hiltViewModel(),
-    navController: NavController
+   viewModel: EmotionViewModel = hiltViewModel(),
+   navController: NavController
 ) {
    val context = LocalContext.current
    val scope = rememberCoroutineScope()
    val scrollState = rememberScrollState()
    val snackBarHostState = remember { SnackbarHostState() }
    val goalsState = viewModel.goals.collectAsState(initial = emptyList())
+   val searchQuery = remember { mutableStateOf("") }
 
    LaunchedEffect(Unit) {
        viewModel.loadGoals()
    }
 
-    Scaffold(
-        topBar = { TopAppBar(title = stringResource(id = R.string.emotion_analysis_title)) }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .padding(16.dp)
-                .verticalScroll(scrollState),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(32.dp)
-        ) {
-            BillInput(
-                billText = viewModel.billText,
-                onBillTextChange = { viewModel.setBillText(it) }
-            )
+   Scaffold(
+       topBar = {
+           TopAppBar(
+               title = {
+                   Text(text = stringResource(id = R.string.emotion_analysis_title))
+               },
+               actions = {
+                   TextField(
+                       value = searchQuery.value,
+                       onValueChange = { query ->
+                           searchQuery.value = query
+                           viewModel.filterGoals(query)
+                       },
+                       placeholder = { Text(stringResource(id = R.string.search_placeholder)) },
+                       modifier = Modifier
+                           .fillMaxWidth(0.5f)
+                           .padding(horizontal = 8.dp)
+                   )
+               }
+           )
+       }
+   ) { innerPadding ->
+       Column(
+           modifier = Modifier
+               .padding(innerPadding)
+               .fillMaxSize()
+               .padding(16.dp)
+               .verticalScroll(scrollState), // 使整个 Column 可滚动
+           horizontalAlignment = Alignment.CenterHorizontally,
+           verticalArrangement = Arrangement.spacedBy(32.dp)
+       ) {
+           BillInput(
+               billText = viewModel.billText,
+               onBillTextChange = { viewModel.setBillText(it) }
+           )
 
            Button(
                onClick = {
@@ -223,6 +225,39 @@ fun EmotionScreen(
                )
            }
 
+           // 显示过滤后的目标列表
+           LazyColumn(
+               modifier = Modifier
+                   .fillMaxWidth()
+                   .heightIn(max = 500.dp) // 限制 LazyColumn 的最大高度
+           ) {
+               items(goalsState.value) { goal ->
+                   Row(
+                       modifier = Modifier
+                           .fillMaxWidth()
+                           .padding(vertical = 8.dp),
+                       horizontalArrangement = Arrangement.SpaceBetween,
+                       verticalAlignment = Alignment.CenterVertically
+                   ) {
+                       Text(
+                           text = goal.goal.title, // 只显示目标的 title
+                           style = MaterialTheme.typography.bodyMedium,
+                           modifier = Modifier.weight(1f)
+                       )
+                       IconButton(
+                           onClick = {
+                               viewModel.addGoalToAnalysis(goal)
+                           }
+                       ) {
+                           Icon(
+                               imageVector = Icons.Default.Add,
+                               contentDescription = stringResource(id = R.string.add_to_analysis)
+                           )
+                       }
+                   }
+               }
+           }
+
            // 监听分析结果的变化并自动滚动
            LaunchedEffect(viewModel.analysisResult) {
                if (viewModel.analysisResult.isNotBlank()) {
@@ -237,44 +272,38 @@ fun EmotionScreen(
 }
 
 
-//@Preview(showBackground = true, apiLevel = 34)
+
+
 //@Composable
-//fun BillAnalyzerScreenPreview() {
-//    val context = LocalContext.current
+//@Preview(showBackground = true)
+//fun EmotionScreenPreview() {
+//    // 创建模拟 ViewModel 的子类
+//    class MockEmotionViewModel : EmotionViewModel() {
+//        override val goals = mutableStateOf(emptyList<GoalWithTransactions>())
+//        override val isLoading = mutableStateOf(false)
+//        override val billText = mutableStateOf("")
+//        override val analysisResult = mutableStateOf("## Emotion Analysis\nThis is the analysis result.")
+//        override val emotionScore = mutableStateOf(75.0)
+//        override val emotionComment = mutableStateOf("This is a positive comment.")
 //
-//    // 创建一个模拟的 GoalWithTransactions 数据库访问对象
-//    val goalDao = object : GoalWithTransactionsDao {
-//        suspend fun getAllGoals(): List<GoalWithTransactions> {
-//            return listOf(
-//                GoalWithTransactions(
-//                    goal = Goal(id = 1, name = "Goal 1", targetAmount = 1000.0, currentAmount = 500.0),
-//                    transactions = listOf(
-//                        Transaction(id = 1, goalId = 1, amount = 100.0, date = "2023-10-01"),
-//                        Transaction(id = 2, goalId = 1, amount = 200.0, date = "2023-10-02")
-//                    )
-//                )
-//            )
-//        }
-//
-//        // 其他数据库操作方法可以类似地实现或抛出异常
+//        override fun loadGoals() {}
+//        override fun setBillText(text: String) {}
+//        override fun analyzeBill() {}
+//        override fun updateFilterState(newValue: String) {}
 //    }
 //
-//    // 创建一个模拟的 EmotionViewModel
-//    val previewViewModel = EmotionViewModel(goalDao, context).apply {
-//        // 使用公共方法设置状态
-//        loadGoals() // 加载目标列表
-//        setBillText("Sample bill text")
-//        setAnalysisResult("## Analysis results\n**This is bold text** \nThis is plain text")
-//        setEmotionScore(80)
-//        setEmotionComment(": This is an emotional comment")
-//        setIsLoading(false)
-//    }
+//    // 实例化模拟 ViewModel
+//    val viewModel = MockEmotionViewModel()
 //
-//    // 使用预览提供的 ViewModel
-//    EmotionScreen(viewModel = previewViewModel, navController = NavController(LocalContext.current))
+//    // 模拟 NavController
+//    val navController = rememberNavController()
 //
-//    // 调试信息
-//    val description = stringResource(id = R.string.emotion_analysis_desc)
-//    println("Description: $description")
+//    // 预览 EmotionScreen
+//    EmotionScreen(
+//        viewModel = viewModel,
+//        navController = navController
+//    )
 //}
+
+
 
