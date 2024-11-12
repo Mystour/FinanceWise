@@ -102,6 +102,7 @@
     <string name="add_to_analysis" tools:ignore="MissingTranslation">Search here…</string>
     <string name="remove_from_analysis" tools:ignore="MissingTranslation">Remove</string>
     <string name="reset_filter" tools:ignore="MissingTranslation">Reset</string>
+    <string name="info_button" tools:ignore="MissingTranslation">View information</string>
 
 
     <!-- Deposit & Withdraw Screen -->

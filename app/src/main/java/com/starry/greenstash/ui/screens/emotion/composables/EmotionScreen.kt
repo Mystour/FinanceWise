@@ -13,7 +13,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.*
@@ -58,6 +58,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalView
+import com.starry.greenstash.ui.navigation.NormalScreens
+import com.starry.greenstash.utils.weakHapticFeedback
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,6 +75,7 @@ fun EmotionScreen(
    val goalsState = viewModel.goals.collectAsState(initial = emptyList())
    val searchQuery = remember { mutableStateOf("") }
    val keyboardController = LocalSoftwareKeyboardController.current
+    val localView = LocalView.current
 
    LaunchedEffect(Unit) {
        viewModel.loadGoals()
@@ -280,6 +284,22 @@ fun EmotionScreen(
                            style = MaterialTheme.typography.bodyMedium,
                            modifier = Modifier.weight(1f)
                        )
+
+                       // 信息按钮
+                       IconButton(
+                           onClick = {
+                               localView.weakHapticFeedback()
+                               navController.navigate(
+                                   NormalScreens.GoalInfoScreen(goalId = goal.goal.goalId.toString())
+                               )
+                           }
+                       ) {
+                           Icon(
+                               imageVector = Icons.Default.Info,
+                               contentDescription = stringResource(id = R.string.info_button)
+                           )
+                       }
+
                        IconButton(
                            onClick = {
                                if (isAdded) {
