@@ -222,8 +222,6 @@ class EmotionViewModel @Inject constructor(
         val gson = Gson()
         val goalJson = gson.toJson(goal)
 
-        // 定义颜色标记
-
         _billText.value = "${_billText.value}\n$goalJson"
     }
 
