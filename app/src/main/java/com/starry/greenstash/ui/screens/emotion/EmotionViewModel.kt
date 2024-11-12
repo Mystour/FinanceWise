@@ -56,9 +56,6 @@ class EmotionViewModel @Inject constructor(
     val goals: StateFlow<List<GoalWithTransactions>>
         get() = _goals
 
-    private val _searchText = mutableStateOf("")
-    val searchText: String
-        get() = _searchText.value
 
     init {
         loadGoals()
@@ -84,10 +81,6 @@ class EmotionViewModel @Inject constructor(
         _isLoading.value = isLoading
     }
 
-    fun setSearchText(text: String) {
-        _searchText.value = text
-        filterGoals(text)
-    }
 
     fun loadGoals() {
         viewModelScope.launch {
@@ -243,9 +236,6 @@ class EmotionViewModel @Inject constructor(
     }
 
     fun reset() {
-        // 重置搜索文本
-        _searchText.value = ""
-
         // 重置情绪分析结果
         _billText.value = ""
         _analysisResult.value = ""
