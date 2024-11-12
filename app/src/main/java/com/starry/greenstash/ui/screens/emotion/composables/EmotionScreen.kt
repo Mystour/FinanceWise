@@ -57,8 +57,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.Locale
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,6 +71,8 @@ fun EmotionScreen(
     val snackBarHostState = remember { SnackbarHostState() }
     val goalsState = viewModel.goals.collectAsState(initial = emptyList())
     val searchQuery = remember { mutableStateOf("") }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
 
     LaunchedEffect(Unit) {
         viewModel.loadGoals()
@@ -100,6 +101,7 @@ fun EmotionScreen(
                         keyboardActions = KeyboardActions(
                             onDone = {
                                 viewModel.filterGoals(searchQuery.value)
+                                keyboardController?.hide() // 隐藏键盘
                             }
                         )
                     )

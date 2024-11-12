@@ -223,12 +223,8 @@ class EmotionViewModel @Inject constructor(
         val goalJson = gson.toJson(goal)
 
         // 定义颜色标记
-        val colorStart = "<span style='color: blue;'>"
-        val colorEnd = "</span>"
 
-        // 将 JSON 字符串添加到 _billText 中
-        val coloredGoalJson = "$colorStart$goalJson$colorEnd"
-        _billText.value = "${_billText.value}\n$coloredGoalJson"
+        _billText.value = "${_billText.value}\n$goalJson"
     }
 
     fun removeGoalFromAnalysis(goal: GoalWithTransactions) {
