@@ -210,11 +210,19 @@ class EmotionViewModel @Inject constructor(
     }
 
     fun filterGoals(query: String) {
-        // 根据查询过滤目标
-        val filteredGoals = _goals.value.filter { goal ->
-            goal.goal.title.contains(query, ignoreCase = true)
+        // 如果查询为空字符串，则返回所有目标
+        if (query.isBlank()) {
+            viewModelScope.launch {
+                val goalsList = goalDao.getAllGoals() // 使用 GoalDao 的方法
+                _goals.value = goalsList
+            }
+        } else {
+            // 根据查询过滤目标
+            val filteredGoals = _goals.value.filter { goal ->
+                goal.goal.title.contains(query, ignoreCase = true)
+            }
+            _goals.value = filteredGoals
         }
-        _goals.value = filteredGoals
     }
 
     fun addGoalToAnalysis(goal: GoalWithTransactions) {

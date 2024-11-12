@@ -104,6 +104,7 @@ fun EmotionScreen(
                        keyboardActions = KeyboardActions(
                            onDone = {
                                viewModel.filterGoals(searchQuery.value)
+                               println("Search query: ${searchQuery.value}")
                                keyboardController?.hide() // 隐藏键盘
                            }
                        )
