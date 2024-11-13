@@ -13,6 +13,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Remove
@@ -20,9 +22,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -59,274 +63,384 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
+import com.starry.greenstash.database.goal.GoalPriority
 import com.starry.greenstash.ui.navigation.NormalScreens
 import com.starry.greenstash.utils.weakHapticFeedback
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmotionScreen(
-   viewModel: EmotionViewModel = hiltViewModel(),
-   navController: NavController
+    viewModel: EmotionViewModel = hiltViewModel(),
+    navController: NavController
 ) {
-   val context = LocalContext.current
-   val scope = rememberCoroutineScope()
-   val scrollState = rememberScrollState()
-   val snackBarHostState = remember { SnackbarHostState() }
-   val goalsState = viewModel.goals.collectAsState(initial = emptyList())
-   val searchQuery = remember { mutableStateOf("") }
-   val keyboardController = LocalSoftwareKeyboardController.current
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
+    val snackBarHostState = remember { SnackbarHostState() }
+    val goalsState = viewModel.goals.collectAsState(initial = emptyList())
+    val searchQuery = remember { mutableStateOf("") }
+    val startDate = remember { mutableStateOf("") }
+    val endDate = remember { mutableStateOf("") }
+    val selectedPriority = remember { mutableStateOf(GoalPriority.Normal) }
+    val keyboardController = LocalSoftwareKeyboardController.current
     val localView = LocalView.current
 
-   LaunchedEffect(Unit) {
-       viewModel.loadGoals()
-   }
+    LaunchedEffect(Unit) {
+        viewModel.loadGoals()
+    }
 
-   // 监听 searchQuery 的变化，自动调用 filterGoals
-   LaunchedEffect(searchQuery.value) {
-       viewModel.filterGoals(searchQuery.value)
-   }
+    // 监听 searchQuery 和筛选条件的变化，自动调用 filterGoals
+    LaunchedEffect(searchQuery.value, startDate.value, endDate.value, selectedPriority.value) {
+        viewModel.filterGoals(
+            searchQuery.value,
+            startDate.value,
+            endDate.value,
+            selectedPriority.value
+        )
+    }
 
-   Scaffold(
-       topBar = {
-           TopAppBar(
-               title = {
-                   Text(text = stringResource(id = R.string.emotion_analysis_title))
-               },
-               actions = {
-                   TextField(
-                       value = searchQuery.value,
-                       onValueChange = { query ->
-                           searchQuery.value = query
-                       },
-                       placeholder = { Text(stringResource(id = R.string.search_placeholder)) },
-                       modifier = Modifier
-                           .fillMaxWidth(0.5f)
-                           .padding(horizontal = 8.dp),
-                       keyboardOptions = KeyboardOptions.Default.copy(
-                           imeAction = ImeAction.Done
-                       ),
-                       keyboardActions = KeyboardActions(
-                           onDone = {
-                               viewModel.filterGoals(searchQuery.value)
-                               println("Search query: ${searchQuery.value}")
-                               keyboardController?.hide() // 隐藏键盘
-                           }
-                       )
-                   )
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(text = stringResource(id = R.string.emotion_analysis_title))
+                },
+                actions = {
+                    TextField(
+                        value = searchQuery.value,
+                        onValueChange = { query ->
+                            searchQuery.value = query
+                        },
+                        placeholder = { Text(stringResource(id = R.string.search_placeholder)) },
+                        modifier = Modifier
+                            .fillMaxWidth(0.5f)
+                            .padding(horizontal = 8.dp),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                viewModel.filterGoals(
+                                    searchQuery.value,
+                                    startDate.value,
+                                    endDate.value,
+                                    selectedPriority.value
+                                )
+                                println("Search query: ${searchQuery.value}")
+                                keyboardController?.hide() // 隐藏键盘
+                            }
+                        )
+                    )
 
-                   // 添加重置筛选条件的按钮
-                   IconButton(
-                       onClick = {
-                           searchQuery.value = ""
-                           viewModel.reset()
-                       }
-                   ) {
-                       Icon(
-                           imageVector = Icons.Default.Refresh,
-                           contentDescription = stringResource(id = R.string.reset_filter)
-                       )
-                   }
-               }
-           )
-       }
-   ) { innerPadding ->
-       Column(
-           modifier = Modifier
-               .padding(innerPadding)
-               .fillMaxSize()
-               .padding(16.dp)
-               .verticalScroll(scrollState), // 使整个 Column 可滚动
-           horizontalAlignment = Alignment.CenterHorizontally,
-           verticalArrangement = Arrangement.spacedBy(32.dp)
-       ) {
-           BillInput(
-               billText = viewModel.billText,
-               onBillTextChange = { viewModel.setBillText(it) }
-           )
+                    // 添加选择筛选标准的下拉菜单
+                    var expanded by remember { mutableStateOf(false) }
+                    Box {
+                        IconButton(onClick = { expanded = true }) {
+                            Icon(
+                                imageVector = Icons.Default.FilterList,
+                                contentDescription = stringResource(id = R.string.select_filter_type)
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            EmotionViewModel.FilterType.entries.forEach { filterType ->
+                                DropdownMenuItem(
+                                    text = { Text(filterType.name) },
+                                    onClick = {
+                                        viewModel.setSelectedFilterType(filterType)
+                                        expanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
 
-           Button(
-               onClick = {
-                   scope.launch(Dispatchers.IO) {
-                       viewModel.analyzeBill()
-                   }
-               },
-               enabled = viewModel.billText.isNotBlank()
-           ) {
-               Text(stringResource(id = R.string.emotion_analysis_button))
-           }
+                    // 添加重置筛选条件的按钮
+                    IconButton(
+                        onClick = {
+                            searchQuery.value = ""
+                            startDate.value = ""
+                            endDate.value = ""
+                            selectedPriority.value = GoalPriority.Normal
+                            viewModel.reset()
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = stringResource(id = R.string.reset_filter)
+                        )
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .padding(16.dp)
+                .verticalScroll(scrollState), // 使整个 Column 可滚动
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(32.dp)
+        ) {
+            when (viewModel.selectedFilterType) {
+                EmotionViewModel.FilterType.Title -> {
+                    OutlinedTextField(
+                        value = searchQuery.value,
+                        onValueChange = { query ->
+                            searchQuery.value = query
+                            viewModel.filterGoals(query, startDate.value, endDate.value, selectedPriority.value)
+                        },
+                        label = { Text(stringResource(id = R.string.title_filter)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                EmotionViewModel.FilterType.DateRange -> {
+                    OutlinedTextField(
+                        value = startDate.value,
+                        onValueChange = { date ->
+                            startDate.value = date
+                            viewModel.filterGoals(searchQuery.value, date, endDate.value, selectedPriority.value)
+                        },
+                        label = { Text(stringResource(id = R.string.start_date)) },
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.CalendarToday,
+                                contentDescription = null
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-           if (viewModel.isLoading) {
-               CircularProgressIndicator()
-           } else {
-               // 分析结束后才显示图表和评论
-               if (viewModel.analysisResult.isNotBlank()) { // 检查 analysisResult 是否为空
-                   val emotionScore = viewModel.emotionScore
-                   EmotionChart(
-                       emotionScore = emotionScore,
-                       modifier = Modifier
-                           .height(300.dp) // 设置高度为 300dp
-                           .fillMaxWidth() // 占据整个宽度
-                   )
+                    OutlinedTextField(
+                        value = endDate.value,
+                        onValueChange = { date ->
+                            endDate.value = date
+                            viewModel.filterGoals(searchQuery.value, startDate.value, date, selectedPriority.value)
+                        },
+                        label = { Text(stringResource(id = R.string.end_date)) },
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.CalendarToday,
+                                contentDescription = null
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                EmotionViewModel.FilterType.Priority -> {
+                    DropdownMenu(
+                        expanded = selectedPriority.value == GoalPriority.Normal,
+                        onDismissRequest = { /* Do nothing */ },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        GoalPriority.entries.forEach { priority ->
+                            DropdownMenuItem(
+                                text = { Text(priority.name) },
+                                onClick = {
+                                    selectedPriority.value = priority
+                                    viewModel.setSelectedPriority(priority)
+                                    viewModel.filterGoals(searchQuery.value, startDate.value, endDate.value, priority)
+                                }
+                            )
+                        }
+                    }
+                }
+                EmotionViewModel.FilterType.None -> {
+                    // 不显示任何筛选控件
+                }
+            }
 
-                   // 去除评论中的米字符
-                   val cleanedComment = viewModel.emotionComment.replace("米", "")
+            BillInput(
+                billText = viewModel.billText,
+                onBillTextChange = { viewModel.setBillText(it) }
+            )
 
-                   // 使用 Card 组件显示评论
-                   Card(
-                       modifier = Modifier
-                           .fillMaxWidth()
-                           .padding(vertical = 8.dp),
-                       shape = MaterialTheme.shapes.medium,
-                       elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-                   ) {
-                       Text(
-                           text = stringResource(id = R.string.score_text, emotionScore, cleanedComment),
-                           style = MaterialTheme.typography.bodyMedium,
-                           textAlign = TextAlign.Justify,
-                           modifier = Modifier.padding(16.dp)
-                       )
-                   }
-               }
+            Button(
+                onClick = {
+                    scope.launch(Dispatchers.IO) {
+                        viewModel.analyzeBill()
+                    }
+                },
+                enabled = viewModel.billText.isNotBlank()
+            ) {
+                Text(stringResource(id = R.string.emotion_analysis_button))
+            }
 
-               // 使用 Markwon 处理 Markdown 文本
-               val markwon = Markwon.create(context)
-               val spanned = remember(viewModel.analysisResult) {
-                   markwon.toMarkdown(viewModel.analysisResult)
-               }
+            if (viewModel.isLoading) {
+                CircularProgressIndicator()
+            } else {
+                // 分析结束后才显示图表和评论
+                if (viewModel.analysisResult.isNotBlank()) { // 检查 analysisResult 是否为空
+                    val emotionScore = viewModel.emotionScore
+                    EmotionChart(
+                        emotionScore = emotionScore,
+                        modifier = Modifier
+                            .height(300.dp) // 设置高度为 300dp
+                            .fillMaxWidth() // 占据整个宽度
+                    )
 
-               // 使用 buildAnnotatedString 添加自定义样式
-               val annotatedString = remember(spanned) {
-                   buildAnnotatedString {
-                       val markdownText = spanned.toString()
-                       var currentIndex = 0
+                    // 去除评论中的米字符
+                    val cleanedComment = viewModel.emotionComment.replace("米", "")
 
-                       while (currentIndex < markdownText.length) {
-                           val titleStart = markdownText.indexOf("## ", currentIndex)
-                           if (titleStart == -1) {
-                               append(markdownText.substring(currentIndex))
-                               break
-                           }
+                    // 使用 Card 组件显示评论
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        shape = MaterialTheme.shapes.medium,
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.score_text, emotionScore, cleanedComment),
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Justify,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                }
 
-                           append(markdownText.substring(currentIndex, titleStart))
-                           val titleEnd = markdownText.indexOf('\n', titleStart)
-                           if (titleEnd == -1) {
-                               append(markdownText.substring(titleStart))
-                               break
-                           }
+                // 使用 Markwon 处理 Markdown 文本
+                val markwon = Markwon.create(context)
+                val spanned = remember(viewModel.analysisResult) {
+                    markwon.toMarkdown(viewModel.analysisResult)
+                }
 
-                           pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-                           append(markdownText.substring(titleStart + 3, titleEnd))
-                           pop()
-                           currentIndex = titleEnd + 1
-                       }
-                   }
-               }
+                // 使用 buildAnnotatedString 添加自定义样式
+                val annotatedString = remember(spanned) {
+                    buildAnnotatedString {
+                        val markdownText = spanned.toString()
+                        var currentIndex = 0
 
-               // 使用 AndroidView 组件显示 AnnotatedString 对象
-               AndroidView(
-                   factory = { context ->
-                       androidx.appcompat.widget.AppCompatTextView(context).apply {
-                           movementMethod = LinkMovementMethod.getInstance()
-                       }
-                   },
-                   update = { textView ->
-                       textView.text = annotatedString.toSpanned()
-                   },
-                   modifier = Modifier.padding(16.dp)
-               )
-           }
+                        while (currentIndex < markdownText.length) {
+                            val titleStart = markdownText.indexOf("## ", currentIndex)
+                            if (titleStart == -1) {
+                                append(markdownText.substring(currentIndex))
+                                break
+                            }
 
-           // 显示描述
-           val description = stringResource(id = R.string.emotion_analysis_desc)
-           val annotatedDescription = buildAnnotatedString {
-               append(description)
-               // 可以在这里添加更多的样式，例如加粗某些部分
-               // pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-               // append("重要部分")
-               // pop()
-           }
+                            append(markdownText.substring(currentIndex, titleStart))
+                            val titleEnd = markdownText.indexOf('\n', titleStart)
+                            if (titleEnd == -1) {
+                                append(markdownText.substring(titleStart))
+                                break
+                            }
 
-           Box(
-               modifier = Modifier
-                   .fillMaxWidth()
-                   .padding(bottom = 8.dp),
-               contentAlignment = Alignment.BottomCenter
-           ) {
-               Text(
-                   text = annotatedDescription,
-                   style = TextStyle(
-                       fontSize = 12.sp,
-                       color = Color.Gray
-                   ),
-                   textAlign = TextAlign.Justify,
-                   modifier = Modifier.padding(16.dp)
-               )
-           }
+                            pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                            append(markdownText.substring(titleStart + 3, titleEnd))
+                            pop()
+                            currentIndex = titleEnd + 1
+                        }
+                    }
+                }
 
-           // 显示过滤后的目标列表
-           LazyColumn(
-               modifier = Modifier
-                   .fillMaxWidth()
-                   .heightIn(max = 500.dp) // 限制 LazyColumn 的最大高度
-           ) {
-               items(goalsState.value) { goal ->
-                   val gson = Gson()
-                   val isAdded = viewModel.billText.contains(gson.toJson(goal))
-                   Row(
-                       modifier = Modifier
-                           .fillMaxWidth()
-                           .padding(vertical = 8.dp),
-                       horizontalArrangement = Arrangement.SpaceBetween,
-                       verticalAlignment = Alignment.CenterVertically
-                   ) {
-                       Text(
-                           text = goal.goal.title, // 只显示目标的 title
-                           style = MaterialTheme.typography.bodyMedium,
-                           modifier = Modifier.weight(1f)
-                       )
+                // 使用 AndroidView 组件显示 AnnotatedString 对象
+                AndroidView(
+                    factory = { context ->
+                        androidx.appcompat.widget.AppCompatTextView(context).apply {
+                            movementMethod = LinkMovementMethod.getInstance()
+                        }
+                    },
+                    update = { textView ->
+                        textView.text = annotatedString.toSpanned()
+                    },
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
 
-                       // 信息按钮
-                       IconButton(
-                           onClick = {
-                               localView.weakHapticFeedback()
-                               navController.navigate(
-                                   NormalScreens.GoalInfoScreen(goalId = goal.goal.goalId.toString())
-                               )
-                           }
-                       ) {
-                           Icon(
-                               imageVector = Icons.Default.Info,
-                               contentDescription = stringResource(id = R.string.info_button)
-                           )
-                       }
+            // 显示描述
+            val description = stringResource(id = R.string.emotion_analysis_desc)
+            val annotatedDescription = buildAnnotatedString {
+                append(description)
+                // 可以在这里添加更多的样式，例如加粗某些部分
+                // pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                // append("重要部分")
+                // pop()
+            }
 
-                       IconButton(
-                           onClick = {
-                               if (isAdded) {
-                                   viewModel.removeGoalFromAnalysis(goal)
-                               } else {
-                                   viewModel.addGoalToAnalysis(goal)
-                               }
-                           }
-                       ) {
-                           Icon(
-                               imageVector = if (isAdded) Icons.Filled.Remove else Icons.Default.Add,
-                               contentDescription = if (isAdded) stringResource(id = R.string.remove_from_analysis) else stringResource(id = R.string.add_to_analysis)
-                           )
-                       }
-                   }
-               }
-           }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                Text(
+                    text = annotatedDescription,
+                    style = TextStyle(
+                        fontSize = 12.sp,
+                        color = Color.Gray
+                    ),
+                    textAlign = TextAlign.Justify,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
 
-           // 监听分析结果的变化并自动滚动
-           LaunchedEffect(viewModel.analysisResult) {
-               if (viewModel.analysisResult.isNotBlank()) {
-                   scope.launch {
-                       delay(300) // 延迟一段时间，确保内容已经渲染完成
-                       scrollState.animateScrollTo(scrollState.maxValue)
-                   }
-               }
-           }
-       }
-   }
+            // 显示过滤后的目标列表
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 500.dp) // 限制 LazyColumn 的最大高度
+            ) {
+                items(goalsState.value) { goal ->
+                    val gson = Gson()
+                    val isAdded = viewModel.billText.contains(gson.toJson(goal))
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = goal.goal.title, // 只显示目标的 title
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        // 信息按钮
+                        IconButton(
+                            onClick = {
+                                localView.weakHapticFeedback()
+                                navController.navigate(
+                                    NormalScreens.GoalInfoScreen(goalId = goal.goal.goalId.toString())
+                                )
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = stringResource(id = R.string.info_button)
+                            )
+                        }
+
+                        IconButton(
+                            onClick = {
+                                if (isAdded) {
+                                    viewModel.removeGoalFromAnalysis(goal)
+                                } else {
+                                    viewModel.addGoalToAnalysis(goal)
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = if (isAdded) Icons.Filled.Remove else Icons.Default.Add,
+                                contentDescription = if (isAdded) stringResource(id = R.string.remove_from_analysis) else stringResource(id = R.string.add_to_analysis)
+                            )
+                        }
+                    }
+                }
+            }
+
+            // 监听分析结果的变化并自动滚动
+            LaunchedEffect(viewModel.analysisResult) {
+                if (viewModel.analysisResult.isNotBlank()) {
+                    scope.launch {
+                        delay(300) // 延迟一段时间，确保内容已经渲染完成
+                        scrollState.animateScrollTo(scrollState.maxValue)
+                    }
+                }
+            }
+        }
+    }
 }

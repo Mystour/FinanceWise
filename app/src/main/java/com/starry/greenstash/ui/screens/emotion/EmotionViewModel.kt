@@ -10,6 +10,7 @@ import com.starry.greenstash.BuildConfig
 import com.starry.greenstash.R
 import com.starry.greenstash.database.core.GoalWithTransactions
 import com.starry.greenstash.database.goal.GoalDao // 导入正确的 DAO
+import com.starry.greenstash.database.goal.GoalPriority
 import com.starry.greenstash.utils.PreferenceUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -80,6 +81,48 @@ class EmotionViewModel @Inject constructor(
     fun setIsLoading(isLoading: Boolean) {
         _isLoading.value = isLoading
     }
+
+    // 新增筛选条件的状态变量
+    private val _startDate = mutableStateOf("")
+    val startDate: String
+        get() = _startDate.value
+
+    private val _endDate = mutableStateOf("")
+    val endDate: String
+        get() = _endDate.value
+
+    private val _selectedPriority = mutableStateOf(GoalPriority.Normal)
+    val selectedPriority: GoalPriority
+        get() = _selectedPriority.value
+
+    // 设置筛选条件的方法
+    fun setStartDate(date: String) {
+        _startDate.value = date
+    }
+
+    fun setEndDate(date: String) {
+        _endDate.value = date
+    }
+
+    fun setSelectedPriority(priority: GoalPriority) {
+        _selectedPriority.value = priority
+    }
+
+    // 新增筛选标准的状态变量
+    private val _selectedFilterType = mutableStateOf(FilterType.None)
+    val selectedFilterType: FilterType
+        get() = _selectedFilterType.value
+
+    // 设置筛选标准的方法
+    fun setSelectedFilterType(filterType: FilterType) {
+        _selectedFilterType.value = filterType
+    }
+
+    // 筛选标准枚举
+    enum class FilterType {
+       Title, DateRange, Priority, None;
+    }
+
 
 
     fun loadGoals() {
@@ -202,17 +245,32 @@ class EmotionViewModel @Inject constructor(
         return preferenceUtil.getString(PreferenceUtil.DATE_FORMAT_STR, "")!!
     }
 
-    fun filterGoals(query: String) {
+    // 更新 filterGoals 方法
+    fun filterGoals(query: String, startDate: String = "", endDate: String = "", priority: GoalPriority = GoalPriority.Normal) {
         // 如果查询为空字符串，则返回所有目标
-        if (query.isBlank()) {
+        if (query.isBlank() && startDate.isEmpty() && endDate.isEmpty() && priority == GoalPriority.Normal) {
             viewModelScope.launch {
                 val goalsList = goalDao.getAllGoals() // 使用 GoalDao 的方法
                 _goals.value = goalsList
             }
         } else {
-            // 根据查询过滤目标
+            // 根据查询、日期范围和优先级过滤目标
             val filteredGoals = _goals.value.filter { goal ->
-                goal.goal.title.contains(query, ignoreCase = true)
+                val titleMatch = goal.goal.title.contains(query, ignoreCase = true)
+                val dateMatch = goal.goal.deadline.let {
+                    if (startDate.isNotEmpty() && endDate.isNotEmpty()) {
+                        it >= startDate && it <= endDate
+                    } else if (startDate.isNotEmpty()) {
+                        it >= startDate
+                    } else if (endDate.isNotEmpty()) {
+                        it <= endDate
+                    } else {
+                        true
+                    }
+                }
+                val priorityMatch = goal.goal.priority == priority
+
+                titleMatch && dateMatch && priorityMatch
             }
             _goals.value = filteredGoals
         }
