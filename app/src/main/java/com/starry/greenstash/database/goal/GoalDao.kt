@@ -184,4 +184,16 @@ interface GoalDao {
     suspend fun insertTransactions(
         transactions: List<com.starry.greenstash.database.transaction.Transaction>
     )
+
+    @Transaction
+    @Query("SELECT * FROM saving_goal WHERE archived = 0 AND priority = :priority")
+    fun getAllGoalsByPriority(priority: GoalPriority): Flow<List<GoalWithTransactions>>
+
+    @Transaction
+    @Query("SELECT * FROM saving_goal WHERE archived = 0 AND deadline BETWEEN :startDate AND :endDate")
+    fun getAllGoalsByDateRange(startDate: String, endDate: String): Flow<List<GoalWithTransactions>>
+
+    @Transaction
+    @Query("SELECT * FROM saving_goal WHERE archived = 0 AND title LIKE '%' || :title || '%'")
+    fun getGoalsByTitleContains(title: String): Flow<List<GoalWithTransactions>>
 }

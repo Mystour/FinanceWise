@@ -5,7 +5,6 @@ import android.text.method.LinkMovementMethod
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
@@ -42,7 +41,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.text.toSpanned
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.airbnb.lottie.compose.LottieAnimation
@@ -63,6 +61,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
+import androidx.core.text.toSpanned
 import com.starry.greenstash.database.goal.GoalPriority
 import com.starry.greenstash.ui.navigation.NormalScreens
 import com.starry.greenstash.utils.weakHapticFeedback
@@ -79,24 +78,11 @@ fun EmotionScreen(
     val snackBarHostState = remember { SnackbarHostState() }
     val goalsState = viewModel.goals.collectAsState(initial = emptyList())
     val searchQuery = remember { mutableStateOf("") }
-    val startDate = remember { mutableStateOf("") }
-    val endDate = remember { mutableStateOf("") }
-    val selectedPriority = remember { mutableStateOf(GoalPriority.Normal) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val localView = LocalView.current
 
     LaunchedEffect(Unit) {
         viewModel.loadGoals()
-    }
-
-    // 监听 searchQuery 和筛选条件的变化，自动调用 filterGoals
-    LaunchedEffect(searchQuery.value, startDate.value, endDate.value, selectedPriority.value) {
-        viewModel.filterGoals(
-            searchQuery.value,
-            startDate.value,
-            endDate.value,
-            selectedPriority.value
-        )
     }
 
     Scaffold(
@@ -110,6 +96,7 @@ fun EmotionScreen(
                         value = searchQuery.value,
                         onValueChange = { query ->
                             searchQuery.value = query
+                            viewModel.setBillText(query)
                         },
                         placeholder = { Text(stringResource(id = R.string.search_placeholder)) },
                         modifier = Modifier
@@ -120,12 +107,7 @@ fun EmotionScreen(
                         ),
                         keyboardActions = KeyboardActions(
                             onDone = {
-                                viewModel.filterGoals(
-                                    searchQuery.value,
-                                    startDate.value,
-                                    endDate.value,
-                                    selectedPriority.value
-                                )
+                                viewModel.setBillText(searchQuery.value)
                                 println("Search query: ${searchQuery.value}")
                                 keyboardController?.hide() // 隐藏键盘
                             }
@@ -161,9 +143,6 @@ fun EmotionScreen(
                     IconButton(
                         onClick = {
                             searchQuery.value = ""
-                            startDate.value = ""
-                            endDate.value = ""
-                            selectedPriority.value = GoalPriority.Normal
                             viewModel.reset()
                         }
                     ) {
@@ -191,7 +170,7 @@ fun EmotionScreen(
                         value = searchQuery.value,
                         onValueChange = { query ->
                             searchQuery.value = query
-                            viewModel.filterGoals(query, startDate.value, endDate.value, selectedPriority.value)
+                            viewModel.setBillText(query)
                         },
                         label = { Text(stringResource(id = R.string.title_filter)) },
                         modifier = Modifier.fillMaxWidth()
@@ -199,10 +178,9 @@ fun EmotionScreen(
                 }
                 EmotionViewModel.FilterType.DateRange -> {
                     OutlinedTextField(
-                        value = startDate.value,
+                        value = viewModel.startDate,
                         onValueChange = { date ->
-                            startDate.value = date
-                            viewModel.filterGoals(searchQuery.value, date, endDate.value, selectedPriority.value)
+                            viewModel.setStartDate(date)
                         },
                         label = { Text(stringResource(id = R.string.start_date)) },
                         trailingIcon = {
@@ -215,10 +193,9 @@ fun EmotionScreen(
                     )
 
                     OutlinedTextField(
-                        value = endDate.value,
+                        value = viewModel.endDate,
                         onValueChange = { date ->
-                            endDate.value = date
-                            viewModel.filterGoals(searchQuery.value, startDate.value, date, selectedPriority.value)
+                            viewModel.setEndDate(date)
                         },
                         label = { Text(stringResource(id = R.string.end_date)) },
                         trailingIcon = {
@@ -232,7 +209,7 @@ fun EmotionScreen(
                 }
                 EmotionViewModel.FilterType.Priority -> {
                     DropdownMenu(
-                        expanded = selectedPriority.value == GoalPriority.Normal,
+                        expanded = viewModel.selectedPriority == GoalPriority.Normal,
                         onDismissRequest = { /* Do nothing */ },
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -240,9 +217,7 @@ fun EmotionScreen(
                             DropdownMenuItem(
                                 text = { Text(priority.name) },
                                 onClick = {
-                                    selectedPriority.value = priority
                                     viewModel.setSelectedPriority(priority)
-                                    viewModel.filterGoals(searchQuery.value, startDate.value, endDate.value, priority)
                                 }
                             )
                         }
