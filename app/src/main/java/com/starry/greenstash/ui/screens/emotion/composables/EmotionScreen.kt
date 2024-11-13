@@ -182,12 +182,14 @@ fun EmotionScreen(
                         value = searchQuery.value,
                         onValueChange = { query ->
                             searchQuery.value = query
-                            viewModel.setBillText(query)
+                            viewModel.setTitleFilter(query)
                         },
                         label = { Text(stringResource(id = R.string.title_filter)) },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
+
+
                 EmotionViewModel.FilterType.DateRange -> {
                     OutlinedTextField(
                         value = viewModel.startDate,
