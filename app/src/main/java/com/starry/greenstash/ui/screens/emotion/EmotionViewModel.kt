@@ -57,7 +57,6 @@ class EmotionViewModel @Inject constructor(
     val goals: StateFlow<List<GoalWithTransactions>>
         get() = _goals
 
-
     init {
         loadGoals()
     }
@@ -120,10 +119,8 @@ class EmotionViewModel @Inject constructor(
 
     // 筛选标准枚举
     enum class FilterType {
-       Title, DateRange, Priority, None;
+        Title, DateRange, Priority, None;
     }
-
-
 
     fun loadGoals() {
         viewModelScope.launch {
@@ -257,18 +254,13 @@ class EmotionViewModel @Inject constructor(
             // 根据查询、日期范围和优先级过滤目标
             val filteredGoals = _goals.value.filter { goal ->
                 val titleMatch = goal.goal.title.contains(query, ignoreCase = true)
-                val dateMatch = goal.goal.deadline.let {
-                    if (startDate.isNotEmpty() && endDate.isNotEmpty()) {
-                        it >= startDate && it <= endDate
-                    } else if (startDate.isNotEmpty()) {
-                        it >= startDate
-                    } else if (endDate.isNotEmpty()) {
-                        it <= endDate
-                    } else {
-                        true
-                    }
+                val dateMatch = when {
+                    startDate.isNotEmpty() && endDate.isNotEmpty() -> goal.goal.deadline >= startDate && goal.goal.deadline <= endDate
+                    startDate.isNotEmpty() -> goal.goal.deadline >= startDate
+                    endDate.isNotEmpty() -> goal.goal.deadline <= endDate
+                    else -> true
                 }
-                val priorityMatch = goal.goal.priority == priority
+                val priorityMatch = if (priority == GoalPriority.Normal) true else goal.goal.priority == priority
 
                 titleMatch && dateMatch && priorityMatch
             }
