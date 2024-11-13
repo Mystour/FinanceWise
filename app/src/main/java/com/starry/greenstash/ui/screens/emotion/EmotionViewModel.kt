@@ -12,6 +12,7 @@ import com.starry.greenstash.R
 import com.starry.greenstash.database.core.GoalWithTransactions
 import com.starry.greenstash.database.goal.GoalDao // 导入正确的 DAO
 import com.starry.greenstash.database.goal.GoalPriority
+import com.starry.greenstash.ui.screens.settings.DateStyle
 import com.starry.greenstash.utils.PreferenceUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -322,5 +323,9 @@ class EmotionViewModel @Inject constructor(
         val endDate: String,
         val selectedPriority: GoalPriority,
         val filterType: FilterType
+    )
+
+    fun getDateStyleValue() = preferenceUtil.getString(
+        PreferenceUtil.DATE_FORMAT_STR, DateStyle.DateMonthYear.pattern
     )
 }

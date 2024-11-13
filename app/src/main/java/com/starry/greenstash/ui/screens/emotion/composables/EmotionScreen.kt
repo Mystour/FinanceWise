@@ -34,6 +34,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -67,6 +68,11 @@ import androidx.core.text.toSpanned
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.gson.Gson
+import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
+import com.maxkeppeler.sheets.calendar.CalendarDialog
+import com.maxkeppeler.sheets.calendar.models.CalendarConfig
+import com.maxkeppeler.sheets.calendar.models.CalendarSelection
+import com.maxkeppeler.sheets.calendar.models.CalendarStyle
 import com.starry.greenstash.R
 import com.starry.greenstash.database.goal.GoalPriority
 import com.starry.greenstash.ui.navigation.NormalScreens
@@ -76,6 +82,8 @@ import io.noties.markwon.Markwon
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,6 +100,13 @@ fun EmotionScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
     val localView = LocalView.current
     var isDropdownExpanded by remember { mutableStateOf(false) }
+
+    // Date variables and state
+    val selectedStartDate = remember { mutableStateOf<LocalDate?>(null) }
+    val selectedEndDate = remember { mutableStateOf<LocalDate?>(null) }
+    val startDateCalendarState = rememberUseCaseState(visible = false, true)
+    val endDateCalendarState = rememberUseCaseState(visible = false, true)
+
 
     LaunchedEffect(Unit) {
         viewModel.loadGoals()
@@ -191,34 +206,74 @@ fun EmotionScreen(
 
 
                 EmotionViewModel.FilterType.DateRange -> {
+
+                    // Start Date Input
                     OutlinedTextField(
-                        value = viewModel.startDate,
-                        onValueChange = { date ->
-                            viewModel.setStartDate(date)
-                        },
+                        value = selectedStartDate.value?.format(DateTimeFormatter.ofPattern(viewModel.getDateStyleValue())) ?: "", // Display formatted date or empty string
+                        onValueChange = {  }, // Make it read-only
                         label = { Text(stringResource(id = R.string.start_date)) },
                         trailingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.CalendarToday,
-                                contentDescription = null
-                            )
+                            IconButton(onClick = { startDateCalendarState.show() }) {
+                                Icon(imageVector = Icons.Default.CalendarToday, contentDescription = null)
+                            }
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = false, // Make the field read-only to prevent keyboard input
+                        colors = OutlinedTextFieldDefaults.colors(
+                            disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                            disabledBorderColor = MaterialTheme.colorScheme.onBackground,
+                            disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.12f), // Adjust as needed
+                            disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
                     )
 
+
+                    // End Date Input (similar to Start Date)
                     OutlinedTextField(
-                        value = viewModel.endDate,
-                        onValueChange = { date ->
-                            viewModel.setEndDate(date)
-                        },
+                        value = selectedEndDate.value?.format(DateTimeFormatter.ofPattern(viewModel.getDateStyleValue())) ?: "", // Display formatted date or empty string
+                        onValueChange = {  },
                         label = { Text(stringResource(id = R.string.end_date)) },
                         trailingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.CalendarToday,
-                                contentDescription = null
-                            )
+                            IconButton(onClick = { endDateCalendarState.show() }) {
+                                Icon(imageVector = Icons.Default.CalendarToday, contentDescription = null)
+                            }
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = false,
+                        colors = OutlinedTextFieldDefaults.colors( // ... same colors as above
+                        )
+                    )
+
+                    // Start Date Calendar Dialog
+                    CalendarDialog(
+                        state = startDateCalendarState,
+                        config = CalendarConfig(
+                            yearSelection = true,
+                            monthSelection = true,
+                            style = CalendarStyle.MONTH
+                        ),
+                        selection = CalendarSelection.Date { newDate ->
+                            selectedStartDate.value = newDate
+                            viewModel.setStartDate(newDate.format(DateTimeFormatter.ofPattern(viewModel.getDateStyleValue())))
+                        }
+                    )
+
+                    // End Date Calendar Dialog (similar to Start Date)
+                    CalendarDialog(
+                        state = endDateCalendarState,
+                        config = CalendarConfig(
+                            yearSelection = true,
+                            monthSelection = true,
+                            style = CalendarStyle.MONTH
+                        ),
+                        selection = CalendarSelection.Date { newDate ->
+                            selectedEndDate.value = newDate
+                            viewModel.setEndDate(newDate.format(DateTimeFormatter.ofPattern(viewModel.getDateStyleValue())))
+                        }
                     )
                 }
 
