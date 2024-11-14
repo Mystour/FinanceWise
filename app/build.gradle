@@ -145,6 +145,7 @@ dependencies {
     implementation(libs.timber)
 
     implementation(libs.chart)
+//    implementation(libs.jsonViewer)
 
     // Oreo back-ports for API 24 (N)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
