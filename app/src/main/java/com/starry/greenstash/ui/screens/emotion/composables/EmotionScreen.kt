@@ -119,14 +119,11 @@ fun EmotionScreen(
             EmotionTopAppBar(
                 title = stringResource(id = R.string.emotion_analysis_title),
                 showTitle = showTitle,
-                searchText = searchQuery.value,
-                onSearchInputChange = { query -> searchQuery.value = query },
-                onSearchAction = { viewModel.setTitleFilter(searchQuery.value) },
+                searchText = viewModel.titleFilter,
+                onSearchInputChange = { viewModel.setTitleFilter(it) },
+                onSearchAction = { viewModel.setTitleFilter(viewModel.titleFilter) }, // Correct search action
                 filterType = viewModel.selectedFilterType,
-                onFilterTypeChange = {
-                    viewModel.setSelectedFilterType(it)
-                    if (it != EmotionViewModel.FilterType.Title) searchQuery.value = ""
-                },
+                onFilterTypeChange = { viewModel.setSelectedFilterType(it) },
                 onRefreshClick = { viewModel.reset() }
             )
         }
@@ -142,15 +139,6 @@ fun EmotionScreen(
         ) {
             when (viewModel.selectedFilterType) {
                 EmotionViewModel.FilterType.Title -> {
-//                    OutlinedTextField(
-//                        value = searchQuery.value,
-//                        onValueChange = { query ->
-//                            searchQuery.value = query
-//                            viewModel.setTitleFilter(query)
-//                        },
-//                        label = { Text(stringResource(id = R.string.title_filter)) },
-//                        modifier = Modifier.fillMaxWidth()
-//                    )
                 }
 
 
