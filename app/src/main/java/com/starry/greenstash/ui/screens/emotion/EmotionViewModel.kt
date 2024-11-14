@@ -57,16 +57,10 @@ class EmotionViewModel @Inject constructor(
 
     // 新增筛选条件的状态变量
     private val _startDate = mutableStateOf("")
-    val startDate: String
-        get() = _startDate.value
 
     private val _endDate = mutableStateOf("")
-    val endDate: String
-        get() = _endDate.value
 
     private val _selectedPriority = mutableStateOf(GoalPriority.Normal)
-    val selectedPriority: GoalPriority
-        get() = _selectedPriority.value
 
     // 新增标题过滤的状态变量
     private val _titleFilter = mutableStateOf("")
@@ -106,19 +100,19 @@ class EmotionViewModel @Inject constructor(
         _billText.value = text
     }
 
-    fun setAnalysisResult(result: String) {
+    private fun setAnalysisResult(result: String) {
         _analysisResult.value = result
     }
 
-    fun setEmotionScore(score: Int) {
+    private fun setEmotionScore(score: Int) {
         _emotionScore.intValue = score
     }
 
-    fun setEmotionComment(comment: String) {
+    private fun setEmotionComment(comment: String) {
         _emotionComment.value = comment
     }
 
-    fun setIsLoading(isLoading: Boolean) {
+    private fun setIsLoading(isLoading: Boolean) {
         _isLoading.value = isLoading
     }
 
@@ -156,7 +150,6 @@ class EmotionViewModel @Inject constructor(
 
     fun loadGoals() {
         viewModelScope.launch {
-            val goalsList = goalDao.getAllGoals() // 使用 GoalDao 的方法
             _filterCriteria.value = _filterCriteria.value.copy(query = "", startDate = "", endDate = "", selectedPriority = GoalPriority.Normal, filterType = FilterType.None)
         }
     }
@@ -264,14 +257,6 @@ class EmotionViewModel @Inject constructor(
     private fun createDetailedAnalysisPrompt(billText: String): String {
         val detailedPrompt = context.getString(R.string.detailed_analysis_prompt)
         return String.format(detailedPrompt, billText)
-    }
-
-    fun getDefaultCurrency(): String {
-        return preferenceUtil.getString(PreferenceUtil.DEFAULT_CURRENCY_STR, "")!!
-    }
-
-    fun getDateFormatPattern(): String {
-        return preferenceUtil.getString(PreferenceUtil.DATE_FORMAT_STR, "")!!
     }
 
     // 更新 filterCriteria 方法
