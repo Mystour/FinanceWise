@@ -303,17 +303,13 @@ class EmotionViewModel @Inject constructor(
     }
 
     fun reset() {
-        // 重置情绪分析结果
         _billText.value = ""
         _analysisResult.value = ""
         _emotionScore.intValue = 0
         _emotionComment.value = ""
-
-        // 重置加载状态
         _isLoading.value = false
-
-        // 重新加载所有目标
-        loadGoals()
+        _titleFilter.value = "" //  添加这行代码
+        loadGoals()  // 这行代码也要保留，用于重新加载目标列表
     }
 
     // 筛选条件的数据类

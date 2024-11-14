@@ -112,19 +112,22 @@ fun EmotionScreen(
         viewModel.loadGoals()
     }
 
+    val showTitle = viewModel.selectedFilterType != EmotionViewModel.FilterType.Title
+
     Scaffold(
         topBar = {
             EmotionTopAppBar(
                 title = stringResource(id = R.string.emotion_analysis_title),
-                searchText = searchQuery.value,  // 传递搜索文本
+                showTitle = showTitle,
+                searchText = searchQuery.value,
                 onSearchInputChange = { query -> searchQuery.value = query },
                 onSearchAction = { viewModel.setTitleFilter(searchQuery.value) },
                 filterType = viewModel.selectedFilterType,
                 onFilterTypeChange = {
                     viewModel.setSelectedFilterType(it)
-                    if (it != EmotionViewModel.FilterType.Title) searchQuery.value = "" // 清空搜索框
+                    if (it != EmotionViewModel.FilterType.Title) searchQuery.value = ""
                 },
-                onRefreshClick = { viewModel.reset() } // 传递刷新回调
+                onRefreshClick = { viewModel.reset() }
             )
         }
     ) { innerPadding ->
@@ -139,15 +142,15 @@ fun EmotionScreen(
         ) {
             when (viewModel.selectedFilterType) {
                 EmotionViewModel.FilterType.Title -> {
-                    OutlinedTextField(
-                        value = searchQuery.value,
-                        onValueChange = { query ->
-                            searchQuery.value = query
-                            viewModel.setTitleFilter(query)
-                        },
-                        label = { Text(stringResource(id = R.string.title_filter)) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+//                    OutlinedTextField(
+//                        value = searchQuery.value,
+//                        onValueChange = { query ->
+//                            searchQuery.value = query
+//                            viewModel.setTitleFilter(query)
+//                        },
+//                        label = { Text(stringResource(id = R.string.title_filter)) },
+//                        modifier = Modifier.fillMaxWidth()
+//                    )
                 }
 
 

@@ -21,46 +21,24 @@ import com.starry.greenstash.ui.screens.emotion.EmotionViewModel
 @Composable
 fun EmotionTopAppBar(
     title: String,
+    showTitle: Boolean,
     searchText: String,
     onSearchInputChange: (String) -> Unit,
     onSearchAction: () -> Unit,
     filterType: EmotionViewModel.FilterType,
     onFilterTypeChange: (EmotionViewModel.FilterType) -> Unit,
-    onRefreshClick: () -> Unit // 添加刷新回调
+    onRefreshClick: () -> Unit
 ) {
     var filterMenuExpanded by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
     TopAppBar(
-        title = { Text(text = title) },
+        title = { if (showTitle) Text(text = title) }, // Conditional title display
         actions = {
-            // Filter Button
+            // Filter menu
             IconButton(onClick = { filterMenuExpanded = true }) {
                 Icon(Icons.Filled.FilterList, contentDescription = "Filter")
             }
-
-            // Search Field (only shown when filterType is Title)
-            if (filterType == EmotionViewModel.FilterType.Title) {
-                OutlinedTextField(
-                    value = searchText,
-                    onValueChange = onSearchInputChange,
-                    placeholder = { Text("Search") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                    keyboardActions = KeyboardActions(onSearch = {
-                        onSearchAction()
-                        keyboardController?.hide()
-                    }),
-                    modifier = Modifier.widthIn(max = 240.dp) // Limit width
-                )
-            }
-
-            // Refresh Button
-            IconButton(onClick = onRefreshClick) {  // 使用提供的回调
-                Icon(Icons.Default.Refresh, contentDescription = "Refresh")
-            }
-
-
             DropdownMenu(
                 expanded = filterMenuExpanded,
                 onDismissRequest = { filterMenuExpanded = false }
@@ -71,9 +49,40 @@ fun EmotionTopAppBar(
                         onClick = {
                             onFilterTypeChange(type)
                             filterMenuExpanded = false
+                            if (type != EmotionViewModel.FilterType.Title) {
+                                onSearchInputChange("") // Clear search text if not Title filter
+                                keyboardController?.hide() // Hide keyboard
+                            }
                         }
                     )
                 }
+            }
+
+
+            // Search field (only for Title filter)
+            if (filterType == EmotionViewModel.FilterType.Title) {
+                OutlinedTextField(
+                    value = searchText,
+                    onValueChange = onSearchInputChange,
+                    placeholder = { Text("Search...") }, // More descriptive placeholder
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                    keyboardActions = KeyboardActions(onSearch = {
+                        onSearchAction()
+                        keyboardController?.hide()
+                    }),
+                    modifier = Modifier.widthIn(max = 240.dp),
+                    textStyle = MaterialTheme.typography.bodyMedium,  // Use appropriate text style
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary, // Customize colors
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                )
+            }
+
+            // Refresh button
+            IconButton(onClick = onRefreshClick) {
+                Icon(Icons.Default.Refresh, contentDescription = "Refresh")
             }
         }
     )
