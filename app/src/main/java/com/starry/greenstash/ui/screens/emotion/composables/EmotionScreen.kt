@@ -114,71 +114,17 @@ fun EmotionScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = stringResource(id = R.string.emotion_analysis_title))
+            EmotionTopAppBar(
+                title = stringResource(id = R.string.emotion_analysis_title),
+                searchText = searchQuery.value,  // 传递搜索文本
+                onSearchInputChange = { query -> searchQuery.value = query },
+                onSearchAction = { viewModel.setTitleFilter(searchQuery.value) },
+                filterType = viewModel.selectedFilterType,
+                onFilterTypeChange = {
+                    viewModel.setSelectedFilterType(it)
+                    if (it != EmotionViewModel.FilterType.Title) searchQuery.value = "" // 清空搜索框
                 },
-                actions = {
-                    TextField(
-                        value = searchQuery.value,
-                        onValueChange = { query ->
-                            searchQuery.value = query
-                            viewModel.setBillText(query)
-                        },
-                        placeholder = { Text(stringResource(id = R.string.search_placeholder)) },
-                        modifier = Modifier
-                            .fillMaxWidth(0.5f)
-                            .padding(horizontal = 8.dp),
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            imeAction = ImeAction.Done
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                viewModel.setBillText(searchQuery.value)
-                                println("Search query: ${searchQuery.value}")
-                                keyboardController?.hide() // 隐藏键盘
-                            }
-                        )
-                    )
-
-                    // 添加选择筛选标准的下拉菜单
-                    var expanded by remember { mutableStateOf(false) }
-                    Box {
-                        IconButton(onClick = { expanded = true }) {
-                            Icon(
-                                imageVector = Icons.Default.FilterList,
-                                contentDescription = stringResource(id = R.string.select_filter_type)
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false }
-                        ) {
-                            EmotionViewModel.FilterType.entries.forEach { filterType ->
-                                DropdownMenuItem(
-                                    text = { Text(filterType.name) },
-                                    onClick = {
-                                        viewModel.setSelectedFilterType(filterType)
-                                        expanded = false
-                                    }
-                                )
-                            }
-                        }
-                    }
-
-                    // 添加重置筛选条件的按钮
-                    IconButton(
-                        onClick = {
-                            searchQuery.value = ""
-                            viewModel.reset()
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = stringResource(id = R.string.reset_filter)
-                        )
-                    }
-                }
+                onRefreshClick = { viewModel.reset() } // 传递刷新回调
             )
         }
     ) { innerPadding ->
