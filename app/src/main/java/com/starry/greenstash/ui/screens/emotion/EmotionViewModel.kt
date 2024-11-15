@@ -146,7 +146,6 @@ class EmotionViewModel @Inject constructor(
         Title, DateRange, Priority, None;
     }
 
-    // 其他代码...
 
     fun loadGoals() {
         viewModelScope.launch {
@@ -275,7 +274,7 @@ class EmotionViewModel @Inject constructor(
         val gson = Gson()
         val goalJson = gson.toJson(goal)
 
-        _billText.value = "${_billText.value}\n$goalJson"
+        _billText.value = "${_billText.value}$goalJson\n"
     }
 
     fun removeGoalFromAnalysis(goal: GoalWithTransactions) {
@@ -284,7 +283,7 @@ class EmotionViewModel @Inject constructor(
         val goalJson = gson.toJson(goal)
 
         // 从 _billText 中移除目标
-        _billText.value = _billText.value.replace(goalJson, "")
+        _billText.value = _billText.value.replace("$goalJson\n", "")
     }
 
     fun reset() {
