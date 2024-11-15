@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.SentimentVerySatisfied
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -75,7 +76,9 @@ fun EmotionAnalysisFAB(
             Text(
                 text = stringResource(id = R.string.emotion_analysis_button),
                 modifier = Modifier.padding(top = 2.dp),
-                fontFamily = greenstashFont)
+                fontFamily = greenstashFont,
+                color = MaterialTheme.colorScheme.onSecondaryContainer // 显式指定颜色
+            )
         }
     }
 }

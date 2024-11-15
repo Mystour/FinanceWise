@@ -201,31 +201,45 @@ fun HomeScreen(navController: NavController) {
                 },
 
                 floatingActionButton = {
-                    HomeExtendedFAB(
-                        modifier = Modifier.tapTarget(
-                            precedence = 0,
-                            title = TextDefinition(
-                                text = stringResource(id = R.string.new_goal_onboarding_title),
-                                textStyle = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = greenstashFont,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                    Row(
+                        modifier = Modifier
+                            .padding(end = 10.dp, bottom = 12.dp), // 应用于整个 Row 的 padding
+                        verticalAlignment = Alignment.CenterVertically // 垂直居中对齐按钮
+                    ) {
+                        EmotionAnalysisFAB(
+                            // 情绪分析按钮，现在在左边
+                            modifier = Modifier,
+                            lazyListState = lazyListState,
+                            navController = navController,
+                        )
+                        Spacer(modifier = Modifier.width(50.dp)) // 按钮之间的间距
+
+                        HomeExtendedFAB(
+                            modifier = Modifier.tapTarget(
+                                precedence = 0,
+                                title = TextDefinition(
+                                    text = stringResource(id = R.string.new_goal_onboarding_title),
+                                    textStyle = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = greenstashFont,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                                ),
+                                description = TextDefinition(
+                                    text = stringResource(id = R.string.new_goal_onboarding_desc),
+                                    textStyle = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                    fontFamily = greenstashFont
+                                ),
+                                tapTargetStyle = TapTargetStyle(
+                                    backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
+                                    tapTargetHighlightColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                                    backgroundAlpha = 1f,
+                                ),
                             ),
-                            description = TextDefinition(
-                                text = stringResource(id = R.string.new_goal_onboarding_desc),
-                                textStyle = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                fontFamily = greenstashFont
-                            ),
-                            tapTargetStyle = TapTargetStyle(
-                                backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
-                                tapTargetHighlightColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                                backgroundAlpha = 1f,
-                            ),
-                        ),
-                        lazyListState = lazyListState,
-                        navController = navController
-                    )
+                            lazyListState = lazyListState,
+                            navController = navController
+                        )
+                    }
                 }
 
             ) {
@@ -270,7 +284,7 @@ fun HomeScreen(navController: NavController) {
                         }
 
                         // 传递 activity 参数
-                        SendDatabaseDataButton(navController, activity = context as Activity)
+//                        EmotionAnalysisFAB(navController, activity = context as Activity)
                     }
                 }
             }
@@ -397,7 +411,15 @@ private fun AllGoalsList(
     }
 }
 
-
+/**
+ * This composable function displays the floating action button (FAB) for adding a new goal.
+ * It uses the [AnimatedVisibility] composable to animate the FAB's visibility based on the scroll position of the [lazyListState].
+ * The FAB is only visible when the list is scrolled up, indicating that the user is scrolling through the list.
+ *
+ * @param modifier The modifier to be applied to the FAB.
+ * @param lazyListState The state of the lazy list used to determine the scroll position.
+ * @param navController The navigation controller used to navigate to the input screen.
+ */
 @Composable
 private fun HomeExtendedFAB(
     modifier: Modifier,
