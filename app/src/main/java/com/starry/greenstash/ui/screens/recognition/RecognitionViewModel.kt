@@ -11,10 +11,18 @@ import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.content
 import com.starry.greenstash.BuildConfig
 import com.starry.greenstash.R
+import com.starry.greenstash.database.goal.GoalDao
+import com.starry.greenstash.utils.PreferenceUtil
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-class RecognitionViewModel(private val context: Context) : ViewModel() {
+@HiltViewModel
+class RecognitionViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
+) : ViewModel() {
     private val generativeModel by lazy {
         GenerativeModel(
             modelName = "gemini-1.5-flash",

@@ -1,6 +1,5 @@
 package com.starry.greenstash.ui.screens.recognition.composables
 
-import RecognitionViewModelFactory
 import android.Manifest
 import android.graphics.Bitmap
 import android.net.Uri
@@ -38,6 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.starry.greenstash.R
 import com.starry.greenstash.ui.screens.recognition.RecognitionViewModel
@@ -46,7 +46,7 @@ import com.starry.greenstash.utils.ImageUtils
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecognitionScreen() {
-    val viewModel: RecognitionViewModel = viewModel(factory = RecognitionViewModelFactory(LocalContext.current))
+    val viewModel: RecognitionViewModel = hiltViewModel()
     val context = LocalContext.current
 
     var selectedImage by remember { mutableStateOf<Uri?>(null) }  // Store the Uri
