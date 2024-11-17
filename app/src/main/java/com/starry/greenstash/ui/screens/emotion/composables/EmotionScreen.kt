@@ -237,7 +237,7 @@ fun EmotionScreen(
             }
 
             BillInput(
-                billText = viewModel.billText.trim(),
+                billText = viewModel.billText,
                 onBillTextChange = { viewModel.setBillText(it) }
             )
 

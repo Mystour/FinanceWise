@@ -14,7 +14,7 @@ import com.starry.greenstash.R
 @Composable
 fun BillInput(billText: String, onBillTextChange: (String) -> Unit) {
     OutlinedTextField(
-        value = billText,
+        value = billText.trim(),
         onValueChange = onBillTextChange,
         label = { Text(text = stringResource(id = R.string.content_hint)) },
         modifier = Modifier.padding(16.dp),
