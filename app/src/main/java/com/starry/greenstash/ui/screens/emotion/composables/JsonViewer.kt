@@ -13,6 +13,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonSyntaxException
 import com.paulvarry.jsonviewer.JsonViewer
+import org.json.JSONArray
 
 @Composable
 fun JsonViewer(jsonString: String) {
@@ -31,7 +32,7 @@ fun JsonViewer(jsonString: String) {
         },
         update = { jsonViewer ->
             val prettyJson = try {
-                gson.toJson(gson.fromJson(jsonString, Any::class.java))
+                gson.toJson(gson.fromJson(jsonString, JSONArray::class.java))
             } catch (e: JsonSyntaxException) {
                 "Invalid JSON: ${e.message}"
             }
