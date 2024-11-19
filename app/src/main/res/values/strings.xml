@@ -125,7 +125,7 @@
     <string name="select_image_button" tools:ignore="MissingTranslation">Select Image</string>
     <string name="analyze_image_button" tools:ignore="MissingTranslation">Analyze Image</string>
     <string name="initial_recognition_prompt" tools:ignore="MissingTranslation">
-        Please analyze the contents of the following pictures and describe the objects, scenes, people and other information in the pictures in as much detail as possible, and speculate about the story or meaning behind the pictures.
+        Please analyze the contents of the following pictures and describe the objects, scenes, people and other information in the pictures in as much detail as possible, and speculate about the story or meaning behind the pictures. (English is used unless otherwise specified)
     </string>
 
     <!-- Congratulations Screen -->
