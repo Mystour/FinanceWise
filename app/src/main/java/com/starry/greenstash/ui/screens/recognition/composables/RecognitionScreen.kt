@@ -22,6 +22,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,6 +46,7 @@ import com.starry.greenstash.R
 import com.starry.greenstash.ui.navigation.NormalScreens
 import com.starry.greenstash.ui.screens.recognition.RecognitionViewModel
 import com.starry.greenstash.utils.ImageUtils
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,12 +79,19 @@ fun RecognitionScreen(
     }
 
     val analysisStream by viewModel.analysisStream.collectAsState()
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(analysisStream) {
+        listState.scrollToItem(0) // 滚动到顶部
+        delay(100) // 等待一段时间，确保内容更新
+        listState.scrollToItem(listState.layoutInfo.visibleItemsInfo.size - 1) // 滚动到底部
+    }
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        state = rememberLazyListState(),
+        state = listState,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -125,7 +134,7 @@ fun RecognitionScreen(
             Button(onClick = {
                 selectedImage?.let { uri ->
                     val bitmap = ImageUtils.uriToBitmap(uri, context, 1024) // Use ImageUtils for analysis Bitmap
-                    viewModel.analyzeImage(bitmap, goalId) { result, transactionType ->
+                    viewModel.analyzeImage(bitmap) { _, transactionType ->
                         // 处理分析结果并进行导航
                         navController.navigate(NormalScreens.DWScreen(goalId.toString(), transactionType.name))
                     }
@@ -166,6 +175,7 @@ fun RecognitionScreen(
         }
     }
 }
+
 
 
 // 预览功能

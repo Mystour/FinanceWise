@@ -38,7 +38,7 @@ class RecognitionViewModel @Inject constructor(
     val isLoading: Boolean get() = _isLoading
     val analysisStream: StateFlow<String> get() = _analysisStream
 
-    fun analyzeImage(bitmap: Bitmap, goalId: Long, onAnalysisComplete: (String, TransactionType) -> Unit) {
+    fun analyzeImage(bitmap: Bitmap, onAnalysisComplete: (String, TransactionType) -> Unit) {
         viewModelScope.launch {
             _isLoading = true
             analyzeImageWithGemini(bitmap) { result ->
