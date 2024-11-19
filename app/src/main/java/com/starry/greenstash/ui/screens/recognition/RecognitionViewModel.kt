@@ -7,17 +7,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.content
 import com.starry.greenstash.BuildConfig
 import com.starry.greenstash.R
-import com.starry.greenstash.database.goal.GoalDao
 import com.starry.greenstash.database.transaction.TransactionType
-import com.starry.greenstash.ui.navigation.NormalScreens
-import com.starry.greenstash.utils.PreferenceUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -35,11 +33,12 @@ class RecognitionViewModel @Inject constructor(
 
     private var _analysisResult by mutableStateOf("")
     private var _isLoading by mutableStateOf(false)
+    private val _analysisStream = MutableStateFlow("")
 
-    val analysisResult: String get() = _analysisResult
     val isLoading: Boolean get() = _isLoading
+    val analysisStream: StateFlow<String> get() = _analysisStream
 
-    fun analyzeImage(bitmap: Bitmap, goalId: Long, onAnalysisComplete: (String, TransactionType) -> Unit) { // 添加 onAnalysisComplete 回调
+    fun analyzeImage(bitmap: Bitmap, goalId: Long, onAnalysisComplete: (String, TransactionType) -> Unit) {
         viewModelScope.launch {
             _isLoading = true
             analyzeImageWithGemini(bitmap) { result ->
@@ -72,9 +71,12 @@ class RecognitionViewModel @Inject constructor(
         try {
             val prompt = context.getString(R.string.initial_recognition_prompt)
             Timber.d("Generated prompt: $prompt")
-            val response = generativeModel.generateContent(content { image(bitmap); text(prompt) })
-            Timber.d("Received response: $response")
-            val analysis = response.text ?: "无法分析图片"
+            val response = generativeModel.generateContentStream(content { image(bitmap); text(prompt) })
+            var analysis = ""
+            response.collect { chunk ->
+                analysis += chunk.text
+                _analysisStream.value = analysis
+            }
             callback(analysis)
         } catch (e: Exception) {
             Timber.e(e, "分析图片时发生错误")
@@ -84,4 +86,5 @@ class RecognitionViewModel @Inject constructor(
         }
     }
 }
+
 

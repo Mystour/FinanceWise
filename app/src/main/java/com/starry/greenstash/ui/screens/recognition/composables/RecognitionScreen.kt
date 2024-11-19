@@ -22,6 +22,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -74,6 +75,8 @@ fun RecognitionScreen(
             Toast.makeText(context, "未获得必要的图片访问权限", Toast.LENGTH_SHORT).show()
         }
     }
+
+    val analysisStream by viewModel.analysisStream.collectAsState()
 
     LazyColumn(
         modifier = Modifier
@@ -139,8 +142,8 @@ fun RecognitionScreen(
         }
 
         item {
-            if (viewModel.analysisResult.isNotEmpty()) {
-                Text(viewModel.analysisResult)
+            if (analysisStream.isNotEmpty()) {
+                Text(analysisStream)
             }
         }
 
@@ -163,6 +166,7 @@ fun RecognitionScreen(
         }
     }
 }
+
 
 // 预览功能
 //@Preview(showBackground = true)
