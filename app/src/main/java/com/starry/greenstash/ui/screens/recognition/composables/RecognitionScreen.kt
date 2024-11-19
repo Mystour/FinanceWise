@@ -43,6 +43,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.starry.greenstash.R
+import com.starry.greenstash.database.transaction.TransactionType
 import com.starry.greenstash.ui.navigation.NormalScreens
 import com.starry.greenstash.ui.screens.recognition.RecognitionViewModel
 import com.starry.greenstash.utils.ImageUtils
@@ -80,6 +81,8 @@ fun RecognitionScreen(
 
     val analysisStream by viewModel.analysisStream.collectAsState()
     val listState = rememberLazyListState()
+    var selectedTransactionType by remember { mutableStateOf<TransactionType?>(null) }
+    var showTransactionDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(analysisStream) {
         listState.scrollToItem(0) // 滚动到顶部
@@ -134,9 +137,13 @@ fun RecognitionScreen(
             Button(onClick = {
                 selectedImage?.let { uri ->
                     val bitmap = ImageUtils.uriToBitmap(uri, context, 1024) // Use ImageUtils for analysis Bitmap
-                    viewModel.analyzeImage(bitmap) { _, transactionType ->
-                        // 处理分析结果并进行导航
-                        navController.navigate(NormalScreens.DWScreen(goalId.toString(), transactionType.name))
+                    viewModel.analyzeImage(bitmap) { result, transactionType ->
+                        if (transactionType == TransactionType.Invalid) {
+                            selectedTransactionType = null
+                        } else {
+                            // 处理分析结果并进行导航
+                            navController.navigate(NormalScreens.DWScreen(goalId.toString(), transactionType.name))
+                        }
                     }
                 }
             }, enabled = selectedImage != null) {
@@ -153,6 +160,30 @@ fun RecognitionScreen(
         item {
             if (analysisStream.isNotEmpty()) {
                 Text(analysisStream)
+            }
+        }
+
+        item {
+            // 新增的按钮
+            Button(onClick = {
+                if (selectedTransactionType == null) {
+                    showTransactionDialog = true // Set the state to true to show the dialog
+                } else {
+                    navController.navigate(NormalScreens.DWScreen(goalId.toString(), selectedTransactionType!!.name))
+                }
+            }, enabled = selectedImage != null && !viewModel.isLoading) {
+                Text(stringResource(id = R.string.add_to_transaction_button))
+            }
+        }
+
+                // Place the conditional rendering of the dialog here:
+        item {
+            if (showTransactionDialog) {
+                ShowTransactionTypeSelectionDialog { selectedType ->
+                    selectedTransactionType = selectedType
+                    navController.navigate(NormalScreens.DWScreen(goalId.toString(), selectedType.name))
+                    showTransactionDialog = false // Hide the dialog after selection
+                }
             }
         }
 

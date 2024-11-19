@@ -114,6 +114,8 @@
     <string name="initial_recognition_prompt">
         请分析以下图片的内容，并尽可能详细地描述图片中的物品、场景、人物等信息，并推测图片背后的故事或含义。（如无特殊说明则使用中文）
     </string>
+    <string name="select_transaction_type_title">未检测到交易类型，请手动选择</string>
+    <string name="add_to_transaction_button">添加交易</string>
 
     <!-- Congratulations Screen -->
     <string name="goal_achieved_heading">恭喜 🥳</string>

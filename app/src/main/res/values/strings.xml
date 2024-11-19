@@ -127,6 +127,8 @@
     <string name="initial_recognition_prompt" tools:ignore="MissingTranslation">
         Please analyze the contents of the following pictures and describe the objects, scenes, people and other information in the pictures in as much detail as possible, and speculate about the story or meaning behind the pictures. (English is used unless otherwise specified)
     </string>
+    <string name="select_transaction_type_title" tools:ignore="MissingTranslation">Transaction type not detected, please manually select</string>
+    <string name="add_to_transaction_button" tools:ignore="MissingTranslation">Add to Transaction</string>
 
     <!-- Congratulations Screen -->
     <string name="goal_achieved_heading">Congratulations 🥳</string>

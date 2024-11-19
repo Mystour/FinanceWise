@@ -60,7 +60,7 @@ class RecognitionViewModel @Inject constructor(
         } else if (analysisResult.contains("withdraw", ignoreCase = true) || analysisResult.contains("取出", ignoreCase = true)) {
             TransactionType.Withdraw
         } else {
-            TransactionType.Withdraw  // 默认返回取款
+            TransactionType.Invalid
         }
     }
 
