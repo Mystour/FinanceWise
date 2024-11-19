@@ -125,7 +125,13 @@
     <string name="select_image_button" tools:ignore="MissingTranslation">Select Image</string>
     <string name="analyze_image_button" tools:ignore="MissingTranslation">Analyze Image</string>
     <string name="initial_recognition_prompt" tools:ignore="MissingTranslation">
-        Please analyze the contents of the following pictures and describe the objects, scenes, people and other information in the pictures in as much detail as possible, and speculate about the story or meaning behind the pictures. (English is used unless otherwise specified)
+        Please analyze the contents of the following pictures and describe the objects, scenes, people and other information in the pictures in as much detail as possible. Pay special attention to the following points:
+        1. ** Type of transaction ** : Please specify whether this is Deposit or Withdraw or not sure.
+        2. ** Transaction Amount ** : Please provide a specific transaction amount, such as "$50" or "$100".
+        3. ** Note ** : If there is any additional information or note, please indicate it here, such as "Buy lunch" or "receive salary".
+
+        For example: this is a receipt for shopping in the supermarket, the transaction type is Withdraw, the transaction amount is 150 $, and the note is "Purchase daily necessities".
+        (English is used unless otherwise specified)
     </string>
     <string name="select_transaction_type_title" tools:ignore="MissingTranslation">Transaction type not detected, please manually select</string>
     <string name="add_to_transaction_button" tools:ignore="MissingTranslation">Add to Transaction</string>

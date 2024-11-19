@@ -57,7 +57,9 @@ class RecognitionViewModel @Inject constructor(
     private fun determineTransactionType(analysisResult: String): TransactionType {
         return if (analysisResult.contains("deposit", ignoreCase = true) || analysisResult.contains("存入", ignoreCase = true)) {
             TransactionType.Deposit
-        } else if (analysisResult.contains("withdraw", ignoreCase = true) || analysisResult.contains("取出", ignoreCase = true)) {
+        } else if (analysisResult.contains("withdraw", ignoreCase = true) ||
+            analysisResult.contains("取出", ignoreCase = true) ||
+            analysisResult.contains("支出", ignoreCase = true)) {
             TransactionType.Withdraw
         } else {
             TransactionType.Invalid

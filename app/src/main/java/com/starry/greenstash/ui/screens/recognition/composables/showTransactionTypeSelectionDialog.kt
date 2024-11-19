@@ -1,6 +1,5 @@
 package com.starry.greenstash.ui.screens.recognition.composables
 
-import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton

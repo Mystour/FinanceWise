@@ -112,8 +112,15 @@
     <string name="select_image_button">选择图片</string>
     <string name="analyze_image_button">分析图片</string>
     <string name="initial_recognition_prompt">
-        请分析以下图片的内容，并尽可能详细地描述图片中的物品、场景、人物等信息，并推测图片背后的故事或含义。（如无特殊说明则使用中文）
+        请分析以下图片的内容，并尽可能详细地描述图片中的物品、场景、人物等信息。请特别注意以下几点：
+        1. **交易类型**：请明确指出这是存入还是取出还是不明确。
+        2. **交易金额**：请提供具体的交易金额，例如“50元”或“100美元”。
+        3. **备注**：如果有任何额外的信息或备注，请在此处注明，例如“购买午餐”或“收到工资”。
+
+        例如：这是一张在超市购物的小票，交易类型是取出，交易金额是150元，备注是“购买日用品”。
+        （未特殊说明则用中文回答）
     </string>
+
     <string name="select_transaction_type_title">未检测到交易类型，请手动选择</string>
     <string name="add_to_transaction_button">添加交易</string>
 
