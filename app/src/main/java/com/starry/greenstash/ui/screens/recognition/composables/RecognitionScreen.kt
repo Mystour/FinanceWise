@@ -39,14 +39,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.starry.greenstash.R
+import com.starry.greenstash.ui.navigation.NormalScreens
 import com.starry.greenstash.ui.screens.recognition.RecognitionViewModel
 import com.starry.greenstash.utils.ImageUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecognitionScreen() {
-    val viewModel: RecognitionViewModel = hiltViewModel()
+fun RecognitionScreen(
+    viewModel: RecognitionViewModel = hiltViewModel(),
+    navController: NavController,
+    goalId: Long
+) {
     val context = LocalContext.current
 
     var selectedImage by remember { mutableStateOf<Uri?>(null) }  // Store the Uri
@@ -117,7 +122,10 @@ fun RecognitionScreen() {
             Button(onClick = {
                 selectedImage?.let { uri ->
                     val bitmap = ImageUtils.uriToBitmap(uri, context, 1024) // Use ImageUtils for analysis Bitmap
-                    viewModel.analyzeImage(bitmap) // Pass Bitmap to ViewModel
+                    viewModel.analyzeImage(bitmap, goalId) { result, transactionType ->
+                        // 处理分析结果并进行导航
+                        navController.navigate(NormalScreens.DWScreen(goalId.toString(), transactionType.name))
+                    }
                 }
             }, enabled = selectedImage != null) {
                 Text(stringResource(id = R.string.analyze_image_button))
@@ -157,8 +165,8 @@ fun RecognitionScreen() {
 }
 
 // 预览功能
-@Preview(showBackground = true)
-@Composable
-fun RecognitionScreenPreview() {
-    RecognitionScreen()
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun RecognitionScreenPreview() {
+//    RecognitionScreen()
+//}

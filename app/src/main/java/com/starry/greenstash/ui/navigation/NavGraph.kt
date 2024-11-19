@@ -181,13 +181,14 @@ fun NavGraph(
         }
 
         // Visual Finance Screen
-        composable<NormalScreens.VisualFinance>(
+        composable<NormalScreens.RecognitionScreen>(
             enterTransition = { enterTransition() },
             exitTransition = { exitTransition() },
             popEnterTransition = { popEnterTransition() },
             popExitTransition = { popExitTransition() }
-        ) {
-            RecognitionScreen() // 调用 RecognitionScreen
+        ) { backStackEntry ->
+            val args = backStackEntry.toRoute<NormalScreens.RecognitionScreen>()
+            RecognitionScreen(navController = navController, goalId = args.goalId.toLong()) // 传递 goalId
         }
 
         /** Emotion Screen */

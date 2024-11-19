@@ -7,11 +7,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.content
 import com.starry.greenstash.BuildConfig
 import com.starry.greenstash.R
 import com.starry.greenstash.database.goal.GoalDao
+import com.starry.greenstash.database.transaction.TransactionType
+import com.starry.greenstash.ui.navigation.NormalScreens
 import com.starry.greenstash.utils.PreferenceUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -21,7 +24,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RecognitionViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
     private val generativeModel by lazy {
         GenerativeModel(
@@ -36,13 +39,29 @@ class RecognitionViewModel @Inject constructor(
     val analysisResult: String get() = _analysisResult
     val isLoading: Boolean get() = _isLoading
 
-    fun analyzeImage(bitmap: Bitmap) {
+    fun analyzeImage(bitmap: Bitmap, goalId: Long, onAnalysisComplete: (String, TransactionType) -> Unit) { // 添加 onAnalysisComplete 回调
         viewModelScope.launch {
             _isLoading = true
             analyzeImageWithGemini(bitmap) { result ->
                 _analysisResult = result
                 _isLoading = false
+
+                // 解析分析结果，识别交易类型
+                val transactionType = determineTransactionType(result)
+
+                // 通过回调通知完成
+                onAnalysisComplete(result, transactionType)
             }
+        }
+    }
+
+    private fun determineTransactionType(analysisResult: String): TransactionType {
+        return if (analysisResult.contains("deposit", ignoreCase = true) || analysisResult.contains("存入", ignoreCase = true)) {
+            TransactionType.Deposit
+        } else if (analysisResult.contains("withdraw", ignoreCase = true) || analysisResult.contains("取出", ignoreCase = true)) {
+            TransactionType.Withdraw
+        } else {
+            TransactionType.Withdraw  // 默认返回取款
         }
     }
 
@@ -51,7 +70,6 @@ class RecognitionViewModel @Inject constructor(
         callback: (String) -> Unit
     ) {
         try {
-            // 从资源文件中读取提示文本
             val prompt = context.getString(R.string.initial_recognition_prompt)
             Timber.d("Generated prompt: $prompt")
             val response = generativeModel.generateContent(content { image(bitmap); text(prompt) })
@@ -66,3 +84,4 @@ class RecognitionViewModel @Inject constructor(
         }
     }
 }
+

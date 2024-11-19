@@ -133,7 +133,7 @@ fun GoalLazyColumnItem(
                 onAnalyzeBillClick = {
                     localView.weakHapticFeedback()
                     navController.navigate(
-                        NormalScreens.VisualFinance(
+                        NormalScreens.RecognitionScreen(
                             goalId = item.goal.goalId.toString()
                         )
                     )
@@ -226,7 +226,7 @@ fun GoalLazyColumnItem(
                 onAnalyzeBillClick = {
                     localView.weakHapticFeedback()
                     navController.navigate(
-                        NormalScreens.VisualFinance(
+                        NormalScreens.RecognitionScreen(
                             goalId = item.goal.goalId.toString()
                         )
                     )
