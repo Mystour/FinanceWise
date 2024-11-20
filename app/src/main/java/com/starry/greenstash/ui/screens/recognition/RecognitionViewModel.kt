@@ -62,31 +62,37 @@ class RecognitionViewModel @Inject constructor(
     }
 
     private fun determineTransactionTypeAndDetails(analysisResult: String): Triple<TransactionType, String, String> {
-        val type = if (analysisResult.contains("不明确", ignoreCase = true)) {
+        // 去除字符串中的 * 符号
+        val cleanedResult = analysisResult.replace("*", "")
+
+        val type = if (cleanedResult.contains("不明确", ignoreCase = true)) {
             TransactionType.Invalid
-        } else if (analysisResult.contains("deposit", ignoreCase = true) || analysisResult.contains("存入", ignoreCase = true)) {
+        } else if (cleanedResult.contains("deposit", ignoreCase = true) || cleanedResult.contains("存入", ignoreCase = true)) {
             TransactionType.Deposit
-        } else if (analysisResult.contains("withdraw", ignoreCase = true) ||
-            analysisResult.contains("取出", ignoreCase = true) ||
-            analysisResult.contains("支出", ignoreCase = true)) {
+        } else if (cleanedResult.contains("withdraw", ignoreCase = true) ||
+            cleanedResult.contains("取出", ignoreCase = true) ||
+            cleanedResult.contains("支出", ignoreCase = true)) {
             TransactionType.Withdraw
         } else {
             TransactionType.Invalid
         }
 
-        val amount = extractAmount(analysisResult)
-        val note = extractnote(analysisResult)
+        val amount = extractAmount(cleanedResult)
+        val note = extractNote(cleanedResult)
 
         return Triple(type, amount, note)
     }
 
+
     private fun extractAmount(analysisResult: String): String {
-        val amountPattern = Regex("\\b\\d+(\\.\\d+)?\\b")
+        val currencySymbols = listOf("$", "€", "£", "¥", "₹", "元", "美元", "欧元", "英镑", "日元", "卢比")
+        val amountPattern = Regex("\\b\\d+(\\.\\d+)?\\s*(?:" + currencySymbols.joinToString("|") { Regex.escape(it) } + ")?")
         val matchResult = amountPattern.find(analysisResult)
-        return matchResult?.value ?: ""
+        return matchResult?.value?.replace(Regex("\\s*[$€£¥₹元美欧英镑日卢比]\\s*"), "") ?: ""
     }
 
-    private fun extractnote(analysisResult: String): String {
+
+    private fun extractNote(analysisResult: String): String {
         val notePattern = Regex("(?<=备注:|note:).+")
         val matchResult = notePattern.find(analysisResult)
         return matchResult?.value?.trim() ?: ""

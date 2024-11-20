@@ -81,6 +81,8 @@ fun RecognitionScreen(
     val listState = rememberLazyListState()
     var selectedTransactionType by remember { mutableStateOf<TransactionType?>(null) }
     var showTransactionDialog by remember { mutableStateOf(false) }
+    var amount by remember { mutableStateOf("")}
+    var note by remember { mutableStateOf("") }
 
     LaunchedEffect(analysisStream) {
         listState.scrollToItem(0) // 滚动到顶部
@@ -159,8 +161,8 @@ fun RecognitionScreen(
             Button(onClick = {
                 if (selectedImage != null && !viewModel.isLoading) {
                     val transactionType = viewModel.transactionType
-                    val amount = viewModel.amount
-                    val note = viewModel.note
+                    amount = viewModel.amount
+                    note = viewModel.note
                     if (transactionType == TransactionType.Invalid) {
                         showTransactionDialog = true // Set the state to true to show the dialog
                     } else {
@@ -177,7 +179,7 @@ fun RecognitionScreen(
             if (showTransactionDialog) {
                 ShowTransactionTypeSelectionDialog { selectedType ->
                     selectedTransactionType = selectedType
-                    navController.navigate(NormalScreens.DWScreen(goalId.toString(), selectedType.name))
+                    navController.navigate(NormalScreens.DWScreen(goalId.toString(), selectedType.name, amount, note ))
                     showTransactionDialog = false // Hide the dialog after selection
                 }
             }
