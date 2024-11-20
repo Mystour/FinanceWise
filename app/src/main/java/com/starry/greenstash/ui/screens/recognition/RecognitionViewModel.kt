@@ -34,6 +34,8 @@ class RecognitionViewModel @Inject constructor(
     private var _analysisResult by mutableStateOf("")
     private var _isLoading by mutableStateOf(false)
     private val _analysisStream = MutableStateFlow("")
+    private var _transactionType by mutableStateOf(TransactionType.Invalid)
+    val transactionType: TransactionType get() = _transactionType
 
     val isLoading: Boolean get() = _isLoading
     val analysisStream: StateFlow<String> get() = _analysisStream
@@ -46,16 +48,16 @@ class RecognitionViewModel @Inject constructor(
                 _isLoading = false
 
                 // 解析分析结果，识别交易类型
-                val transactionType = determineTransactionType(result)
-
-                // 通过回调通知完成
-                onAnalysisComplete(result, transactionType)
+                _transactionType = determineTransactionType(result)
+                
             }
         }
     }
 
     private fun determineTransactionType(analysisResult: String): TransactionType {
-        return if (analysisResult.contains("deposit", ignoreCase = true) || analysisResult.contains("存入", ignoreCase = true)) {
+        return if (analysisResult.contains("不明确", ignoreCase = true)) {
+            TransactionType.Invalid
+        } else if(analysisResult.contains("deposit", ignoreCase = true) || analysisResult.contains("存入", ignoreCase = true)) {
             TransactionType.Deposit
         } else if (analysisResult.contains("withdraw", ignoreCase = true) ||
             analysisResult.contains("取出", ignoreCase = true) ||

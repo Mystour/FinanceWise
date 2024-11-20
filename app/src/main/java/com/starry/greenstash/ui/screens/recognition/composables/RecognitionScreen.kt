@@ -135,13 +135,13 @@ fun RecognitionScreen(
             Button(onClick = {
                 selectedImage?.let { uri ->
                     val bitmap = ImageUtils.uriToBitmap(uri, context, 1024) // Use ImageUtils for analysis Bitmap
-                    viewModel.analyzeImage(bitmap) { _, transactionType ->
-                        if (transactionType == TransactionType.Invalid) {
-                            selectedTransactionType = null
-                        } else {
-                            // 处理分析结果并进行导航
-                            navController.navigate(NormalScreens.DWScreen(goalId.toString(), transactionType.name))
-                        }
+                    viewModel.analyzeImage(bitmap) { _, _ ->
+//                        if (transactionType == TransactionType.Invalid) {
+//                            selectedTransactionType = null
+//                        } else {
+//                            // 处理分析结果并进行导航
+//                            navController.navigate(NormalScreens.DWScreen(goalId.toString(), transactionType.name))
+//                        }
                     }
                 }
             }, enabled = selectedImage != null) {
@@ -164,10 +164,13 @@ fun RecognitionScreen(
         item {
             // 新增的按钮
             Button(onClick = {
-                if (selectedTransactionType == null) {
-                    showTransactionDialog = true // Set the state to true to show the dialog
-                } else {
-                    navController.navigate(NormalScreens.DWScreen(goalId.toString(), selectedTransactionType!!.name))
+                if (selectedImage != null && !viewModel.isLoading) {
+                    val transactionType = viewModel.transactionType
+                    if (transactionType == TransactionType.Invalid) {
+                        showTransactionDialog = true // Set the state to true to show the dialog
+                    } else {
+                        navController.navigate(NormalScreens.DWScreen(goalId.toString(), transactionType.name))
+                    }
                 }
             }, enabled = selectedImage != null && !viewModel.isLoading) {
                 Text(stringResource(id = R.string.add_to_transaction_button))
