@@ -35,29 +35,36 @@ class RecognitionViewModel @Inject constructor(
     private var _isLoading by mutableStateOf(false)
     private val _analysisStream = MutableStateFlow("")
     private var _transactionType by mutableStateOf(TransactionType.Invalid)
+    private var _amount by mutableStateOf("")
+    private var _note by mutableStateOf("")
+
     val transactionType: TransactionType get() = _transactionType
+    val amount: String get() = _amount
+    val note: String get() = _note
 
     val isLoading: Boolean get() = _isLoading
     val analysisStream: StateFlow<String> get() = _analysisStream
 
-    fun analyzeImage(bitmap: Bitmap, onAnalysisComplete: (String, TransactionType) -> Unit) {
+    fun analyzeImage(bitmap: Bitmap) {
         viewModelScope.launch {
             _isLoading = true
             analyzeImageWithGemini(bitmap) { result ->
                 _analysisResult = result
                 _isLoading = false
 
-                // 解析分析结果，识别交易类型
-                _transactionType = determineTransactionType(result)
-                
+                // 解析分析结果，识别交易类型、金额和备注
+                val (type, amount, note) = determineTransactionTypeAndDetails(result)
+                _transactionType = type
+                _amount = amount
+                _note = note
             }
         }
     }
 
-    private fun determineTransactionType(analysisResult: String): TransactionType {
-        return if (analysisResult.contains("不明确", ignoreCase = true)) {
+    private fun determineTransactionTypeAndDetails(analysisResult: String): Triple<TransactionType, String, String> {
+        val type = if (analysisResult.contains("不明确", ignoreCase = true)) {
             TransactionType.Invalid
-        } else if(analysisResult.contains("deposit", ignoreCase = true) || analysisResult.contains("存入", ignoreCase = true)) {
+        } else if (analysisResult.contains("deposit", ignoreCase = true) || analysisResult.contains("存入", ignoreCase = true)) {
             TransactionType.Deposit
         } else if (analysisResult.contains("withdraw", ignoreCase = true) ||
             analysisResult.contains("取出", ignoreCase = true) ||
@@ -66,6 +73,23 @@ class RecognitionViewModel @Inject constructor(
         } else {
             TransactionType.Invalid
         }
+
+        val amount = extractAmount(analysisResult)
+        val note = extractnote(analysisResult)
+
+        return Triple(type, amount, note)
+    }
+
+    private fun extractAmount(analysisResult: String): String {
+        val amountPattern = Regex("\\b\\d+(\\.\\d+)?\\b")
+        val matchResult = amountPattern.find(analysisResult)
+        return matchResult?.value ?: ""
+    }
+
+    private fun extractnote(analysisResult: String): String {
+        val notePattern = Regex("(?<=备注:|note:).+")
+        val matchResult = notePattern.find(analysisResult)
+        return matchResult?.value?.trim() ?: ""
     }
 
     private suspend fun analyzeImageWithGemini(
@@ -90,5 +114,3 @@ class RecognitionViewModel @Inject constructor(
         }
     }
 }
-
-

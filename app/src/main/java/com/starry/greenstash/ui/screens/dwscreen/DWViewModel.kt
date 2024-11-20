@@ -34,6 +34,11 @@ class DWViewModel @Inject constructor(
 
     var state by mutableStateOf(DWScreenState())
 
+    // 新函数：用于初始化 state
+    fun initializeState(amount: String? = null, notes: String? = null) {
+        state = DWScreenState(amount ?: "", notes ?: "")
+    }
+
     fun getDateStyle(): DateStyle {
         val dateStyleValue = preferenceUtil.getString(
             PreferenceUtil.DATE_FORMAT_STR,

@@ -31,7 +31,12 @@ import kotlinx.serialization.Serializable
 sealed class NormalScreens : Screen() {
 
     @Serializable
-    data class DWScreen(val goalId: String, val transactionType: String)
+    data class DWScreen(
+        val goalId: String,
+        val transactionType: String,
+        val amount: String? = null, // 添加可选参数
+        val note: String? = null // 添加可选参数
+    )
 
     @Serializable
     data class InputScreen(val goalId: String? = null)

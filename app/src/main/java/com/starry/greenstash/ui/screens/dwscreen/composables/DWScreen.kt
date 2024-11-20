@@ -51,6 +51,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -102,10 +103,22 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DWScreen(goalId: String, transactionTypeName: String, navController: NavController) {
+fun DWScreen(
+    goalId: String,
+    transactionTypeName: String,
+    amount: String? = null, // 可选参数
+    note: String? = null,  // 可选参数
+    navController: NavController
+) {
     val view = LocalView.current
     val context = LocalContext.current
     val viewModel: DWViewModel = hiltViewModel()
+
+    // 在Composable函数进入时初始化ViewModel的状态
+    LaunchedEffect(amount, note) {
+        viewModel.initializeState(amount, note)
+    }
+
 
     val selectedDateTime = remember {
         mutableStateOf<LocalDateTime>(LocalDateTime.now())
@@ -424,5 +437,5 @@ private fun navigateToHome(
 @Preview
 @Composable
 private fun PV() {
-    DWScreen("", "", rememberNavController())
+    DWScreen("", "", "", "", rememberNavController())
 }

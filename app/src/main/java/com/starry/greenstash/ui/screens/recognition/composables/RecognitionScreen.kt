@@ -135,8 +135,7 @@ fun RecognitionScreen(
             Button(onClick = {
                 selectedImage?.let { uri ->
                     val bitmap = ImageUtils.uriToBitmap(uri, context, 1024) // Use ImageUtils for analysis Bitmap
-                    viewModel.analyzeImage(bitmap) { _, _ ->
-                    }
+                    viewModel.analyzeImage(bitmap)
                 }
             }, enabled = selectedImage != null) {
                 Text(stringResource(id = R.string.analyze_image_button))
@@ -160,10 +159,12 @@ fun RecognitionScreen(
             Button(onClick = {
                 if (selectedImage != null && !viewModel.isLoading) {
                     val transactionType = viewModel.transactionType
+                    val amount = viewModel.amount
+                    val note = viewModel.note
                     if (transactionType == TransactionType.Invalid) {
                         showTransactionDialog = true // Set the state to true to show the dialog
                     } else {
-                        navController.navigate(NormalScreens.DWScreen(goalId.toString(), transactionType.name))
+                        navController.navigate(NormalScreens.DWScreen(goalId.toString(), transactionType.name, amount, note))
                     }
                 }
             }, enabled = selectedImage != null && !viewModel.isLoading) {

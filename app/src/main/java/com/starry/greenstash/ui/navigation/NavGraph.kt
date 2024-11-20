@@ -87,9 +87,12 @@ fun NavGraph(
             popExitTransition = { popExitTransition() }
         ) { backStackEntry ->
             val args = backStackEntry.toRoute<NormalScreens.DWScreen>()
+
             DWScreen(
                 goalId = args.goalId,
                 transactionTypeName = args.transactionType,
+                amount = args.amount, // 传递可选参数
+                note = args.note,  // 传递可选参数
                 navController = navController
             )
         }
@@ -180,7 +183,7 @@ fun NavGraph(
             AboutScreen(navController = navController)
         }
 
-        // Visual Finance Screen
+        /** Recognition Screen */
         composable<NormalScreens.RecognitionScreen>(
             enterTransition = { enterTransition() },
             exitTransition = { exitTransition() },
