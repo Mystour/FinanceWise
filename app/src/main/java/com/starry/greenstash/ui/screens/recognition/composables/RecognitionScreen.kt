@@ -136,12 +136,6 @@ fun RecognitionScreen(
                 selectedImage?.let { uri ->
                     val bitmap = ImageUtils.uriToBitmap(uri, context, 1024) // Use ImageUtils for analysis Bitmap
                     viewModel.analyzeImage(bitmap) { _, _ ->
-//                        if (transactionType == TransactionType.Invalid) {
-//                            selectedTransactionType = null
-//                        } else {
-//                            // 处理分析结果并进行导航
-//                            navController.navigate(NormalScreens.DWScreen(goalId.toString(), transactionType.name))
-//                        }
                     }
                 }
             }, enabled = selectedImage != null) {
