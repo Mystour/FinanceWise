@@ -22,7 +22,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import java.util.regex.Pattern
 
 @HiltViewModel
 class EmotionViewModel @Inject constructor(
@@ -229,41 +228,6 @@ class EmotionViewModel @Inject constructor(
             return Pair(0, "")
         }
     }
-
-//    private fun extractEmotionInfo(analysis: String): Pair<Int, String> {
-//        val scorePattern = context.getString(R.string.score_pattern)
-//        val commentPattern = context.getString(R.string.comment_pattern)
-//
-//        val scoreRegex = Pattern.compile(scorePattern, Pattern.DOTALL or Pattern.MULTILINE)
-//        val commentRegex = Pattern.compile(commentPattern, Pattern.DOTALL or Pattern.MULTILINE)
-//
-//        val scoreMatcher = scoreRegex.matcher(analysis)
-//        val commentMatcher = commentRegex.matcher(analysis)
-//
-//        val score = if (scoreMatcher.find()) {
-//            scoreMatcher.group(1)?.toIntOrNull() ?: 0
-//        } else {
-//            80 // 默认分数
-//        }
-//
-//        val comment = if (commentMatcher.find()) {
-//            val initialComment = commentMatcher.group(1)?.replace("*", "") ?: ""
-//            if (initialComment.trim().endsWith(":") || initialComment.trim().endsWith("：")) {
-//                // 如果评论只包含冒号，继续往下取到第一个句号结束
-//                val extendedComment = analysis.substring(initialComment.length).takeWhile { it != '.' }.trim()
-//                initialComment + extendedComment
-//            } else {
-//                initialComment
-//            }
-//        } else {
-//            context.getString(R.string.default_emotion_comment)
-//        }
-//
-//        println("Extracted Score: $score")
-//        println("Extracted Comment: $comment")
-//
-//        return Pair(score, comment)
-//    }
 
     private fun createInitialAnalysisPrompt(billText: String): String {
         val initialPrompt = context.getString(R.string.initial_analysis_prompt)

@@ -5,6 +5,7 @@ import android.graphics.Typeface
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,21 +25,29 @@ import com.github.mikephil.charting.formatter.PercentFormatter
 import com.starry.greenstash.R
 
 @Composable
-fun EmotionChart(emotionScore: Int, modifier: Modifier = Modifier) {
+fun EmotionChart(
+    emotionScore: Int,
+    modifier: Modifier = Modifier,
+) {
     val entries = listOf(
         PieEntry(emotionScore.toFloat(), stringResource(id = R.string.emotion_score)),
         PieEntry((100 - emotionScore).toFloat(), "") // 补充剩余部分
     )
     val colors = listOf(
         Color(0xFFB39DDB), // 淡紫色
-        Color(0xFFE0E0E0)  // 浅灰色
+        Color(0xFFE0E0E0),  // 浅灰色
     )
     val isPreview = LocalInspectionMode.current
+    val color = MaterialTheme.colorScheme.onSecondaryContainer
+    val scoreColor = MaterialTheme.colorScheme.onSecondaryContainer.toArgb()
+    val labelColor = MaterialTheme.colorScheme.onSecondaryContainer.toArgb()
+
+    println("scoreColor: $color")
 
     Box(modifier = modifier) {
         AndroidView(
             factory = { context ->
-                createPieChart(context, entries, colors.map { it.toArgb() }, isPreview)
+                createPieChart(context, entries, colors.map { it.toArgb() }, scoreColor, labelColor, isPreview)
             },
             modifier = Modifier
                 .fillMaxSize()
@@ -47,10 +56,13 @@ fun EmotionChart(emotionScore: Int, modifier: Modifier = Modifier) {
     }
 }
 
+
 private fun createPieChart(
     context: Context,
     entries: List<PieEntry>,
     colors: List<Int>,
+    scoreColor: Int,
+    labelColor: Int,
     isPreview: Boolean
 ): PieChart {
     val chart = PieChart(context)
@@ -60,7 +72,7 @@ private fun createPieChart(
     dataSet.colors = colors
     dataSet.setDrawValues(true)
     dataSet.valueTextSize = 16f
-    dataSet.valueTextColor = Color.Black.toArgb()
+    dataSet.valueTextColor = scoreColor // 设置分数颜色
     dataSet.valueTypeface = tf
     dataSet.sliceSpace = 3f
     dataSet.selectionShift = 5f
@@ -70,13 +82,13 @@ private fun createPieChart(
     dataSet.yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
     dataSet.valueLinePart1Length = 0.6f
     dataSet.valueLinePart2Length = 0.4f
-    dataSet.valueLineColor = Color.Black.toArgb()
+    dataSet.valueLineColor = labelColor  // 设置标签线颜色
     dataSet.valueLinePart1OffsetPercentage = 30f
 
     val pieData = PieData(dataSet)
     pieData.setValueFormatter(PercentFormatter(chart))
     pieData.setValueTextSize(16f)
-    pieData.setValueTextColor(Color.Black.toArgb())
+    pieData.setValueTextColor(labelColor )
     pieData.setValueTypeface(tf) // 使用系统默认字体
 
     chart.isDrawHoleEnabled = false // 不绘制中心空洞
@@ -90,6 +102,7 @@ private fun createPieChart(
     chart.legend.setDrawInside(false)
     chart.legend.textSize = 14f
     chart.legend.typeface = tf
+    chart.legend.textColor = labelColor
     chart.setExtraOffsets(20f, 8f, 75f, 8f)
     chart.setBackgroundColor(Color.Transparent.toArgb()) // 设置背景为透明
     chart.dragDecelerationFrictionCoef = 0.75f
@@ -109,6 +122,7 @@ private fun createPieChart(
 
     return chart
 }
+
 
 @Preview(showBackground = true, apiLevel = 34) // 去掉背景
 @Composable
