@@ -16,6 +16,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -45,21 +46,34 @@ class RecognitionViewModel @Inject constructor(
     val isLoading: Boolean get() = _isLoading
     val analysisStream: StateFlow<String> get() = _analysisStream
 
+    private val _isAnalyzing = MutableStateFlow(false)
+    val isAnalyzing = _isAnalyzing.asStateFlow()
+
+    private val _isAnalysisSuccessful = MutableStateFlow(false)
+    val isAnalysisSuccessful = _isAnalysisSuccessful.asStateFlow()
+
+
     fun analyzeImage(bitmap: Bitmap) {
         viewModelScope.launch {
+            _isAnalyzing.value = true  // 开始分析
+            _isAnalysisSuccessful.value = false // 重置分析成功状态
             _isLoading = true
             analyzeImageWithGemini(bitmap) { result ->
                 _analysisResult = result
                 _isLoading = false
+                _isAnalyzing.value = false  // 分析结束
 
-                // 解析分析结果，识别交易类型、金额和备注
+                // 解析分析结果
                 val (type, amount, note) = determineTransactionTypeAndDetails(result)
                 _transactionType = type
                 _amount = amount
                 _note = note
+
+                _isAnalysisSuccessful.value = type != TransactionType.Invalid // 根据解析结果设置分析成功状态
             }
         }
     }
+
 
     private fun determineTransactionTypeAndDetails(analysisResult: String): Triple<TransactionType, String, String> {
         // 去除字符串中的 * 符号
@@ -93,10 +107,11 @@ class RecognitionViewModel @Inject constructor(
 
 
     private fun extractNote(analysisResult: String): String {
-        val notePattern = Regex("(?<=备注:|note:).+")
+        val notePattern = Regex("(?<=备注:|note:)[^\\r\\n]*")
         val matchResult = notePattern.find(analysisResult)
         return matchResult?.value?.trim() ?: ""
     }
+
 
     private suspend fun analyzeImageWithGemini(
         bitmap: Bitmap,

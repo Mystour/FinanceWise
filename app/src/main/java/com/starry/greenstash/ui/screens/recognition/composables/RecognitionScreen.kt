@@ -81,8 +81,10 @@ fun RecognitionScreen(
     val listState = rememberLazyListState()
     var selectedTransactionType by remember { mutableStateOf<TransactionType?>(null) }
     var showTransactionDialog by remember { mutableStateOf(false) }
-    var amount by remember { mutableStateOf("")}
+    var amount by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }
+    val isAnalyzing by viewModel.isAnalyzing.collectAsState()
+    val isAnalysisSuccessful by viewModel.isAnalysisSuccessful.collectAsState()
 
     LaunchedEffect(analysisStream) {
         listState.scrollToItem(0) // 滚动到顶部
@@ -134,12 +136,13 @@ fun RecognitionScreen(
         }
 
         item {
+            // 分析图片按钮
             Button(onClick = {
                 selectedImage?.let { uri ->
                     val bitmap = ImageUtils.uriToBitmap(uri, context, 1024) // Use ImageUtils for analysis Bitmap
                     viewModel.analyzeImage(bitmap)
                 }
-            }, enabled = selectedImage != null) {
+            }, enabled = selectedImage != null && !isAnalyzing) {
                 Text(stringResource(id = R.string.analyze_image_button))
             }
         }
@@ -158,28 +161,29 @@ fun RecognitionScreen(
 
         item {
             // 新增的按钮
-            Button(onClick = {
-                if (selectedImage != null && !viewModel.isLoading) {
-                    val transactionType = viewModel.transactionType
-                    amount = viewModel.amount
-                    note = viewModel.note
-                    if (transactionType == TransactionType.Invalid) {
-                        showTransactionDialog = true // Set the state to true to show the dialog
-                    } else {
-                        navController.navigate(NormalScreens.DWScreen(goalId.toString(), transactionType.name, amount, note))
+            if (isAnalysisSuccessful) { // 仅当分析成功时显示
+                Button(onClick = {
+                    if (selectedImage != null && !viewModel.isLoading) {
+                        val transactionType = viewModel.transactionType
+                        amount = viewModel.amount
+                        note = viewModel.note
+                        if (transactionType == TransactionType.Invalid) {
+                            showTransactionDialog = true // Set the state to true to show the dialog
+                        } else {
+                            navController.navigate(NormalScreens.DWScreen(goalId.toString(), transactionType.name, amount, note))
+                        }
                     }
+                }, enabled = !isAnalyzing) {  // 仅当不在分析时启用
+                    Text(stringResource(id = R.string.add_to_transaction_button))
                 }
-            }, enabled = selectedImage != null && !viewModel.isLoading) {
-                Text(stringResource(id = R.string.add_to_transaction_button))
             }
         }
 
-                // Place the conditional rendering of the dialog here:
         item {
             if (showTransactionDialog) {
                 ShowTransactionTypeSelectionDialog { selectedType ->
                     selectedTransactionType = selectedType
-                    navController.navigate(NormalScreens.DWScreen(goalId.toString(), selectedType.name, amount, note ))
+                    navController.navigate(NormalScreens.DWScreen(goalId.toString(), selectedType.name, amount, note))
                     showTransactionDialog = false // Hide the dialog after selection
                 }
             }
