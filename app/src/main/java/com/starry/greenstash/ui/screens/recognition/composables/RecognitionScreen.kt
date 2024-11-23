@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.internal.enableLiveLiterals
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -112,14 +113,19 @@ fun RecognitionScreen(
         }
 
         item {
+            // 选择图片按钮
             Button(onClick = {
                 permissionLauncher.launch(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     Manifest.permission.READ_MEDIA_IMAGES
                 } else {
                     Manifest.permission.READ_EXTERNAL_STORAGE
                 })
-            }) {
-                Text(stringResource(id = R.string.select_image_button))
+            }, enabled = !isAnalyzing) {
+                if (isAnalyzing) {
+                    Text("正在分析...")
+                } else {
+                    Text(stringResource(id = R.string.select_image_button))
+                }
             }
         }
 
@@ -160,18 +166,16 @@ fun RecognitionScreen(
         }
 
         item {
-            // 新增的按钮
+            // 添加交易按钮
             if (isAnalysisSuccessful) { // 仅当分析成功时显示
                 Button(onClick = {
-                    if (selectedImage != null && !viewModel.isLoading) {
-                        val transactionType = viewModel.transactionType
-                        amount = viewModel.amount
-                        note = viewModel.note
-                        if (transactionType == TransactionType.Invalid) {
-                            showTransactionDialog = true // Set the state to true to show the dialog
-                        } else {
-                            navController.navigate(NormalScreens.DWScreen(goalId.toString(), transactionType.name, amount, note))
-                        }
+                    val transactionType = viewModel.transactionType
+                    amount = viewModel.amount
+                    note = viewModel.note
+                    if (transactionType == TransactionType.Invalid) {
+                        showTransactionDialog = true // Set the state to true to show the dialog
+                    } else {
+                        navController.navigate(NormalScreens.DWScreen(goalId.toString(), transactionType.name, amount, note))
                     }
                 }, enabled = !isAnalyzing) {  // 仅当不在分析时启用
                     Text(stringResource(id = R.string.add_to_transaction_button))

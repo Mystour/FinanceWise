@@ -9,6 +9,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.content
+import com.google.gson.Gson
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
+import com.google.gson.JsonSyntaxException
 import com.starry.greenstash.BuildConfig
 import com.starry.greenstash.R
 import com.starry.greenstash.database.transaction.TransactionType
@@ -69,6 +73,8 @@ class RecognitionViewModel @Inject constructor(
                 _amount = amount
                 _note = note
 
+                println("Transaction Type: $_transactionType, Amount: $_amount, Note: $_note")
+
                 _isAnalysisSuccessful.value = type != TransactionType.Invalid // 根据解析结果设置分析成功状态
             }
         }
@@ -76,40 +82,34 @@ class RecognitionViewModel @Inject constructor(
 
 
     private fun determineTransactionTypeAndDetails(analysisResult: String): Triple<TransactionType, String, String> {
-        // 去除字符串中的 * 符号
-        val cleanedResult = analysisResult.replace("*", "")
+        val gson = Gson()
+        try {
+            val cleanedJson = analysisResult.replace(Regex("```json|```"), "").trim()
+            val jsonObject = gson.fromJson(cleanedJson, JsonObject::class.java)
 
-        val type = if (cleanedResult.contains("不明确", ignoreCase = true)) {
-            TransactionType.Invalid
-        } else if (cleanedResult.contains("deposit", ignoreCase = true) || cleanedResult.contains("存入", ignoreCase = true)) {
-            TransactionType.Deposit
-        } else if (cleanedResult.contains("withdraw", ignoreCase = true) ||
-            cleanedResult.contains("取出", ignoreCase = true) ||
-            cleanedResult.contains("支出", ignoreCase = true)) {
-            TransactionType.Withdraw
-        } else {
-            TransactionType.Invalid
+            val typeString = jsonObject.get("transactionType")?.asString ?: "不明确"
+            val type = when (typeString) {
+                "存入", "deposit" -> TransactionType.Deposit
+                "取出", "withdraw" -> TransactionType.Withdraw
+                else -> TransactionType.Invalid
+            }
+
+            val amount = when (val amountJson: JsonElement? = jsonObject.get("amount")) {
+                is com.google.gson.JsonPrimitive -> {
+                    if (amountJson.isNumber) amountJson.asNumber.toString() else amountJson.asString
+                }
+                else -> ""
+            }
+            val note = jsonObject.get("note")?.asString ?: ""
+
+            return Triple(type, amount, note)
+
+        } catch (e: JsonSyntaxException) {
+            println(e.message)
+            Timber.e(e, "JSON 解析错误: $analysisResult")
+            println("JSON 解析错误: $analysisResult")
+            return Triple(TransactionType.Invalid, "", "") // 解析失败，返回默认值
         }
-
-        val amount = extractAmount(cleanedResult)
-        val note = extractNote(cleanedResult)
-
-        return Triple(type, amount, note)
-    }
-
-
-    private fun extractAmount(analysisResult: String): String {
-        val currencySymbols = listOf("$", "€", "£", "¥", "₹", "元", "美元", "欧元", "英镑", "日元", "卢比")
-        val amountPattern = Regex("\\b\\d+(\\.\\d+)?\\s*(?:" + currencySymbols.joinToString("|") { Regex.escape(it) } + ")?")
-        val matchResult = amountPattern.find(analysisResult)
-        return matchResult?.value?.replace(Regex("\\s*[$€£¥₹元美欧英镑日卢比]\\s*"), "") ?: ""
-    }
-
-
-    private fun extractNote(analysisResult: String): String {
-        val notePattern = Regex("(?<=备注:|note:)[^\\r\\n]*")
-        val matchResult = notePattern.find(analysisResult)
-        return matchResult?.value?.trim() ?: ""
     }
 
 
