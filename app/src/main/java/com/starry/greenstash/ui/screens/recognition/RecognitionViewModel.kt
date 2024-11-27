@@ -75,7 +75,8 @@ class RecognitionViewModel @Inject constructor(
 
                 println("Transaction Type: $_transactionType, Amount: $_amount, Note: $_note")
 
-                _isAnalysisSuccessful.value = type != TransactionType.Invalid // 根据解析结果设置分析成功状态
+                // 根据解析结果设置分析成功状态
+                _isAnalysisSuccessful.value = amount.isNotEmpty() && note.isNotEmpty()
             }
         }
     }
@@ -84,11 +85,12 @@ class RecognitionViewModel @Inject constructor(
     private fun determineTransactionTypeAndDetails(analysisResult: String): Triple<TransactionType, String, String> {
         val gson = Gson()
         try {
-            val cleanedJson = analysisResult.replace(Regex("```json|```"), "").trim()
+            val cleanedJson = analysisResult.replace(Regex("```json\\s*(.*?)\\s*```", RegexOption.DOT_MATCHES_ALL), "$1").trim()
+            println("Cleaned JSON: $cleanedJson")  // 打印清理后的 Json
             val jsonObject = gson.fromJson(cleanedJson, JsonObject::class.java)
 
             val typeString = jsonObject.get("transactionType")?.asString ?: "不明确"
-            val type = when (typeString) {
+            val type = when (typeString.lowercase()) {
                 "存入", "deposit" -> TransactionType.Deposit
                 "取出", "withdraw" -> TransactionType.Withdraw
                 else -> TransactionType.Invalid

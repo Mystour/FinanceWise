@@ -50,7 +50,7 @@
     <string name="new_goal_onboarding_desc">Click on the floating action button to create a new saving goal.</string>
     <string name="home_search_label">Search here…</string>
     <string name="search_goal_not_found">404: Goal not found!</string>>
-    <string name="emotion_analysis_button" tools:ignore="MissingTranslation">Emotion Analysis</string>
+    <string name="emotion_analysis_button" tools:ignore="MissingTranslation">Emotion \nAnalysis</string>
     <string name="emotion_analysis_button_error" tools:ignore="MissingTranslation">Data not available!</string>
 
     <!-- Emotion Analysis Screen -->
@@ -63,30 +63,48 @@
     <string name="score_text" formatted="false" tools:ignore="MissingTranslation">%1$d points %2$s</string>
 
     <string name="initial_analysis_prompt" tools:ignore="MissingTranslation">
-        Here is my billing information for the past month:
+        Please analyze the following billing information to analyze my emotions.
 
         %1$s
 
-        Please help me analyze my spending and emotional state over the past month:
+        Be sure to extract the following information and return it in JSON format:
 
-        1. How is my overall spending level?
-        2. In which areas do I spend the most?
-        3. Based on my spending, infer my recent emotional state, such as whether I feel anxious, stressed, or overspending?
+        ```json
+        {
+            "score": "Mood score", (0-100)
+            "comment": "Emotional comment"
+        }
+        ```
+        For example, if the bill shows a spike in negative consumption at a certain time, return:
+        ```json
+        {
+            "score": "20",
+            "comment": "Please note that your recent spending behavior may have been overly negative."
+        }
+        }
+        ```
+        If the bill shows a surge in positive consumption at a certain time, return:
+        ```json
+        {
+            "score": "80",
+            "comment": "Your recent consumption behavior is consistent with your usual consumption habits, please continue to do so."
+        }
+        ```
 
-        Please clearly indicate the emotional score (0-100 points) and the emotional comment in the analysis results.
+        (Answer in English)
     </string>
     <string name="detailed_analysis_prompt" tools:ignore="MissingTranslation">
-        Here is my billing information for the past month:
+        Here is my most recent billing information:
 
         %1$s
 
-        Please help me analyze my spending and emotional state over the past month:
+        Please help me analyze my recent spending situation and mood:
 
-        1. How is my overall spending level?
-        2. In which areas do I spend the most?
-        3. Based on my spending, infer my recent emotional state, such as whether I feel anxious, stressed, or overspending?
-        4. Based on my spending and emotional analysis, please provide some specific suggestions to help me better manage my finances, such as how to reduce unnecessary expenses, how to set a reasonable budget, and how to save and invest.
-        5. Please help me create a spending plan for the next month. Based on my goals and current spending status, create a reasonable and challenging spending plan to achieve the nearest goal (obtained from the goal field, focusing on the title and additionalNotes, which usually provide accurate goals), and calculate how long it will take to achieve the goal and whether it can be completed within the expected time.
+        1. What is my overall spending level?
+        2. Where do I spend the most?
+        3. Based on my spending, infer my recent possible emotional state, for example, am I feeling anxious, stressed, or overspending?
+        4. Based on my consumption situation and emotional analysis, please give me some specific suggestions to help me manage my finances better, such as how to reduce unnecessary expenses, how to make a reasonable budget, how to save and invest?
+        5. Please help me make a consumption plan for the next month. Based on my goal and current consumption status, make a reasonable and challenging consumption plan to achieve the latest goal (obtain from the goal field, pay special attention to title and additionalNotes, and generally get accurate goals). And calculate how long it will take me to achieve my goal and whether I can achieve it in the expected time.
     </string>
     <string name="format_bill_text_prompt" tools:ignore="MissingTranslation">
         Please convert the following billing text into a standardized table format with the following columns: Date, Item, Amount, Location (if extractable).
@@ -125,13 +143,27 @@
     <string name="select_image_button" tools:ignore="MissingTranslation">Select Image</string>
     <string name="analyze_image_button" tools:ignore="MissingTranslation">Analyze Image</string>
     <string name="initial_recognition_prompt" tools:ignore="MissingTranslation">
-        Please analyze the contents of the following pictures and describe the objects, scenes, people and other information in the pictures in as much detail as possible. Pay special attention to the following points:
-        1. ** Type of transaction ** : Please specify whether this is Deposit or Withdraw or not sure.
-        2. ** Transaction Amount ** : Please provide a specific transaction amount, such as "$50" or "$100".
-        3. ** Note ** : If there is any additional information or note, please indicate it here, such as "Buy lunch" or "receive salary".
+        Please analyze the contents of the following pictures and describe the objects, scenes, people and other information in the pictures in as much detail as possible. Be sure to extract the following information and return it in JSON format:
+        ```json
+        {
+            "transactionType": "Deposit|Withdraw|Unclear",
+            "amount": "Amount ",
+            "note": "Remarks, such as usage, etc. ",
+            "description": "Other description information"
+        }
+        ```
+        For example, if the picture is a supermarket receipt, the transaction type is withdrawal, the transaction amount is 150 yuan, and the note is "buy daily necessities", then return:
+        ```json
+        {
+            "transactionType": "Withdraw",
+            "amount": "150",
+            "note": "Buy daily necessities ",
+            "description": "Supermarket receipt"
+        }
+        ```
+        If you cannot determine the transaction type, set "transactionType" to "Unclear."
 
-        For example: this is a receipt for shopping in the supermarket, the transaction type is Withdraw, the transaction amount is 150 $, and the note is "Purchase daily necessities".
-        (English is used unless otherwise specified)
+        (Answer in English)
     </string>
     <string name="select_transaction_type_title" tools:ignore="MissingTranslation">Transaction type not detected, please manually select</string>
     <string name="add_to_transaction_button" tools:ignore="MissingTranslation">Add to Transaction</string>
