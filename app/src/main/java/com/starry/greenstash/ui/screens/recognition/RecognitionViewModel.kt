@@ -85,7 +85,11 @@ class RecognitionViewModel @Inject constructor(
     private fun determineTransactionTypeAndDetails(analysisResult: String): Triple<TransactionType, String, String> {
         val gson = Gson()
         try {
-            val cleanedJson = analysisResult.replace(Regex("```json\\s*(.*?)\\s*```", RegexOption.DOT_MATCHES_ALL), "$1").trim()
+            // 使用正则表达式提取 JSON 字符串
+            val jsonPattern = Regex("`{3}json\\s*(.*?)\\s*`{3}", RegexOption.DOT_MATCHES_ALL)
+            val matchResult = jsonPattern.find(analysisResult)
+            val cleanedJson = matchResult?.groupValues?.get(1)?.trim() ?: ""
+
             println("Cleaned JSON: $cleanedJson")  // 打印清理后的 Json
             val jsonObject = gson.fromJson(cleanedJson, JsonObject::class.java)
 
