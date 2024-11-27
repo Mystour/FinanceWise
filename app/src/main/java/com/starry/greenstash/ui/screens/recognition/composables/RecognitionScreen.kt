@@ -74,7 +74,7 @@ fun RecognitionScreen(
         if (isGranted) {
             imagePickerLauncher.launch("image/*")
         } else {
-            Toast.makeText(context, "未获得必要的图片访问权限", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -122,7 +122,7 @@ fun RecognitionScreen(
                 })
             }, enabled = !isAnalyzing) {
                 if (isAnalyzing) {
-                    Text("正在分析...")
+                    Text(stringResource(id = R.string.recognizing_info))
                 } else {
                     Text(stringResource(id = R.string.select_image_button))
                 }

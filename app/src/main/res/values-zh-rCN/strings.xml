@@ -123,6 +123,7 @@
     <string name="withdraw_overflow_error">取出金额多于当前存入的金额！</string>
 
     <!-- Bill Recognition Screen -->
+    <string name="permission_denied">未获得必要的图片访问权限</string>
     <string name="bill_recognition_title">账单识别</string>
     <string name="bill_recognition_desc">
         我们将使用AI来分析您上传的图片，并提取出账单信息自动填入到您的交易记录中。
@@ -155,6 +156,7 @@
 
     <string name="select_transaction_type_title">未检测到交易类型，请手动选择</string>
     <string name="add_to_transaction_button">添加交易</string>
+    <string name="recognizing_info">正在识别中…</string>
 
     <!-- Congratulations Screen -->
     <string name="goal_achieved_heading">恭喜 🥳</string>

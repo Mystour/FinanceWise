@@ -136,6 +136,7 @@
     <string name="withdraw_overflow_error">Amount is more than current deposited amount!</string>
 
     <!-- Bill Recognition Screen -->
+    <string name="permission_denied" tools:ignore="MissingTranslation">Necessary image access not obtained</string>
     <string name="bill_recognition_title" tools:ignore="MissingTranslation">Bill Recognition</string>
     <string name="bill_recognition_desc" tools:ignore="MissingTranslation">
         We will use AI to analyze the images you upload and extract the billing information to automatically fill in your transaction history.
@@ -167,6 +168,7 @@
     </string>
     <string name="select_transaction_type_title" tools:ignore="MissingTranslation">Transaction type not detected, please manually select</string>
     <string name="add_to_transaction_button" tools:ignore="MissingTranslation">Add to Transaction</string>
+    <string name="recognizing_info" tools:ignore="MissingTranslation">Recognizing…</string>
 
     <!-- Congratulations Screen -->
     <string name="goal_achieved_heading">Congratulations 🥳</string>
