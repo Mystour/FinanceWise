@@ -201,46 +201,45 @@ fun HomeScreen(navController: NavController) {
                 },
 
                 floatingActionButton = {
-                    Row(
-                        modifier = Modifier
-                            .padding(end = 10.dp, bottom = 12.dp), // 应用于整个 Row 的 padding
-                        verticalAlignment = Alignment.CenterVertically // 垂直居中对齐按钮
-                    ) {
-                        EmotionAnalysisFAB(
-                            // 情绪分析按钮，现在在左边
-                            modifier = Modifier,
-                            lazyListState = lazyListState,
-                            navController = navController,
-                        )
-                        Spacer(modifier = Modifier.width(50.dp)) // 按钮之间的间距
-
-                        HomeExtendedFAB(
-                            modifier = Modifier.tapTarget(
-                                precedence = 0,
-                                title = TextDefinition(
-                                    text = stringResource(id = R.string.new_goal_onboarding_title),
-                                    textStyle = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.Bold,
-                                    fontFamily = greenstashFont,
-                                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                                ),
-                                description = TextDefinition(
-                                    text = stringResource(id = R.string.new_goal_onboarding_desc),
-                                    textStyle = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                    fontFamily = greenstashFont
-                                ),
-                                tapTargetStyle = TapTargetStyle(
-                                    backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
-                                    tapTargetHighlightColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                                    backgroundAlpha = 1f,
-                                ),
+                Row(
+                    modifier = Modifier
+                        .padding(end = 10.dp, bottom = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    EmotionAnalysisFAB(
+                        modifier = Modifier.weight(1f), // 使用权重
+                        lazyListState = lazyListState,
+                        navController = navController,
+                    )
+                    Spacer(modifier = Modifier.width(20.dp)) // 添加一个固定的间距
+                    HomeExtendedFAB(
+                        modifier = Modifier.tapTarget(
+                            precedence = 0,
+                            title = TextDefinition(
+                                text = stringResource(id = R.string.new_goal_onboarding_title),
+                                textStyle = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = greenstashFont,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
                             ),
-                            lazyListState = lazyListState,
-                            navController = navController
-                        )
-                    }
+                            description = TextDefinition(
+                                text = stringResource(id = R.string.new_goal_onboarding_desc),
+                                textStyle = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                fontFamily = greenstashFont
+                            ),
+                            tapTargetStyle = TapTargetStyle(
+                                backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
+                                tapTargetHighlightColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                                backgroundAlpha = 1f,
+                            ),
+                        ).weight(1f), // 使用权重
+                        lazyListState = lazyListState,
+                        navController = navController
+                    )
                 }
+}
+
 
             ) {
                 Box(

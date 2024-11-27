@@ -114,6 +114,7 @@
     <string name="default_emotion_comment">你最近的情绪状态可能处于**轻微焦虑**的状态</string>
     <string name="score_pattern">情绪分数\\D*(\\d+)</string>
     <string name="comment_pattern">情绪评论\\s*(.*?)(?=\\n\\*|\\n\\n|\\n$|\\.\\s*|。\\s*)</string>
+    <string name="select_priority_button">选择优先级</string>
 
     <!-- Deposit & Withdraw Screen -->
     <string name="deposit_screen_title">很棒！存入多少</string>

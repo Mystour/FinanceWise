@@ -227,7 +227,7 @@ fun EmotionScreen(
 
                     // 添加一个按钮或其他方式来触发下拉菜单的展开
                     Button(onClick = { isDropdownExpanded = true }) {
-                        Text("选择优先级")
+                        Text(context.getString(R.string.select_priority_button))
                     }
                 }
 
@@ -265,9 +265,6 @@ fun EmotionScreen(
                             .fillMaxWidth() // 占据整个宽度
                     )
 
-                    // 去除评论中的米字符
-                    val cleanedComment = viewModel.emotionComment.replace("米", "")
-
                     // 使用 Card 组件显示评论
                     Card(
                         modifier = Modifier
@@ -277,7 +274,7 @@ fun EmotionScreen(
                         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                     ) {
                         Text(
-                            text = stringResource(id = R.string.score_text, emotionScore, cleanedComment),
+                            text = stringResource(id = R.string.score_text, emotionScore, viewModel.emotionComment),
                             style = MaterialTheme.typography.bodyMedium,
                             textAlign = TextAlign.Justify,
                             modifier = Modifier.padding(16.dp)

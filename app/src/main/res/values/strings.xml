@@ -125,6 +125,7 @@
     <string name="end_date" tools:ignore="MissingTranslation">End Date</string>
     <string name="select_filter_type" tools:ignore="MissingTranslation">Select Filter Type</string>
     <string name="title_filter" tools:ignore="MissingTranslation">Title</string>
+    <string name="select_priority_button" tools:ignore="MissingTranslation">Select Priority</string>
 
 
 
