@@ -57,17 +57,17 @@ class RecognitionViewModel @Inject constructor(
     val isAnalysisSuccessful = _isAnalysisSuccessful.asStateFlow()
 
 
-    fun analyzeImage(bitmap: Bitmap) {
+    fun analyzeImage(bitmap: Bitmap?, inputText: String) {
         viewModelScope.launch {
-            _isAnalyzing.value = true  // 开始分析
-            _isAnalysisSuccessful.value = false // 重置分析成功状态
+            _isAnalyzing.value = true
+            _isAnalysisSuccessful.value = false
             _isLoading = true
-            analyzeImageWithGemini(bitmap) { result ->
+
+            analyzeImageWithGemini(bitmap, inputText) { result ->
                 _analysisResult = result
                 _isLoading = false
-                _isAnalyzing.value = false  // 分析结束
+                _isAnalyzing.value = false
 
-                // 解析分析结果
                 val (type, amount, note) = determineTransactionTypeAndDetails(result)
                 _transactionType = type
                 _amount = amount
@@ -75,7 +75,6 @@ class RecognitionViewModel @Inject constructor(
 
                 println("Transaction Type: $_transactionType, Amount: $_amount, Note: $_note")
 
-                // 根据解析结果设置分析成功状态
                 _isAnalysisSuccessful.value = amount.isNotEmpty() && note.isNotEmpty()
             }
         }
@@ -120,13 +119,22 @@ class RecognitionViewModel @Inject constructor(
 
 
     private suspend fun analyzeImageWithGemini(
-        bitmap: Bitmap,
+        bitmap: Bitmap?,
+        inputText: String,
         callback: (String) -> Unit
     ) {
         try {
-            val prompt = context.getString(R.string.initial_recognition_prompt)
+            val prompt = context.getString(R.string.initial_recognition_prompt, inputText)
+
+            val response = if (bitmap != null) {
+                generativeModel.generateContentStream(content { image(bitmap); text(prompt) })
+            } else {
+                generativeModel.generateContentStream(prompt)
+            }
+
+//            val prompt = context.getString(R.string.initial_recognition_prompt)
             Timber.d("Generated prompt: $prompt")
-            val response = generativeModel.generateContentStream(content { image(bitmap); text(prompt) })
+//            val response = generativeModel.generateContentStream(content { image(bitmap); text(prompt) })
             var analysis = ""
             response.collect { chunk ->
                 analysis += chunk.text

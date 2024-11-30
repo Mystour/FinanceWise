@@ -143,9 +143,9 @@
         We will use AI to analyze the images you upload and extract the billing information to automatically fill in your transaction history.
     </string>
     <string name="select_image_button" tools:ignore="MissingTranslation">Select Image</string>
-    <string name="analyze_image_button" tools:ignore="MissingTranslation">Analyze Image</string>
+    <string name="analyze_button" tools:ignore="MissingTranslation">Start Analyze</string>
     <string name="initial_recognition_prompt" tools:ignore="MissingTranslation">
-        Please analyze the contents of the following pictures and describe the objects, scenes, people and other information in the pictures in as much detail as possible. Be sure to extract the following information and return it in JSON format:
+        Please analyze the contents of the following pictures/text and describe the objects, scenes, people and other information in as much detail as possible. Be sure to extract the following information and return it in JSON format:
         ```json
         {
             "transactionType": "Deposit|Withdraw|Unclear",
@@ -165,11 +165,17 @@
         ```
         If you cannot determine the transaction type, set "transactionType" to "Unclear."
 
+        Text message :%1$s
+
         (Answer in English)
     </string>
     <string name="select_transaction_type_title" tools:ignore="MissingTranslation">Transaction type not detected, please manually select</string>
     <string name="add_to_transaction_button" tools:ignore="MissingTranslation">Add to Transaction</string>
     <string name="recognizing_info" tools:ignore="MissingTranslation">Recognizing…</string>
+    <string name="input_hint" tools:ignore="MissingTranslation">Enter Text or Image or Voice</string>
+    <string name="speech_input" tools:ignore="MissingTranslation">Speak</string>
+    <string name="selected_image" tools:ignore="MissingTranslation">Selected Image</string>
+    <string name="add_image" tools:ignore="MissingTranslation">Add Image</string>
 
     <!-- Congratulations Screen -->
     <string name="goal_achieved_heading">Congratulations 🥳</string>

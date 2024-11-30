@@ -8,27 +8,12 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.internal.enableLiveLiterals
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -57,14 +42,16 @@ fun RecognitionScreen(
 ) {
     val context = LocalContext.current
 
-    var selectedImage by remember { mutableStateOf<Uri?>(null) }  // Store the Uri
-    var displayedImage by remember { mutableStateOf<Bitmap?>(null) } // For displaying the image
+    var inputText by remember { mutableStateOf("") }
+    var selectedImage by remember { mutableStateOf<Uri?>(null) }
+    var displayedImage by remember { mutableStateOf<Bitmap?>(null) }
+    var showImagePicker by remember { mutableStateOf(false) }
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         selectedImage = uri
         uri?.let {
-            displayedImage = ImageUtils.uriToBitmap(it, context, 200) // Use ImageUtils for Bitmap
+            displayedImage = ImageUtils.uriToBitmap(it, context, 200)
         }
     }
 
@@ -79,7 +66,6 @@ fun RecognitionScreen(
     }
 
     val analysisStream by viewModel.analysisStream.collectAsState()
-    val listState = rememberLazyListState()
     var selectedTransactionType by remember { mutableStateOf<TransactionType?>(null) }
     var showTransactionDialog by remember { mutableStateOf(false) }
     var amount by remember { mutableStateOf("") }
@@ -87,23 +73,15 @@ fun RecognitionScreen(
     val isAnalyzing by viewModel.isAnalyzing.collectAsState()
     val isAnalysisSuccessful by viewModel.isAnalysisSuccessful.collectAsState()
 
-    LaunchedEffect(analysisStream) {
-        listState.scrollToItem(0) // 滚动到顶部
-        delay(100) // 等待一段时间，确保内容更新
-        listState.scrollToItem(listState.layoutInfo.visibleItemsInfo.size - 1) // 滚动到底部
-    }
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        state = listState,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-
         item {
-            // 显示标题
             Text(
                 text = stringResource(id = R.string.bill_recognition_title),
                 style = MaterialTheme.typography.headlineLarge,
@@ -113,43 +91,65 @@ fun RecognitionScreen(
         }
 
         item {
-            // 选择图片按钮
-            Button(onClick = {
-                permissionLauncher.launch(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    Manifest.permission.READ_MEDIA_IMAGES
-                } else {
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                })
-            }, enabled = !isAnalyzing) {
-                if (isAnalyzing) {
-                    Text(stringResource(id = R.string.recognizing_info))
-                } else {
-                    Text(stringResource(id = R.string.select_image_button))
-                }
-            }
+            OutlinedTextField(
+                value = inputText,
+                onValueChange = { inputText = it },
+                label = { Text(stringResource(id = R.string.input_hint)) },
+                trailingIcon = {
+                    IconButton(onClick = { /* 语音识别逻辑 */ }) {
+                        Icon(Icons.Filled.Mic, contentDescription = stringResource(id = R.string.speech_input))
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
         }
 
         item {
-            displayedImage?.let { bitmap ->  // Display image if available
+            if (displayedImage != null) {
                 Image(
-                    bitmap = bitmap.asImageBitmap(), // 直接使用 bitmap.asImageBitmap()
-                    contentDescription = "Selected Image",
+                    bitmap = displayedImage!!.asImageBitmap(),
+                    contentDescription = stringResource(id = R.string.selected_image),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp)
                 )
             }
+            Row(verticalAlignment = Alignment.CenterVertically){
+
+                if (showImagePicker) {
+                    Button(onClick = {
+                        permissionLauncher.launch(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            Manifest.permission.READ_MEDIA_IMAGES
+                        } else {
+                            Manifest.permission.READ_EXTERNAL_STORAGE
+                        }
+                        )
+
+                    }, enabled = !isAnalyzing) {
+                        Text(stringResource(id = R.string.select_image_button))
+                    }
+
+                }
+
+
+                IconButton(onClick = { showImagePicker = !showImagePicker }) {
+                    Icon(Icons.Filled.AddAPhoto, contentDescription = stringResource(id = R.string.add_image))
+                }
+            }
+
+
         }
 
         item {
-            // 分析图片按钮
             Button(onClick = {
                 selectedImage?.let { uri ->
-                    val bitmap = ImageUtils.uriToBitmap(uri, context, 1024) // Use ImageUtils for analysis Bitmap
-                    viewModel.analyzeImage(bitmap)
+                    val bitmap = ImageUtils.uriToBitmap(uri, context, 1024)
+                    viewModel.analyzeImage(bitmap, inputText)
+                } ?: run {
+                    viewModel.analyzeImage(null, inputText)
                 }
-            }, enabled = selectedImage != null && !isAnalyzing) {
-                Text(stringResource(id = R.string.analyze_image_button))
+            }, enabled = (inputText.isNotBlank() || selectedImage != null) && !isAnalyzing) {
+                Text(stringResource(id = R.string.analyze_button))
             }
         }
 
@@ -166,18 +166,25 @@ fun RecognitionScreen(
         }
 
         item {
-            // 添加交易按钮
-            if (isAnalysisSuccessful) { // 仅当分析成功时显示
+            if (isAnalysisSuccessful) {
                 Button(onClick = {
                     val transactionType = viewModel.transactionType
                     amount = viewModel.amount
                     note = viewModel.note
+
                     if (transactionType == TransactionType.Invalid) {
-                        showTransactionDialog = true // Set the state to true to show the dialog
+                        showTransactionDialog = true
                     } else {
-                        navController.navigate(NormalScreens.DWScreen(goalId.toString(), transactionType.name, amount, note))
+                        navController.navigate(
+                            NormalScreens.DWScreen(
+                                goalId.toString(),
+                                transactionType.name,
+                                amount,
+                                note
+                            )
+                        )
                     }
-                }, enabled = !isAnalyzing) {  // 仅当不在分析时启用
+                }, enabled = !isAnalyzing) {
                     Text(stringResource(id = R.string.add_to_transaction_button))
                 }
             }
@@ -187,14 +194,20 @@ fun RecognitionScreen(
             if (showTransactionDialog) {
                 ShowTransactionTypeSelectionDialog { selectedType ->
                     selectedTransactionType = selectedType
-                    navController.navigate(NormalScreens.DWScreen(goalId.toString(), selectedType.name, amount, note))
-                    showTransactionDialog = false // Hide the dialog after selection
+                    navController.navigate(
+                        NormalScreens.DWScreen(
+                            goalId.toString(),
+                            selectedType.name,
+                            amount,
+                            note
+                        )
+                    )
+                    showTransactionDialog = false
                 }
             }
         }
 
         item {
-            // 使用 Box 布局来包裹 Text 组件，并将其对齐到 Box 的底部中心
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -203,21 +216,9 @@ fun RecognitionScreen(
             ) {
                 Text(
                     text = stringResource(id = R.string.bill_recognition_desc),
-                    style = TextStyle(
-                        fontSize = 12.sp,
-                        color = Color.Gray
-                    )
+                    style = TextStyle(fontSize = 12.sp, color = Color.Gray)
                 )
             }
         }
     }
 }
-
-
-
-// 预览功能
-//@Preview(showBackground = true)
-//@Composable
-//fun RecognitionScreenPreview() {
-//    RecognitionScreen()
-//}
