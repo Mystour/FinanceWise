@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -21,6 +22,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -95,12 +97,35 @@ fun RecognitionScreen(
                 value = inputText,
                 onValueChange = { inputText = it },
                 label = { Text(stringResource(id = R.string.input_hint)) },
-                trailingIcon = {
-                    IconButton(onClick = { /* 语音识别逻辑 */ }) {
-                        Icon(Icons.Filled.Mic, contentDescription = stringResource(id = R.string.speech_input))
+                trailingIcon = { //  将两个图标都放在 trailingIcon 中
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically //  垂直居中对齐图标
+                    ) {
+                        IconButton(onClick = { /* 语音识别逻辑 */ }) {
+                            Icon(
+                                imageVector = Icons.Filled.Mic,
+                                contentDescription = stringResource(id = R.string.speech_input)
+                            )
+                        }
+                        IconButton(onClick = {
+                            permissionLauncher.launch(
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                    Manifest.permission.READ_MEDIA_IMAGES
+                                } else {
+                                    Manifest.permission.READ_EXTERNAL_STORAGE
+                                }
+                            )
+                        }) {
+                            Icon(
+                                imageVector = Icons.Filled.AddAPhoto,
+                                contentDescription = stringResource(id = R.string.add_image)
+                            )
+                        }
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true
             )
         }
 
@@ -114,30 +139,6 @@ fun RecognitionScreen(
                         .height(200.dp)
                 )
             }
-            Row(verticalAlignment = Alignment.CenterVertically){
-
-                if (showImagePicker) {
-                    Button(onClick = {
-                        permissionLauncher.launch(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            Manifest.permission.READ_MEDIA_IMAGES
-                        } else {
-                            Manifest.permission.READ_EXTERNAL_STORAGE
-                        }
-                        )
-
-                    }, enabled = !isAnalyzing) {
-                        Text(stringResource(id = R.string.select_image_button))
-                    }
-
-                }
-
-
-                IconButton(onClick = { showImagePicker = !showImagePicker }) {
-                    Icon(Icons.Filled.AddAPhoto, contentDescription = stringResource(id = R.string.add_image))
-                }
-            }
-
-
         }
 
         item {
