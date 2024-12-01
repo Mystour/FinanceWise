@@ -214,16 +214,17 @@ fun EmotionScreen(
                         onDismissRequest = { isDropdownExpanded = false },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        GoalPriority.entries.forEach { priority ->
+                        EmotionViewModel.FilterType.entries.filter { it != EmotionViewModel.FilterType.None }.forEach { priority ->
                             DropdownMenuItem(
                                 text = { Text(priority.name) },
                                 onClick = {
-                                    viewModel.setSelectedPriority(priority)
+                                    viewModel.setSelectedFilterType(priority)
                                     isDropdownExpanded = false // 关闭下拉菜单
                                 }
                             )
                         }
                     }
+
 
                     // 添加一个按钮或其他方式来触发下拉菜单的展开
                     Button(onClick = { isDropdownExpanded = true }) {
