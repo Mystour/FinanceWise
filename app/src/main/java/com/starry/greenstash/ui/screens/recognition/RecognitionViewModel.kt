@@ -16,7 +16,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.ai.client.generativeai.GenerativeModel
+import com.google.ai.client.generativeai.type.FunctionType
+import com.google.ai.client.generativeai.type.Schema
 import com.google.ai.client.generativeai.type.content
+import com.google.ai.client.generativeai.type.generationConfig
 //import com.google.ai.client.generativeai
 import com.google.gson.Gson
 import com.google.gson.JsonElement
@@ -44,9 +47,39 @@ class RecognitionViewModel @Inject constructor(
     private val generativeModel by lazy {
         GenerativeModel(
             modelName = "gemini-1.5-flash",
-            apiKey = BuildConfig.apiKey
+            apiKey = BuildConfig.apiKey,
+            generationConfig = generationConfig {
+                responseMimeType = "application/json"
+                responseSchema = Schema(
+                    name = "transactionDetails",
+                    description = "Transaction details",
+                    type = FunctionType.OBJECT,
+                    properties = mapOf(
+                        "transactionType" to Schema(
+                            name = "transactionType",
+                            description = "Type of transaction",
+                            type = FunctionType.STRING,
+                            nullable = false
+                        ),
+                        "amount" to Schema(
+                            name = "amount",
+                            description = "Amount of transaction",
+                            type = FunctionType.NUMBER,
+                            nullable = false
+                        ),
+                        "note" to Schema(
+                            name = "note",
+                            description = "Note for transaction",
+                            type = FunctionType.STRING,
+                            nullable = false
+                        )
+                    ),
+                    required = listOf("transactionType", "amount", "note")
+                )
+            }
         )
     }
+
 
     private var _analysisResult by mutableStateOf("")
     private var _isLoading by mutableStateOf(false)
@@ -96,13 +129,8 @@ class RecognitionViewModel @Inject constructor(
     private fun determineTransactionTypeAndDetails(analysisResult: String): Triple<TransactionType, String, String> {
         val gson = Gson()
         try {
-            // 使用正则表达式提取 JSON 字符串
-            val jsonPattern = Regex("`{3}json\\s*(.*?)\\s*`{3}", RegexOption.DOT_MATCHES_ALL)
-            val matchResult = jsonPattern.find(analysisResult)
-            val cleanedJson = matchResult?.groupValues?.get(1)?.trim() ?: ""
-
-            println("Cleaned JSON: $cleanedJson")  // 打印清理后的 Json
-            val jsonObject = gson.fromJson(cleanedJson, JsonObject::class.java)
+            // 尝试解析 JSON 对象
+            val jsonObject = gson.fromJson(analysisResult, JsonObject::class.java)
 
             val typeString = jsonObject.get("transactionType")?.asString ?: "不明确"
             val type = when (typeString.lowercase()) {
@@ -126,8 +154,15 @@ class RecognitionViewModel @Inject constructor(
             Timber.e(e, "JSON 解析错误: $analysisResult")
             println("JSON 解析错误: $analysisResult")
             return Triple(TransactionType.Invalid, "", "") // 解析失败，返回默认值
+        } catch (e: Exception) {
+            println(e.message)
+            Timber.e(e, "其他错误: $analysisResult")
+            println("其他错误: $analysisResult")
+            return Triple(TransactionType.Invalid, "", "") // 其他错误，返回默认值
         }
     }
+
+
 
 
     private suspend fun analyzeImageWithGemini(
