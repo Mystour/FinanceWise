@@ -151,7 +151,6 @@
             "transactionType": "Deposit|Withdraw|Unclear",
             "amount": "Amount ",
             "note": "Remarks, such as usage, etc. ",
-            "description": "Other description information"
         }
         ```
         For example, if the picture is a supermarket receipt, the transaction type is withdrawal, the transaction amount is 150 yuan, and the note is "buy daily necessities", then return:
@@ -160,7 +159,6 @@
             "transactionType": "Withdraw",
             "amount": "150",
             "note": "Buy daily necessities ",
-            "description": "Supermarket receipt"
         }
         ```
         If you cannot determine the transaction type, set "transactionType" to "Unclear."
@@ -176,6 +174,9 @@
     <string name="speech_input" tools:ignore="MissingTranslation">Speak</string>
     <string name="selected_image" tools:ignore="MissingTranslation">Selected Image</string>
     <string name="add_image" tools:ignore="MissingTranslation">Add Image</string>
+    <string name="transaction_type_label" tools:ignore="MissingTranslation">Transaction Type</string>
+    <string name="amount_label" tools:ignore="MissingTranslation">Amount</string>
+    <string name="note_label" tools:ignore="MissingTranslation">Note</string>
 
     <!-- Congratulations Screen -->
     <string name="goal_achieved_heading">Congratulations 🥳</string>

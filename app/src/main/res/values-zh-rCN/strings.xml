@@ -138,7 +138,6 @@
       "transactionType": "存入|取出|不明确",
       "amount": "金额",
       "note": "备注，如用途等",
-      "description": "其他描述信息"
     }
     ```
     例如，如果图片是一张超市购物小票，交易类型是取出，交易金额是 150 元，备注是“购买日用品”，则返回：
@@ -147,7 +146,6 @@
       "transactionType": "取出",
       "amount": "150",
       "note": "购买日用品",
-      "description": "超市购物小票"
     }
     ```
     如果无法确定交易类型，请将 "transactionType" 设置为 "不明确"。
@@ -164,6 +162,10 @@
     <string name="speech_input">输入语音</string>
     <string name="selected_image">被选取的图片</string>
     <string name="add_image">添加图片</string>
+    <string name="transaction_type_label">交易类型</string>
+    <string name="amount_label">金额</string>
+    <string name="note_label">备注</string>
+
 
     <!-- Congratulations Screen -->
     <string name="goal_achieved_heading">恭喜 🥳</string>

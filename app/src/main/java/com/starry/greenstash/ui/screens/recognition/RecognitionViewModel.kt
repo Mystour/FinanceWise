@@ -93,7 +93,6 @@ class RecognitionViewModel @Inject constructor(
     val note: String get() = _note
 
     val isLoading: Boolean get() = _isLoading
-    val analysisStream: StateFlow<String> get() = _analysisStream
 
     private val _isAnalyzing = MutableStateFlow(false)
     val isAnalyzing = _isAnalyzing.asStateFlow()
@@ -143,6 +142,7 @@ class RecognitionViewModel @Inject constructor(
                 is com.google.gson.JsonPrimitive -> {
                     if (amountJson.isNumber) amountJson.asNumber.toString() else amountJson.asString
                 }
+
                 else -> ""
             }
             val note = jsonObject.get("note")?.asString ?: ""
@@ -163,8 +163,6 @@ class RecognitionViewModel @Inject constructor(
     }
 
 
-
-
     private suspend fun analyzeImageWithGemini(
         bitmap: Bitmap?,
         inputText: String,
@@ -174,20 +172,18 @@ class RecognitionViewModel @Inject constructor(
             val prompt = context.getString(R.string.initial_recognition_prompt, inputText)
 
             val response = if (bitmap != null) {
-                generativeModel.generateContentStream(content { image(bitmap); text(prompt) })
+                generativeModel.generateContent(content { image(bitmap); text(prompt) })
             } else {
-                generativeModel.generateContentStream(prompt)
+                generativeModel.generateContent(prompt)
             }
 
-//            val prompt = context.getString(R.string.initial_recognition_prompt)
             Timber.d("Generated prompt: $prompt")
-//            val response = generativeModel.generateContentStream(content { image(bitmap); text(prompt) })
-            var analysis = ""
-            response.collect { chunk ->
-                analysis += chunk.text
+
+            val analysis = response.text
+            if (analysis != null) {
                 _analysisStream.value = analysis
             }
-            callback(analysis)
+            analysis?.let { callback(it) }
         } catch (e: Exception) {
             Timber.e(e, "分析图片时发生错误")
             Timber.e("Error details: ${e.localizedMessage}")
@@ -196,3 +192,4 @@ class RecognitionViewModel @Inject constructor(
         }
     }
 }
+

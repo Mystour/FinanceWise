@@ -67,14 +67,12 @@ fun RecognitionScreen(
         }
     }
 
-    val analysisStream by viewModel.analysisStream.collectAsState()
     var selectedTransactionType by remember { mutableStateOf<TransactionType?>(null) }
     var showTransactionDialog by remember { mutableStateOf(false) }
     var amount by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }
     val isAnalyzing by viewModel.isAnalyzing.collectAsState()
     val isAnalysisSuccessful by viewModel.isAnalysisSuccessful.collectAsState()
-
 
     LazyColumn(
         modifier = Modifier
@@ -161,8 +159,53 @@ fun RecognitionScreen(
         }
 
         item {
-            if (analysisStream.isNotEmpty()) {
-                Text(analysisStream)
+            if (isAnalysisSuccessful) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.transaction_type_label),
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                        Text(
+                            text = viewModel.transactionType.name,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.amount_label),
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                        Text(
+                            text = viewModel.amount,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.note_label),
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                        Text(
+                            text = viewModel.note,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
             }
         }
 
