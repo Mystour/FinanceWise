@@ -37,6 +37,8 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.ExperimentalComposeUiApi
 import cat.ereza.customactivityoncrash.config.CaocConfig
+import com.iflytek.cloud.SpeechConstant
+import com.iflytek.cloud.SpeechUtility
 import com.starry.greenstash.reminder.ReminderNotificationSender
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -51,6 +53,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 class GreenStashApp : Application() {
     override fun onCreate() {
         super.onCreate()
+
+        // 初始化 SpeechUtility
+        SpeechUtility.createUtility(this, SpeechConstant.APPID + "=119f6b60")
+
         createNotificationChannel()
         CaocConfig.Builder.create().restartActivity(MainActivity::class.java).apply()
     }

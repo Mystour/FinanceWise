@@ -27,7 +27,9 @@ package com.starry.greenstash.ui.navigation
 
 import androidx.compose.foundation.background
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -191,7 +193,13 @@ fun NavGraph(
             popExitTransition = { popExitTransition() }
         ) { backStackEntry ->
             val args = backStackEntry.toRoute<NormalScreens.RecognitionScreen>()
-            RecognitionScreen(navController = navController, goalId = args.goalId.toLong()) // 传递 goalId
+            val snackbarHostState = remember { SnackbarHostState() }
+
+            RecognitionScreen(
+                navController = navController,
+                goalId = args.goalId.toLong(),
+                snackbarHostState = snackbarHostState
+            )
         }
 
         /** Emotion Screen */

@@ -1,9 +1,14 @@
 package com.starry.greenstash.ui.screens.recognition.composables
 
 import android.Manifest
+import android.content.ActivityNotFoundException
+import android.app.Activity
+import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
+import android.speech.RecognizerIntent
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -35,19 +40,25 @@ import com.starry.greenstash.ui.screens.recognition.RecognitionViewModel
 import com.starry.greenstash.utils.ImageUtils
 import kotlinx.coroutines.delay
 
+import com.iflytek.cloud.RecognizerListener
+import com.iflytek.cloud.RecognizerResult
+import com.iflytek.cloud.SpeechConstant
+import com.iflytek.cloud.SpeechError
+import com.iflytek.cloud.SpeechRecognizer
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecognitionScreen(
     viewModel: RecognitionViewModel = hiltViewModel(),
     navController: NavController,
-    goalId: Long
+    goalId: Long,
+    snackbarHostState: SnackbarHostState
 ) {
     val context = LocalContext.current
 
     var inputText by remember { mutableStateOf("") }
     var selectedImage by remember { mutableStateOf<Uri?>(null) }
     var displayedImage by remember { mutableStateOf<Bitmap?>(null) }
-    var showImagePicker by remember { mutableStateOf(false) }
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -58,14 +69,63 @@ fun RecognitionScreen(
     }
 
     val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            imagePickerLauncher.launch("image/*")
-        } else {
-            Toast.makeText(context, context.getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = { permissions ->
+            if (permissions[Manifest.permission.READ_MEDIA_IMAGES] == true || permissions[Manifest.permission.READ_EXTERNAL_STORAGE] == true) {
+                imagePickerLauncher.launch("image/*")
+            }
+
+            if (permissions[Manifest.permission.RECORD_AUDIO] != true) {
+                Toast.makeText(context, context.getString(R.string.record_audio_permission_denied), Toast.LENGTH_SHORT).show()
+            }
+
+            if (permissions.values.any { !it }) {
+                Toast.makeText(context, context.getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
+            }
+        }
+    )
+
+    val recognizer = SpeechRecognizer.createRecognizer(context, null)
+
+    val speechRecognizerListener = object : RecognizerListener {
+        override fun onVolumeChanged(volume: Int, data: ByteArray?) {
+            println("Speech recognition volume changed: $volume")
+        }
+
+        override fun onResult(result: RecognizerResult?, isLast: Boolean) {
+            if (result != null) {
+                val resultString = result.resultString
+                println("Speech recognition result: $resultString")
+                inputText = resultString
+
+            } else {
+                println("Speech recognition result is null")
+            }
+        }
+
+
+        override fun onError(error: SpeechError?) {
+            error?.let {
+                println("Speech recognition error: ${it.errorDescription}")
+                Toast.makeText(context, "Error: ${it.errorDescription}", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        override fun onEvent(p0: Int, p1: Int, p2: Int, p3: Bundle?) {
+            println("Event: $p0")
+        }
+
+
+        override fun onBeginOfSpeech() {
+            println("Speech recognition started")
+        }
+
+        override fun onEndOfSpeech() {
+            println("Speech recognition ended")
         }
     }
+
+
 
     var selectedTransactionType by remember { mutableStateOf<TransactionType?>(null) }
     var showTransactionDialog by remember { mutableStateOf(false) }
@@ -91,40 +151,68 @@ fun RecognitionScreen(
         }
 
         item {
-            OutlinedTextField(
-                value = inputText,
-                onValueChange = { inputText = it },
-                label = { Text(stringResource(id = R.string.input_hint)) },
-                trailingIcon = { //  将两个图标都放在 trailingIcon 中
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically //  垂直居中对齐图标
-                    ) {
-                        IconButton(onClick = { /* 语音识别逻辑 */ }) {
-                            Icon(
-                                imageVector = Icons.Filled.Mic,
-                                contentDescription = stringResource(id = R.string.speech_input)
-                            )
-                        }
-                        IconButton(onClick = {
-                            permissionLauncher.launch(
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                OutlinedTextField(
+                    value = inputText,
+                    onValueChange = { inputText = it },
+                    label = { Text(stringResource(id = R.string.input_hint)) },
+                    trailingIcon = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            IconButton(onClick = {
+                            try {
+                            val params = HashMap<String, String>()
+                            params["domain"] = "iat"
+                            params["language"] = "zh_cn"
+                            params["accent"] = "mandarin"
+                            recognizer.setParameter(SpeechConstant.DOMAIN, "iat")
+                            recognizer.setParameter(SpeechConstant.LANGUAGE, "zh_cn")
+                            recognizer.setParameter(SpeechConstant.ACCENT, "mandarin")
+                            recognizer.startListening(speechRecognizerListener)
+                            } catch (e: Exception) {
+                            viewModel.showSnackbar(context.getString(R.string.speech_recognition_not_supported), snackbarHostState)
+                            }
+
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Filled.Mic,
+                                    contentDescription = stringResource(id = R.string.speech_input)
+                                )
+                            }
+
+                            IconButton(onClick = {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                    Manifest.permission.READ_MEDIA_IMAGES
+                                    permissionLauncher.launch(
+                                        arrayOf(
+                                            Manifest.permission.READ_MEDIA_IMAGES,
+                                            Manifest.permission.RECORD_AUDIO
+                                        )
+                                    )
                                 } else {
-                                    Manifest.permission.READ_EXTERNAL_STORAGE
+                                    permissionLauncher.launch(
+                                        arrayOf(
+                                            Manifest.permission.READ_EXTERNAL_STORAGE,
+                                            Manifest.permission.RECORD_AUDIO
+                                        )
+                                    )
                                 }
-                            )
-                        }) {
-                            Icon(
-                                imageVector = Icons.Filled.AddAPhoto,
-                                contentDescription = stringResource(id = R.string.add_image)
-                            )
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Filled.AddAPhoto,
+                                    contentDescription = stringResource(id = R.string.add_image)
+                                )
+                            }
                         }
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                singleLine = true
-            )
+                    },
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true
+                )
+            }
         }
 
         item {
@@ -266,3 +354,4 @@ fun RecognitionScreen(
         }
     }
 }
+

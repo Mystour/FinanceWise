@@ -10,6 +10,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.speech.RecognizerIntent
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -189,6 +191,21 @@ class RecognitionViewModel @Inject constructor(
             Timber.e("Error details: ${e.localizedMessage}")
             Timber.e("Stack trace: ${e.stackTraceToString()}")
             callback("分析出错: ${e.message}")
+            _isLoading = false
+            _isAnalyzing.value = false
+        } finally {
+            _isLoading = false
+            _isAnalyzing.value = false
+        }
+    }
+
+
+    fun showSnackbar(message: String, snackbarHostState: SnackbarHostState) {
+        viewModelScope.launch {
+            snackbarHostState.showSnackbar(
+                message = message,
+                duration = SnackbarDuration.Short
+            )
         }
     }
 }

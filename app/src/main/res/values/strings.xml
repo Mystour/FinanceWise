@@ -138,6 +138,8 @@
 
     <!-- Bill Recognition Screen -->
     <string name="permission_denied" tools:ignore="MissingTranslation">Necessary image access not obtained</string>
+    <string name="record_audio_permission_denied" tools:ignore="MissingTranslation">Necessary audio access not obtained</string>
+    <string name="speech_recognition_not_supported" tools:ignore="MissingTranslation">Speech recognition not supported</string>
     <string name="bill_recognition_title" tools:ignore="MissingTranslation">Bill Recognition</string>
     <string name="bill_recognition_desc" tools:ignore="MissingTranslation">
         We will use AI to analyze the images you upload and extract the billing information to automatically fill in your transaction history.

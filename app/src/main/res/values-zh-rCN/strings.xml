@@ -125,6 +125,8 @@
 
     <!-- Bill Recognition Screen -->
     <string name="permission_denied">未获得必要的图片访问权限</string>
+    <string name="record_audio_permission_denied">未获得必要的录音访问权限</string>
+    <string name="speech_recognition_not_supported">您的设备不支持语音识别</string>
     <string name="bill_recognition_title">账单识别</string>
     <string name="bill_recognition_desc">
         我们将使用AI来分析您上传的图片，并提取出账单信息自动填入到您的交易记录中。
