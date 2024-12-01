@@ -357,7 +357,7 @@ fun EmotionScreen(
                 )
             }
 
-            // 显示过滤后的目标列表
+
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -411,6 +411,7 @@ fun EmotionScreen(
                     }
                 }
             }
+
 
             // 监听分析结果的变化并自动滚动
             LaunchedEffect(viewModel.analysisResult) {

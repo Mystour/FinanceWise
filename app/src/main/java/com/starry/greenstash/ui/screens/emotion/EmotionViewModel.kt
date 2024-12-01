@@ -76,22 +76,12 @@ class EmotionViewModel @Inject constructor(
     // 筛选条件的组合
     private val _filterCriteria = MutableStateFlow(FilterCriteria("", "", "", GoalPriority.Normal, FilterType.None))
 
-    // 动态获取目标列表
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val goalsListFlow = _filterCriteria.flatMapLatest { criteria ->
-        when (criteria.filterType) {
-            FilterType.Title -> goalDao.getGoalsByTitleContains(criteria.query) // 使用新的方法
-            FilterType.DateRange -> goalDao.getAllGoalsByDateRange(criteria.startDate, criteria.endDate)
-            FilterType.Priority -> goalDao.getAllGoalsByPriority(criteria.selectedPriority)
-            FilterType.None -> goalDao.getAllGoalsAsLiveData().asFlow()
-        }
-    }
+    // 将筛选条件存储在一个列表中
+    private val appliedFilters = mutableStateListOf<FilterType>()
 
-    val goals: StateFlow<List<GoalWithTransactions>> = goalsListFlow.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = emptyList()
-    )
+    // 声明为 MutableStateFlow
+    private val _goals = MutableStateFlow(emptyList<GoalWithTransactions>())
+    val goals: StateFlow<List<GoalWithTransactions>> = _goals
 
     init {
         loadGoals()
@@ -119,28 +109,125 @@ class EmotionViewModel @Inject constructor(
 
     fun setStartDate(date: String) {
         _startDate.value = date
+        if (date.isNotBlank()) {
+            appliedFilters.remove(FilterType.DateRange) // 移除已有的日期范围筛选器
+            appliedFilters.add(FilterType.DateRange) // 添加日期范围筛选器
+        } else {
+            appliedFilters.remove(FilterType.DateRange) // 移除日期范围筛选器
+        }
         updateFilterCriteria()
     }
 
     fun setEndDate(date: String) {
         _endDate.value = date
+        if (date.isNotBlank()) {
+            appliedFilters.remove(FilterType.DateRange) // 移除已有的日期范围筛选器
+            appliedFilters.add(FilterType.DateRange) // 添加日期范围筛选器
+        } else {
+            appliedFilters.remove(FilterType.DateRange) // 移除日期范围筛选器
+        }
         updateFilterCriteria()
     }
+
 
     fun setSelectedPriority(priority: GoalPriority) {
         _selectedPriority.value = priority
+        appliedFilters.remove(FilterType.Priority) // 移除已有的优先级筛选器
+        appliedFilters.add(FilterType.Priority) // 添加优先级筛选器
         updateFilterCriteria()
     }
 
-    fun setSelectedFilterType(filterType: FilterType) {
-        _selectedFilterType.value = filterType
-        updateFilterCriteria()
-    }
+
 
     fun setTitleFilter(query: String) {
         _titleFilter.value = query
+        if (query.isNotBlank()) {
+            appliedFilters.remove(FilterType.Title) // 移除已有的标题筛选器
+            appliedFilters.add(FilterType.Title) // 添加标题筛选器
+        } else {
+            appliedFilters.remove(FilterType.Title) // 移除标题筛选器
+        }
         updateFilterCriteria()
     }
+
+
+    private fun updateFilterCriteria() {
+        viewModelScope.launch {
+            val allGoals = goalDao.getAllGoalsAsLiveData().asFlow().first()
+
+            val filteredLists = mutableListOf<List<GoalWithTransactions>>()
+
+            if (appliedFilters.contains(FilterType.Title) && _titleFilter.value.isNotBlank()) {
+                filteredLists.add(goalDao.getGoalsByTitleContains(_titleFilter.value).first())
+            }
+            if (appliedFilters.contains(FilterType.DateRange) && (_startDate.value.isNotBlank() || _endDate.value.isNotBlank())) {
+                filteredLists.add(goalDao.getAllGoalsByDateRange(_startDate.value, _endDate.value).first())
+            }
+            if (appliedFilters.contains(FilterType.Priority)) {
+                filteredLists.add(goalDao.getAllGoalsByPriority(_selectedPriority.value).first())
+            }
+
+            // 计算交集
+            val filteredList = if (appliedFilters.isEmpty()) {
+                allGoals
+            } else if (filteredLists.isEmpty()) {
+                emptyList()
+            } else {
+                filteredLists.reduce { acc, list ->
+                    acc.intersect(list.toSet()).toList() // 取交集
+                }
+            }
+
+            println("Filtered List: $filteredList")
+
+            // 更新 goals 的状态
+            _goals.value = filteredList
+            _filterCriteria.value = FilterCriteria(
+                query = _titleFilter.value,
+                startDate = _startDate.value,
+                endDate = _endDate.value,
+                selectedPriority = _selectedPriority.value,
+                filterType = _selectedFilterType.value
+            )
+        }
+    }
+
+
+
+    fun setSelectedFilterType(filterType: FilterType) {
+        if (_selectedFilterType.value != filterType) {
+            // 如果当前筛选类型与新筛选类型不同，则更新筛选类型
+            _selectedFilterType.value = filterType
+
+            // 根据新的筛选类型更新 appliedFilters
+            when (filterType) {
+                FilterType.Title -> {
+                    if (_titleFilter.value.isNotBlank()) {
+                        appliedFilters.add(FilterType.Title)
+                    }
+                }
+                FilterType.DateRange -> {
+                    if (_startDate.value.isNotBlank() || _endDate.value.isNotBlank()) {
+                        appliedFilters.add(FilterType.DateRange)
+                    }
+                }
+                FilterType.Priority -> {
+                    if (_selectedPriority.value != GoalPriority.Normal) {
+                        appliedFilters.add(FilterType.Priority)
+                    }
+                }
+                FilterType.None -> {
+                    appliedFilters.clear()
+                }
+            }
+
+            // 更新 filterCriteria
+            updateFilterCriteria()
+        }
+    }
+
+
+
 
     // 筛选标准枚举
     enum class FilterType {
@@ -150,7 +237,7 @@ class EmotionViewModel @Inject constructor(
 
     fun loadGoals() {
         viewModelScope.launch {
-            _filterCriteria.value = _filterCriteria.value.copy(query = "", startDate = "", endDate = "", selectedPriority = GoalPriority.Normal, filterType = FilterType.None)
+            _goals.value = goalDao.getAllGoalsAsLiveData().asFlow().first()
         }
     }
 
@@ -239,16 +326,6 @@ class EmotionViewModel @Inject constructor(
         return String.format(detailedPrompt, billText)
     }
 
-    // 更新 filterCriteria 方法
-    private fun updateFilterCriteria() {
-        _filterCriteria.value = FilterCriteria(
-            query = _titleFilter.value,
-            startDate = _startDate.value,
-            endDate = _endDate.value,
-            selectedPriority = _selectedPriority.value,
-            filterType = _selectedFilterType.value
-        )
-    }
 
     fun addGoalToAnalysis(goal: GoalWithTransactions) {
         // 将目标转换为 JSON 格式
@@ -273,9 +350,14 @@ class EmotionViewModel @Inject constructor(
         _emotionScore.intValue = 0
         _emotionComment.value = ""
         _isLoading.value = false
-        _titleFilter.value = "" //  添加这行代码
-        loadGoals()  // 这行代码也要保留，用于重新加载目标列表
+        _titleFilter.value = ""
+        _startDate.value = ""
+        _endDate.value = ""
+        _selectedFilterType.value = FilterType.None
+        appliedFilters.clear()
+        updateFilterCriteria()
     }
+
 
     // 筛选条件的数据类
     data class FilterCriteria(

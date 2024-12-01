@@ -45,6 +45,9 @@ import com.iflytek.cloud.RecognizerResult
 import com.iflytek.cloud.SpeechConstant
 import com.iflytek.cloud.SpeechError
 import com.iflytek.cloud.SpeechRecognizer
+import com.starry.greenstash.iflytek.speech.util.JsonParser.parseIatResult
+import org.json.JSONException
+import org.json.JSONObject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -96,8 +99,30 @@ fun RecognitionScreen(
             if (result != null) {
                 val resultString = result.resultString
                 println("Speech recognition result: $resultString")
-                inputText = resultString
 
+                // 解析结果
+                val parsedResult = parseIatResult(resultString)
+                inputText = parsedResult
+
+                // 提取SN字段
+                var sn: String? = null
+                try {
+                    val resultJson = JSONObject(resultString)
+                    sn = resultJson.optString("sn")
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                }
+
+                // 存储结果
+                val iatResults = mutableMapOf<String, String>()
+                iatResults[sn ?: "default"] = parsedResult
+
+                // 拼接结果并更新UI
+                val resultBuffer = StringBuilder()
+                for (key in iatResults.keys) {
+                    resultBuffer.append(iatResults[key])
+                }
+                inputText = resultBuffer.toString()
             } else {
                 println("Speech recognition result is null")
             }

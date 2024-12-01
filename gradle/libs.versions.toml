@@ -45,6 +45,7 @@ material = "1.7.4"
 material3 = "1.3.0"
 jsonViewer = "v1.1"
 mp3-encoder = "0.2.0"
+places = "4.1.0"
 
 [libraries]
 aboutlibraries-compose = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutlibrariesCompose" }
@@ -106,6 +107,7 @@ timber = {group = "com.jakewharton.timber", name = "timber", version.ref = "timb
 chart = { group = "com.github.PhilJay", name = "MPAndroidChart", version.ref = "chart"}
 jsonViewer = { group = "com.github.pvarry", name = "android-json-viewer", version.ref = "jsonViewer"}
 mp3-encoder = { group = "com.benasher44", name = "kotlinx-mp3-encoder", version.ref = "mp3-encoder"}
+places = { group = "com.google.android.libraries.places", name = "places", version.ref = "places" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
