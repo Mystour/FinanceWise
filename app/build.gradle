@@ -147,6 +147,8 @@ dependencies {
     implementation(libs.chart)
     implementation(libs.jsonViewer)
 
+//    implementation(libs.mp3.encoder)
+
     // Oreo back-ports for API 24 (N)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     // Testing components.

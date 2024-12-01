@@ -44,6 +44,7 @@ chart = "v3.1.0"
 material = "1.7.4"
 material3 = "1.3.0"
 jsonViewer = "v1.1"
+mp3-encoder = "0.2.0"
 
 [libraries]
 aboutlibraries-compose = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutlibrariesCompose" }
@@ -104,6 +105,7 @@ ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 timber = {group = "com.jakewharton.timber", name = "timber", version.ref = "timber"}
 chart = { group = "com.github.PhilJay", name = "MPAndroidChart", version.ref = "chart"}
 jsonViewer = { group = "com.github.pvarry", name = "android-json-viewer", version.ref = "jsonViewer"}
+mp3-encoder = { group = "com.benasher44", name = "kotlinx-mp3-encoder", version.ref = "mp3-encoder"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
