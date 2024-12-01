@@ -81,6 +81,7 @@ aboutLibraries {
 
 dependencies {
 
+    implementation files('libs\\Msc.jar')
     def composeBom = libs.androidx.compose.bom.v20240902
     implementation composeBom
     androidTestImplementation composeBom
