@@ -61,6 +61,9 @@
     <string name="content_hint" tools:ignore="MissingTranslation">The Bill Content</string>
     <string name="emotion_score" tools:ignore="MissingTranslation">Emotion Score</string>
     <string name="score_text" formatted="false" tools:ignore="MissingTranslation">%1$d points %2$s</string>
+    <string name="score_text_with_emoji" formatted="false" tools:ignore="MissingTranslation">%1$d points: %2$s %3$s</string>
+
+
 
     <string name="initial_analysis_prompt" tools:ignore="MissingTranslation">
         Please analyze the following billing information to analyze my emotions.

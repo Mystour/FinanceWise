@@ -61,6 +61,9 @@
     <string name="content_hint">账单内容</string>
     <string name="emotion_score">情绪评分</string>
     <string name="score_text" formatted="false">%1$d 分 %2$s</string>
+    <string name="score_text_with_emoji" formatted="false">%1$d 分：%2$s %3$s</string>
+
+
     <string name="initial_analysis_prompt">
         请分析以下账单信息，来分析我的情绪。
 

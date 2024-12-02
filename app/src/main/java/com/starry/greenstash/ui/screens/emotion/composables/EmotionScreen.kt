@@ -273,13 +273,21 @@ fun EmotionScreen(
                         shape = MaterialTheme.shapes.medium,
                         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                     ) {
+                        val emoji = when (viewModel.emotionScore) {
+                            in 70..Int.MAX_VALUE -> "😄" // 开心的表情
+                            in 40..69 -> "😐" // 一般的表情
+                            in 0..39 -> "😢" // 伤心的表情
+                            else -> "😐"  // 默认情况
+                        }
+
                         Text(
-                            text = stringResource(id = R.string.score_text, emotionScore, viewModel.emotionComment),
+                            text = stringResource(id = R.string.score_text_with_emoji, viewModel.emotionScore, viewModel.emotionComment, emoji),
                             style = MaterialTheme.typography.bodyMedium,
                             textAlign = TextAlign.Justify,
                             modifier = Modifier.padding(16.dp)
                         )
                     }
+
                 }
 
                 // 使用 Markwon 处理 Markdown 文本
