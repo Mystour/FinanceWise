@@ -1,15 +1,9 @@
 package com.starry.greenstash.ui.screens.recognition
 
 
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-
-import android.app.Activity
+//import com.google.ai.client.generativeai
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
-import android.speech.RecognizerIntent
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.getValue
@@ -22,7 +16,6 @@ import com.google.ai.client.generativeai.type.FunctionType
 import com.google.ai.client.generativeai.type.Schema
 import com.google.ai.client.generativeai.type.content
 import com.google.ai.client.generativeai.type.generationConfig
-//import com.google.ai.client.generativeai
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
@@ -32,14 +25,10 @@ import com.starry.greenstash.R
 import com.starry.greenstash.database.transaction.TransactionType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel

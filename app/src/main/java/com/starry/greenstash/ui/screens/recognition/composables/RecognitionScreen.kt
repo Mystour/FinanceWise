@@ -1,25 +1,41 @@
 package com.starry.greenstash.ui.screens.recognition.composables
 
 import android.Manifest
-import android.content.ActivityNotFoundException
-import android.app.Activity
-import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
-import android.os.Bundle
-import android.speech.RecognizerIntent
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,21 +49,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.starry.greenstash.R
-import com.starry.greenstash.database.transaction.TransactionType
-import com.starry.greenstash.ui.navigation.NormalScreens
-import com.starry.greenstash.ui.screens.recognition.RecognitionViewModel
-import com.starry.greenstash.utils.ImageUtils
-import kotlinx.coroutines.delay
-
-import com.iflytek.cloud.RecognizerListener
 import com.iflytek.cloud.RecognizerResult
 import com.iflytek.cloud.SpeechConstant
 import com.iflytek.cloud.SpeechError
-import com.iflytek.cloud.SpeechRecognizer
+import com.iflytek.cloud.ui.RecognizerDialog
+import com.iflytek.cloud.ui.RecognizerDialogListener
+import com.starry.greenstash.R
+import com.starry.greenstash.database.transaction.TransactionType
 import com.starry.greenstash.iflytek.speech.util.JsonParser.parseIatResult
-import org.json.JSONException
-import org.json.JSONObject
+import com.starry.greenstash.ui.navigation.NormalScreens
+import com.starry.greenstash.ui.screens.recognition.RecognitionViewModel
+import com.starry.greenstash.utils.ImageUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -88,68 +100,25 @@ fun RecognitionScreen(
         }
     )
 
-    val recognizer = SpeechRecognizer.createRecognizer(context, null)
+    val recognizerDialog = RecognizerDialog(context, null)
 
-    val speechRecognizerListener = object : RecognizerListener {
-        override fun onVolumeChanged(volume: Int, data: ByteArray?) {
-            println("Speech recognition volume changed: $volume")
+// 设置识别参数 (在onCreate中设置一次即可)
+    recognizerDialog.setParameter(SpeechConstant.LANGUAGE, "zh_cn")
+    recognizerDialog.setParameter(SpeechConstant.ACCENT, "mandarin")
+    recognizerDialog.setParameter(SpeechConstant.ASR_PTT, "0") // 关闭标点符号
+
+
+    val recognizerDialogListener = object : RecognizerDialogListener {
+        override fun onResult(results: RecognizerResult, isLast: Boolean) {
+            val text = parseIatResult(results.resultString) // 现在可以正确调用了
+            inputText = text
         }
 
-        override fun onResult(result: RecognizerResult?, isLast: Boolean) {
-            if (result != null) {
-                val resultString = result.resultString
-                println("Speech recognition result: $resultString")
-
-                // 解析结果
-                val parsedResult = parseIatResult(resultString)
-                inputText = parsedResult
-
-                // 提取SN字段
-                var sn: String? = null
-                try {
-                    val resultJson = JSONObject(resultString)
-                    sn = resultJson.optString("sn")
-                } catch (e: JSONException) {
-                    e.printStackTrace()
-                }
-
-                // 存储结果
-                val iatResults = mutableMapOf<String, String>()
-                iatResults[sn ?: "default"] = parsedResult
-
-                // 拼接结果并更新UI
-                val resultBuffer = StringBuilder()
-                for (key in iatResults.keys) {
-                    resultBuffer.append(iatResults[key])
-                }
-                inputText = resultBuffer.toString()
-            } else {
-                println("Speech recognition result is null")
-            }
-        }
-
-
-        override fun onError(error: SpeechError?) {
-            error?.let {
-                println("Speech recognition error: ${it.errorDescription}")
-                Toast.makeText(context, "Error: ${it.errorDescription}", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        override fun onEvent(p0: Int, p1: Int, p2: Int, p3: Bundle?) {
-            println("Event: $p0")
-        }
-
-
-        override fun onBeginOfSpeech() {
-            println("Speech recognition started")
-        }
-
-        override fun onEndOfSpeech() {
-            println("Speech recognition ended")
+        override fun onError(error: SpeechError) {
+            println("Speech recognition error: ${error.errorDescription}")
+            Toast.makeText(context, "Error: ${error.errorDescription}", Toast.LENGTH_SHORT).show()
         }
     }
-
 
 
     var selectedTransactionType by remember { mutableStateOf<TransactionType?>(null) }
@@ -189,19 +158,12 @@ fun RecognitionScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             IconButton(onClick = {
-                            try {
-                            val params = HashMap<String, String>()
-                            params["domain"] = "iat"
-                            params["language"] = "zh_cn"
-                            params["accent"] = "mandarin"
-                            recognizer.setParameter(SpeechConstant.DOMAIN, "iat")
-                            recognizer.setParameter(SpeechConstant.LANGUAGE, "zh_cn")
-                            recognizer.setParameter(SpeechConstant.ACCENT, "mandarin")
-                            recognizer.startListening(speechRecognizerListener)
-                            } catch (e: Exception) {
-                            viewModel.showSnackbar(context.getString(R.string.speech_recognition_not_supported), snackbarHostState)
-                            }
-
+                                try {
+                                    recognizerDialog.setListener(recognizerDialogListener)
+                                    recognizerDialog.show()
+                                } catch (e: Exception) {
+                                    viewModel.showSnackbar(context.getString(R.string.speech_recognition_not_supported), snackbarHostState)
+                                }
                             }) {
                                 Icon(
                                     imageVector = Icons.Filled.Mic,
@@ -379,4 +341,3 @@ fun RecognitionScreen(
         }
     }
 }
-
