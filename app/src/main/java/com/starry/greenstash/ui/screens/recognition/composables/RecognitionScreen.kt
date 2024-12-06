@@ -60,6 +60,7 @@ import com.starry.greenstash.iflytek.speech.util.JsonParser.parseIatResult
 import com.starry.greenstash.ui.navigation.NormalScreens
 import com.starry.greenstash.ui.screens.recognition.RecognitionViewModel
 import com.starry.greenstash.utils.ImageUtils
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -102,11 +103,17 @@ fun RecognitionScreen(
 
     val recognizerDialog = RecognizerDialog(context, null)
 
-// 设置识别参数 (在onCreate中设置一次即可)
-    recognizerDialog.setParameter(SpeechConstant.LANGUAGE, "zh_cn")
-    recognizerDialog.setParameter(SpeechConstant.ACCENT, "mandarin")
-    recognizerDialog.setParameter(SpeechConstant.ASR_PTT, "0") // 关闭标点符号
+    // 根据系统语言设置识别参数
+    val systemLanguage = Locale.getDefault().language
+    val languageSetting = when (systemLanguage) {
+        "en" -> Pair("en_us", "english")
+        "zh" -> Pair("zh_cn", "mandarin")
+        else -> Pair("zh_cn", "mandarin") // 默认设置为中文
+    }
 
+    recognizerDialog.setParameter(SpeechConstant.LANGUAGE, languageSetting.first)
+    recognizerDialog.setParameter(SpeechConstant.ACCENT, languageSetting.second)
+    recognizerDialog.setParameter(SpeechConstant.ASR_PTT, "0") // 关闭标点符号
 
     val recognizerDialogListener = object : RecognizerDialogListener {
         override fun onResult(results: RecognizerResult, isLast: Boolean) {
@@ -119,7 +126,6 @@ fun RecognitionScreen(
             Toast.makeText(context, "Error: ${error.errorDescription}", Toast.LENGTH_SHORT).show()
         }
     }
-
 
     var selectedTransactionType by remember { mutableStateOf<TransactionType?>(null) }
     var showTransactionDialog by remember { mutableStateOf(false) }
@@ -341,3 +347,4 @@ fun RecognitionScreen(
         }
     }
 }
+
