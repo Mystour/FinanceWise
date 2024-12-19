@@ -305,21 +305,18 @@ class EmotionViewModel @Inject constructor(
         return response.text ?: ""
     }
 
+
     private suspend fun generateDetailedAnalysis(billText: String, callback: (String) -> Unit) {
         val prompt = createDetailedAnalysisPrompt(billText)
-        val response = generativeModel.generateContentStream(prompt)
-        var analysis = ""
-        response.collect { chunk ->
-            analysis += chunk.text
-            callback(analysis)
-        }
+        val response = generativeModel.generateContent(prompt)
+        callback(response.text ?: "")
     }
+
 
     private fun extractEmotionInfo(analysisResult: String): Pair<Int, String> {
         val gson = Gson()
         try {
-            val cleanedJson = analysisResult.replace(Regex("```json|```"), "").trim()
-            val jsonObject = gson.fromJson(cleanedJson, JsonObject::class.java)
+            val jsonObject = gson.fromJson(analysisResult, JsonObject::class.java)
 
             val score = jsonObject.get("score")?.asInt ?: 0
             val comment = jsonObject.get("comment")?.asString ?: ""

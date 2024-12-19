@@ -103,11 +103,17 @@
 
         Please help me analyze my recent spending situation and mood:
 
-        1. What is my overall spending level?
-        2. Where do I spend the most?
-        3. Based on my spending, infer my recent possible emotional state, for example, am I feeling anxious, stressed, or overspending?
-        4. Based on my consumption situation and emotional analysis, please give me some specific suggestions to help me manage my finances better, such as how to reduce unnecessary expenses, how to make a reasonable budget, how to save and invest?
-        5. Please help me make a consumption plan for the next month. Based on my goal and current consumption status, make a reasonable and challenging consumption plan to achieve the latest goal (obtain from the goal field, pay special attention to title and additionalNotes, and generally get accurate goals). And calculate how long it will take me to achieve my goal and whether I can achieve it in the expected time.
+        ```json
+        {
+        "summary": "What is my overall consumption level?" ,
+        "consumption_analysis": "Where do I spend the most?" ,
+        "emotional_inference": "Based on my spending, infer my recent possible emotional state, such as am I anxious, stressed, or overspending?" ,
+        "suggestions": Based on my spending and sentiment analysis, please give me some specific suggestions to help me manage my finances better, such as how to reduce unnecessary expenses, how to make a reasonable budget, and how to save and invest? ,
+        "plan": "Please help me make a spending plan for the next month, based on my goals and current spending status, make a reasonable and challenging spending plan to achieve the nearest goal (from the goal field, especially focusing on title and additionalNotes, generally can get accurate goals). And calculate how long it will take me to reach my goal and whether I can do it in the time I want."
+        }
+        ```
+
+        (Answer in English)
     </string>
     <string name="format_bill_text_prompt" tools:ignore="MissingTranslation">
         Please convert the following billing text into a standardized table format with the following columns: Date, Item, Amount, Location (if extractable).
