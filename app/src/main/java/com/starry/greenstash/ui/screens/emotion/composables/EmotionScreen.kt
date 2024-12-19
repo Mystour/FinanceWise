@@ -61,6 +61,8 @@ import androidx.core.text.toSpanned
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.gson.Gson
+import com.google.gson.JsonObject
+import com.google.gson.JsonSyntaxException
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
@@ -72,12 +74,15 @@ import com.starry.greenstash.ui.navigation.NormalScreens
 import com.starry.greenstash.ui.screens.emotion.EmotionViewModel
 import com.starry.greenstash.ui.screens.settings.SettingsViewModel
 import com.starry.greenstash.utils.weakHapticFeedback
-import io.noties.markwon.Markwon
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.StyleSpan
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -293,52 +298,21 @@ fun EmotionScreen(
 
                 }
 
-                // 使用 Markwon 处理 Markdown 文本
-                val markwon = Markwon.create(context)
-                val spanned = remember(emotionViewModel.analysisResult) {
-                    markwon.toMarkdown(emotionViewModel.analysisResult)
-                }
-
-                // 使用 buildAnnotatedString 添加自定义样式
-                val annotatedString = remember(spanned) {
-                    buildAnnotatedString {
-                        val markdownText = spanned.toString()
-                        var currentIndex = 0
-
-                        while (currentIndex < markdownText.length) {
-                            val titleStart = markdownText.indexOf("## ", currentIndex)
-                            if (titleStart == -1) {
-                                append(markdownText.substring(currentIndex))
-                                break
-                            }
-
-                            append(markdownText.substring(currentIndex, titleStart))
-                            val titleEnd = markdownText.indexOf('\n', titleStart)
-                            if (titleEnd == -1) {
-                                append(markdownText.substring(titleStart))
-                                break
-                            }
-
-                            pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-                            append(markdownText.substring(titleStart + 3, titleEnd))
-                            pop()
-                            currentIndex = titleEnd + 1
-                        }
-                    }
-                }
 
                 // 使用 AndroidView 组件显示 AnnotatedString 对象
-                AndroidView(
-                    factory = { context ->
-                        androidx.appcompat.widget.AppCompatTextView(context).apply {
-                            movementMethod = LinkMovementMethod.getInstance()
-                        }
-                    },
-                    update = { textView ->
-                        textView.text = annotatedString.toSpanned()
-                    },
-                    modifier = Modifier.padding(16.dp)
-                )
+                if(emotionViewModel.analysisResult.isNotBlank()){
+                    AndroidView(
+                        factory = { context ->
+                            androidx.appcompat.widget.AppCompatTextView(context).apply {
+                                movementMethod = LinkMovementMethod.getInstance()
+                            }
+                        },
+                        update = { textView ->
+                            textView.text = formatAnalysisResult(emotionViewModel.analysisResult)
+                        },
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
             }
 
             // 显示描述
@@ -434,5 +408,67 @@ fun EmotionScreen(
                 }
             }
         }
+    }
+}
+
+// 在需要展示的页面解析json，然后展示
+fun formatAnalysisResult(jsonResult: String): Spanned {
+    val gson = Gson()
+    val spannableStringBuilder = SpannableStringBuilder()
+    try {
+        val jsonObject = gson.fromJson(jsonResult, JsonObject::class.java)
+
+        if (jsonObject == null) {
+            spannableStringBuilder.append("JSON 解析失败，请稍后重试")
+            return spannableStringBuilder.toSpanned()
+        }
+
+        val summary = jsonObject.get("summary")?.asString?.trim() ?: ""
+        val consumptionAnalysis = jsonObject.get("consumption_analysis")?.asString?.trim() ?: ""
+        val emotionalInference = jsonObject.get("emotional_inference")?.asString?.trim() ?: ""
+        val suggestions = jsonObject.get("suggestions")?.asString?.trim() ?: ""
+        val plan = jsonObject.get("plan")?.asString?.trim() ?: ""
+
+        if (summary.isNotBlank()) {
+            appendWithMarkdown(spannableStringBuilder,"### 消费概述\n",true)
+            spannableStringBuilder.append(summary)
+            spannableStringBuilder.append("\n\n")
+        }
+        if (consumptionAnalysis.isNotBlank()) {
+            appendWithMarkdown(spannableStringBuilder,"### 消费分析\n",true)
+            spannableStringBuilder.append(consumptionAnalysis)
+            spannableStringBuilder.append("\n\n")
+        }
+        if (emotionalInference.isNotBlank()) {
+            appendWithMarkdown(spannableStringBuilder,"### 情绪推断\n",true)
+            spannableStringBuilder.append(emotionalInference)
+            spannableStringBuilder.append("\n\n")
+        }
+        if (suggestions.isNotBlank()) {
+            appendWithMarkdown(spannableStringBuilder,"### 建议\n",true)
+            spannableStringBuilder.append(suggestions)
+            spannableStringBuilder.append("\n\n")
+        }
+        if (plan.isNotBlank()) {
+            appendWithMarkdown(spannableStringBuilder,"### 消费规划\n",true)
+            spannableStringBuilder.append(plan)
+            spannableStringBuilder.append("\n")
+        }
+
+
+    } catch (e: JsonSyntaxException) {
+        spannableStringBuilder.append( "JSON 解析错误，请稍后重试")
+    } catch (e: Exception) {
+        spannableStringBuilder.append( "发生未知错误，请稍后重试")
+    }
+    return spannableStringBuilder.toSpanned()
+}
+
+private fun appendWithMarkdown(spannableStringBuilder: SpannableStringBuilder, text: String, isTitle: Boolean){
+    val startIndex = spannableStringBuilder.length
+    spannableStringBuilder.append(text)
+    if (isTitle){
+        val styleSpan = StyleSpan(android.graphics.Typeface.BOLD)
+        spannableStringBuilder.setSpan(styleSpan, startIndex, startIndex+text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
     }
 }
