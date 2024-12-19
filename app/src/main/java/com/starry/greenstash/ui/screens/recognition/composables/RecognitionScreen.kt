@@ -31,6 +31,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -59,13 +60,15 @@ import com.starry.greenstash.database.transaction.TransactionType
 import com.starry.greenstash.iflytek.speech.util.JsonParser.parseIatResult
 import com.starry.greenstash.ui.navigation.NormalScreens
 import com.starry.greenstash.ui.screens.recognition.RecognitionViewModel
+import com.starry.greenstash.ui.screens.settings.SettingsViewModel
 import com.starry.greenstash.utils.ImageUtils
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecognitionScreen(
-    viewModel: RecognitionViewModel = hiltViewModel(),
+    recognitionViewModel: RecognitionViewModel = hiltViewModel(),
+    settingsViewModel: SettingsViewModel = hiltViewModel(),
     navController: NavController,
     goalId: Long,
     snackbarHostState: SnackbarHostState
@@ -131,8 +134,12 @@ fun RecognitionScreen(
     var showTransactionDialog by remember { mutableStateOf(false) }
     var amount by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }
-    val isAnalyzing by viewModel.isAnalyzing.collectAsState()
-    val isAnalysisSuccessful by viewModel.isAnalysisSuccessful.collectAsState()
+    val isAnalyzing by recognitionViewModel.isAnalyzing.collectAsState()
+    val isAnalysisSuccessful by recognitionViewModel.isAnalysisSuccessful.collectAsState()
+
+    LaunchedEffect(Unit) {
+        recognitionViewModel.setApiKey(settingsViewModel.getApiKey() ?: "")
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -168,7 +175,7 @@ fun RecognitionScreen(
                                     recognizerDialog.setListener(recognizerDialogListener)
                                     recognizerDialog.show()
                                 } catch (e: Exception) {
-                                    viewModel.showSnackbar(context.getString(R.string.speech_recognition_not_supported), snackbarHostState)
+                                    recognitionViewModel.showSnackbar(context.getString(R.string.speech_recognition_not_supported), snackbarHostState)
                                 }
                             }) {
                                 Icon(
@@ -224,9 +231,9 @@ fun RecognitionScreen(
             Button(onClick = {
                 selectedImage?.let { uri ->
                     val bitmap = ImageUtils.uriToBitmap(uri, context, 1024)
-                    viewModel.analyzeImage(bitmap, inputText)
+                    recognitionViewModel.analyzeImage(bitmap, inputText)
                 } ?: run {
-                    viewModel.analyzeImage(null, inputText)
+                    recognitionViewModel.analyzeImage(null, inputText)
                 }
             }, enabled = (inputText.isNotBlank() || selectedImage != null) && !isAnalyzing) {
                 Text(stringResource(id = R.string.analyze_button))
@@ -234,7 +241,7 @@ fun RecognitionScreen(
         }
 
         item {
-            if (viewModel.isLoading) {
+            if (recognitionViewModel.isLoading) {
                 CircularProgressIndicator()
             }
         }
@@ -256,7 +263,7 @@ fun RecognitionScreen(
                             style = MaterialTheme.typography.labelMedium
                         )
                         Text(
-                            text = viewModel.transactionType.name,
+                            text = recognitionViewModel.transactionType.name,
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -269,7 +276,7 @@ fun RecognitionScreen(
                             style = MaterialTheme.typography.labelMedium
                         )
                         Text(
-                            text = viewModel.amount,
+                            text = recognitionViewModel.amount,
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -282,7 +289,7 @@ fun RecognitionScreen(
                             style = MaterialTheme.typography.labelMedium
                         )
                         Text(
-                            text = viewModel.note,
+                            text = recognitionViewModel.note,
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -293,9 +300,9 @@ fun RecognitionScreen(
         item {
             if (isAnalysisSuccessful) {
                 Button(onClick = {
-                    val transactionType = viewModel.transactionType
-                    amount = viewModel.amount
-                    note = viewModel.note
+                    val transactionType = recognitionViewModel.transactionType
+                    amount = recognitionViewModel.amount
+                    note = recognitionViewModel.note
 
                     if (transactionType == TransactionType.Invalid) {
                         showTransactionDialog = true

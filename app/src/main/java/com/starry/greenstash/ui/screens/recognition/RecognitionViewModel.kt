@@ -35,10 +35,13 @@ import javax.inject.Inject
 class RecognitionViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
+
+    private  var _apiKey = MutableStateFlow("")
+
     private val generativeModel by lazy {
         GenerativeModel(
             modelName = "gemini-1.5-flash",
-            apiKey = BuildConfig.apiKey,
+            apiKey = _apiKey.value,
             generationConfig = generationConfig {
                 responseMimeType = "application/json"
                 responseSchema = Schema(
@@ -196,6 +199,10 @@ class RecognitionViewModel @Inject constructor(
                 duration = SnackbarDuration.Short
             )
         }
+    }
+
+    fun setApiKey(key: String) {
+        _apiKey.value = key
     }
 }
 

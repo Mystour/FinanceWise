@@ -65,11 +65,16 @@ class SettingsViewModel @Inject constructor(
     private val _amoledTheme = MutableLiveData(false)
     private val _materialYou = MutableLiveData(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
     private val _goalCardStyle = MutableLiveData(GoalCardStyle.Classic)
+    // 新增 API 密钥相关状态
+    private val _apiKey = MutableLiveData("")
 
     val theme: LiveData<ThemeMode> = _theme
     val amoledTheme: LiveData<Boolean> = _amoledTheme
     val materialYou: LiveData<Boolean> = _materialYou
     val goalCardStyle: LiveData<GoalCardStyle> = _goalCardStyle
+    // 新增 API 密钥状态
+    val apiKey : LiveData<String> = _apiKey
+
 
     // Initialize preferences --------------------------------------------
     init {
@@ -77,6 +82,8 @@ class SettingsViewModel @Inject constructor(
         _amoledTheme.value = getAmoledThemeValue()
         _materialYou.value = getMaterialYouValue()
         _goalCardStyle.value = GoalCardStyle.entries.toTypedArray()[getGoalCardStyleValue()]
+        // 初始化 API 密钥
+        _apiKey.value = getApiKey()
     }
 
     // Setters for preferences --------------------------------------------
@@ -112,6 +119,12 @@ class SettingsViewModel @Inject constructor(
         preferenceUtil.putBoolean(PreferenceUtil.APP_LOCK_BOOL, newValue)
     }
 
+    // 新增 API 密钥的 setter
+    fun setApiKey(newApiKey: String) {
+        _apiKey.postValue(newApiKey)
+        preferenceUtil.putString(PreferenceUtil.API_KEY_STR, newApiKey)
+    }
+
     // Getters for preferences --------------------------------------------
     fun getThemeValue() = preferenceUtil.getInt(
         PreferenceUtil.APP_THEME_INT, ThemeMode.Auto.ordinal
@@ -139,6 +152,11 @@ class SettingsViewModel @Inject constructor(
 
     fun getAppLockValue() = preferenceUtil.getBoolean(
         PreferenceUtil.APP_LOCK_BOOL, false
+    )
+
+    // 新增 API 密钥的 getter
+    fun getApiKey() = preferenceUtil.getString(
+        PreferenceUtil.API_KEY_STR, "" // Default value empty string.
     )
 
     /**

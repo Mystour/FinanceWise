@@ -28,9 +28,11 @@ package com.starry.greenstash.ui.screens.settings.composables
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
@@ -42,6 +44,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
@@ -49,22 +52,46 @@ import com.starry.greenstash.ui.theme.greenstashFont
 import com.starry.greenstash.utils.weakHapticFeedback
 
 @Composable
-fun SettingsItem(title: String, description: String, icon: ImageVector, onClick: () -> Unit) {
+fun SettingsItem(
+    title: String,
+    description: String,
+    icon: ImageVector? = null,
+    painter: Painter? = null,
+    onClick: () -> Unit = {},
+    switchState: MutableState<Boolean>? = null,
+    onCheckChange: ((Boolean) -> Unit)? = null,
+    content: @Composable () -> Unit = {},
+    action: @Composable () -> Unit = {}
+) {
+    val view = LocalView.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
+            .clickable(enabled = onCheckChange == null) { onClick() }
             .padding(horizontal = 8.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            modifier = Modifier
-                .padding(start = 14.dp, end = 16.dp)
-                .size(26.dp),
-            tint = MaterialTheme.colorScheme.secondary
-        )
+        if (icon != null) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(start = 14.dp, end = 16.dp)
+                    .size(26.dp),
+                tint = MaterialTheme.colorScheme.secondary
+            )
+        }
+
+        if (painter != null) {
+            androidx.compose.foundation.Image(
+                painter = painter,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(start = 14.dp, end = 16.dp)
+                    .size(26.dp),
+            )
+        }
+
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -84,9 +111,36 @@ fun SettingsItem(title: String, description: String, icon: ImageVector, onClick:
                 fontFamily = greenstashFont
             )
         }
-    }
+        Spacer(modifier = Modifier.width(8.dp))
 
+        if (switchState != null && onCheckChange != null) {
+            Switch(
+                checked = switchState.value,
+                onCheckedChange = {
+                    view.weakHapticFeedback()
+                    onCheckChange(it)
+                },
+                thumbContent = if (switchState.value) {
+                    {
+                        Icon(
+                            imageVector = Icons.Filled.Check,
+                            contentDescription = null,
+                            modifier = Modifier.size(SwitchDefaults.IconSize),
+                        )
+                    }
+                } else {
+                    null
+                },
+                modifier = Modifier.padding(start = 12.dp, end = 12.dp)
+            )
+        } else {
+            content()
+            Spacer(modifier = Modifier.width(8.dp))
+            action()
+        }
+    }
 }
+
 
 @Composable
 fun SettingsItem(

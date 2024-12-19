@@ -318,6 +318,12 @@
     <string name="app_info_setting">App Information</string>
     <string name="app_info_setting_desc">Show app version and useful links.</string>
 
+    <string name="api_setting_title" tools:ignore="MissingTranslation">Gemini API Settings</string>
+    <string name="api_key_setting" tools:ignore="MissingTranslation">Enter your Gemini API key to enable the Gemini API.</string>
+    <string name="api_key_setting_desc" tools:ignore="MissingTranslation">Enter your Gemini API key to enable the Gemini API.</string>
+    <string name="api_key_save_button" tools:ignore="MissingTranslation">Save</string>
+
+
     <!-- Goal Card Style -->
     <string name="goal_card_settings_header">Goal Style</string>
     <string name="goal_card_settings_tip">Tip! You can swipe a compact-styled card left or right to either edit or delete a savings goal.</string>

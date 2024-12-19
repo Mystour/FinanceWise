@@ -42,6 +42,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.BrightnessMedium
@@ -62,17 +63,23 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -84,6 +91,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -103,8 +112,8 @@ import com.starry.greenstash.utils.Utils
 import com.starry.greenstash.utils.getActivity
 import com.starry.greenstash.utils.toToast
 import com.starry.greenstash.utils.weakHapticFeedback
+import kotlinx.coroutines.launch
 import java.util.concurrent.Executor
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -113,6 +122,7 @@ fun SettingsScreen(navController: NavController) {
     val context = LocalContext.current
     val viewModel = (context.getActivity() as MainActivity).settingsViewModel
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
         modifier = Modifier
@@ -152,6 +162,10 @@ fun SettingsScreen(navController: NavController) {
 
             /** Security Settings. */
             item { SecuritySettings(viewModel = viewModel) }
+
+            /** API Settings */
+            item { ApiSettings(viewModel = viewModel, snackbarHostState = snackbarHostState) }
+
 
             /** About Setting */
             item { MiscSettings(navController = navController) }
@@ -543,6 +557,54 @@ private fun SecuritySettings(viewModel: SettingsViewModel) {
                     viewModel.setAppLock(false)
                 }
             })
+    }
+}
+
+
+@Composable
+private fun ApiSettings(viewModel: SettingsViewModel, snackbarHostState: SnackbarHostState) {
+    var apiKey by remember { mutableStateOf(viewModel.getApiKey() ?: "") }
+    val coroutineScope = rememberCoroutineScope()
+    SettingsContainer {
+        SettingsCategory(title = stringResource(id = R.string.api_setting_title))
+        SettingsItem(
+            title = stringResource(id = R.string.api_key_setting),
+            description = stringResource(id = R.string.api_key_setting_desc),
+            icon = ImageVector.vectorResource(id = R.drawable.api_key_icon),
+//            icon = null,
+            content = {
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    value = apiKey,
+                    onValueChange = { apiKey = it },
+                    singleLine = true,
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                )
+            },
+            action =  {
+                FilledTonalButton(
+                    onClick = {
+                        viewModel.setApiKey(apiKey)
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = "API Key Saved",
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+                    },
+                    colors = ButtonDefaults.filledTonalButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
+                    Text(
+                        text =  stringResource(id = R.string.api_key_save_button), fontFamily = greenstashFont
+                    )
+                }
+            }
+        )
     }
 }
 

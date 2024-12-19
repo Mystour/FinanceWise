@@ -70,6 +70,7 @@ import com.starry.greenstash.R
 import com.starry.greenstash.database.goal.GoalPriority
 import com.starry.greenstash.ui.navigation.NormalScreens
 import com.starry.greenstash.ui.screens.emotion.EmotionViewModel
+import com.starry.greenstash.ui.screens.settings.SettingsViewModel
 import com.starry.greenstash.utils.weakHapticFeedback
 import io.noties.markwon.Markwon
 import kotlinx.coroutines.Dispatchers
@@ -81,14 +82,15 @@ import java.time.format.DateTimeFormatter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmotionScreen(
-    viewModel: EmotionViewModel = hiltViewModel(),
+    emotionViewModel: EmotionViewModel = hiltViewModel(),
+    settingsViewModel: SettingsViewModel = hiltViewModel(),
     navController: NavController
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
     remember { SnackbarHostState() }
-    val goalsState = viewModel.goals.collectAsState(initial = emptyList())
+    val goalsState = emotionViewModel.goals.collectAsState(initial = emptyList())
     remember { mutableStateOf("") }
     LocalSoftwareKeyboardController.current
     val localView = LocalView.current
@@ -102,22 +104,23 @@ fun EmotionScreen(
 
 
     LaunchedEffect(Unit) {
-        viewModel.loadGoals()
+        emotionViewModel.setApiKey(settingsViewModel. getApiKey()?:"")
+        emotionViewModel.loadGoals ()
     }
 
-    val showTitle = viewModel.selectedFilterType != EmotionViewModel.FilterType.Title
+    val showTitle = emotionViewModel.selectedFilterType != EmotionViewModel.FilterType.Title
 
     Scaffold(
         topBar = {
             EmotionTopAppBar(
                 title = stringResource(id = R.string.emotion_analysis_title),
                 showTitle = showTitle,
-                searchText = viewModel.titleFilter,
-                onSearchInputChange = { viewModel.setTitleFilter(it) },
-                onSearchAction = { viewModel.setTitleFilter(viewModel.titleFilter) }, // Correct search action
-                filterType = viewModel.selectedFilterType,
-                onFilterTypeChange = { viewModel.setSelectedFilterType(it) },
-                onRefreshClick = { viewModel.reset() }
+                searchText = emotionViewModel.titleFilter,
+                onSearchInputChange = { emotionViewModel.setTitleFilter(it) },
+                onSearchAction = { emotionViewModel.setTitleFilter(emotionViewModel.titleFilter) }, // Correct search action
+                filterType = emotionViewModel.selectedFilterType,
+                onFilterTypeChange = { emotionViewModel.setSelectedFilterType(it) },
+                onRefreshClick = { emotionViewModel.reset() }
             )
         }
     ) { innerPadding ->
@@ -130,7 +133,7 @@ fun EmotionScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
-            when (viewModel.selectedFilterType) {
+            when (emotionViewModel.selectedFilterType) {
                 EmotionViewModel.FilterType.Title -> {
                 }
 
@@ -139,7 +142,7 @@ fun EmotionScreen(
 
                     // Start Date Input
                     OutlinedTextField(
-                        value = selectedStartDate.value?.format(DateTimeFormatter.ofPattern(viewModel.getDateStyleValue())) ?: "", // Display formatted date or empty string
+                        value = selectedStartDate.value?.format(DateTimeFormatter.ofPattern(emotionViewModel.getDateStyleValue())) ?: "", // Display formatted date or empty string
                         onValueChange = {  }, // Make it read-only
                         label = { Text(stringResource(id = R.string.start_date)) },
                         trailingIcon = {
@@ -164,7 +167,7 @@ fun EmotionScreen(
 
                     // End Date Input (similar to Start Date)
                     OutlinedTextField(
-                        value = selectedEndDate.value?.format(DateTimeFormatter.ofPattern(viewModel.getDateStyleValue())) ?: "", // Display formatted date or empty string
+                        value = selectedEndDate.value?.format(DateTimeFormatter.ofPattern(emotionViewModel.getDateStyleValue())) ?: "", // Display formatted date or empty string
                         onValueChange = {  },
                         label = { Text(stringResource(id = R.string.end_date)) },
                         trailingIcon = {
@@ -188,7 +191,7 @@ fun EmotionScreen(
                         ),
                         selection = CalendarSelection.Date { newDate ->
                             selectedStartDate.value = newDate
-                            viewModel.setStartDate(newDate.format(DateTimeFormatter.ofPattern(viewModel.getDateStyleValue())))
+                            emotionViewModel.setStartDate(newDate.format(DateTimeFormatter.ofPattern(emotionViewModel.getDateStyleValue())))
                         }
                     )
 
@@ -202,7 +205,7 @@ fun EmotionScreen(
                         ),
                         selection = CalendarSelection.Date { newDate ->
                             selectedEndDate.value = newDate
-                            viewModel.setEndDate(newDate.format(DateTimeFormatter.ofPattern(viewModel.getDateStyleValue())))
+                            emotionViewModel.setEndDate(newDate.format(DateTimeFormatter.ofPattern(emotionViewModel.getDateStyleValue())))
                         }
                     )
                 }
@@ -218,7 +221,7 @@ fun EmotionScreen(
                             DropdownMenuItem(
                                 text = { Text(priority.name) },
                                 onClick = {
-                                    viewModel.setSelectedPriority(priority)
+                                    emotionViewModel.setSelectedPriority(priority)
                                     isDropdownExpanded = false // 关闭下拉菜单
                                 }
                             )
@@ -237,27 +240,27 @@ fun EmotionScreen(
             }
 
             BillInput(
-                billText = viewModel.billText,
-                onBillTextChange = { viewModel.setBillText(it) }
+                billText = emotionViewModel.billText,
+                onBillTextChange = { emotionViewModel.setBillText(it) }
             )
 
             Button(
                 onClick = {
                     scope.launch(Dispatchers.IO) {
-                        viewModel.analyzeBill()
+                        emotionViewModel.analyzeBill()
                     }
                 },
-                enabled = viewModel.billText.isNotBlank()
+                enabled = emotionViewModel.billText.isNotBlank()
             ) {
                 Text(stringResource(id = R.string.emotion_analysis_button))
             }
 
-            if (viewModel.isLoading) {
+            if (emotionViewModel.isLoading) {
                 CircularProgressIndicator()
             } else {
                 // 分析结束后才显示图表和评论
-                if (viewModel.analysisResult.isNotBlank()) { // 检查 analysisResult 是否为空
-                    val emotionScore = viewModel.emotionScore
+                if (emotionViewModel.analysisResult.isNotBlank()) { // 检查 analysisResult 是否为空
+                    val emotionScore = emotionViewModel.emotionScore
                     EmotionChart(
                         emotionScore = emotionScore,
                         modifier = Modifier
@@ -273,7 +276,7 @@ fun EmotionScreen(
                         shape = MaterialTheme.shapes.medium,
                         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                     ) {
-                        val emoji = when (viewModel.emotionScore) {
+                        val emoji = when (emotionViewModel.emotionScore) {
                             in 70..Int.MAX_VALUE -> "😄" // 开心的表情
                             in 40..69 -> "😐" // 一般的表情
                             in 0..39 -> "😢" // 伤心的表情
@@ -281,7 +284,7 @@ fun EmotionScreen(
                         }
 
                         Text(
-                            text = stringResource(id = R.string.score_text_with_emoji, viewModel.emotionScore, viewModel.emotionComment, emoji),
+                            text = stringResource(id = R.string.score_text_with_emoji, emotionViewModel.emotionScore, emotionViewModel.emotionComment, emoji),
                             style = MaterialTheme.typography.bodyMedium,
                             textAlign = TextAlign.Justify,
                             modifier = Modifier.padding(16.dp)
@@ -292,8 +295,8 @@ fun EmotionScreen(
 
                 // 使用 Markwon 处理 Markdown 文本
                 val markwon = Markwon.create(context)
-                val spanned = remember(viewModel.analysisResult) {
-                    markwon.toMarkdown(viewModel.analysisResult)
+                val spanned = remember(emotionViewModel.analysisResult) {
+                    markwon.toMarkdown(emotionViewModel.analysisResult)
                 }
 
                 // 使用 buildAnnotatedString 添加自定义样式
@@ -373,7 +376,7 @@ fun EmotionScreen(
             ) {
                 items(goalsState.value) { goal ->
                     val gson = Gson()
-                    val isAdded = viewModel.billText.contains(gson.toJson(goal))
+                    val isAdded = emotionViewModel.billText.contains(gson.toJson(goal))
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -405,9 +408,9 @@ fun EmotionScreen(
                         IconButton(
                             onClick = {
                                 if (isAdded) {
-                                    viewModel.removeGoalFromAnalysis(goal)
+                                    emotionViewModel.removeGoalFromAnalysis(goal)
                                 } else {
-                                    viewModel.addGoalToAnalysis(goal)
+                                    emotionViewModel.addGoalToAnalysis(goal)
                                 }
                             }
                         ) {
@@ -422,8 +425,8 @@ fun EmotionScreen(
 
 
             // 监听分析结果的变化并自动滚动
-            LaunchedEffect(viewModel.analysisResult) {
-                if (viewModel.analysisResult.isNotBlank()) {
+            LaunchedEffect(emotionViewModel.analysisResult) {
+                if (emotionViewModel.analysisResult.isNotBlank()) {
                     scope.launch {
                         delay(300) // 延迟一段时间，确保内容已经渲染完成
                         scrollState.animateScrollTo(scrollState.maxValue)

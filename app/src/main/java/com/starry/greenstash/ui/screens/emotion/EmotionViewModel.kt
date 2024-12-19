@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.google.ai.client.generativeai.GenerativeModel
+import com.google.ai.client.generativeai.type.generationConfig
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonSyntaxException
@@ -27,12 +28,18 @@ import javax.inject.Inject
 class EmotionViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val goalDao: GoalDao,
-    private val preferenceUtil: PreferenceUtil
+    private val preferenceUtil: PreferenceUtil,
 ) : ViewModel() {
+
+    private  var _apiKey = MutableStateFlow("")
+
     private val generativeModel by lazy {
         GenerativeModel(
             modelName = "gemini-1.5-flash",
-            apiKey = BuildConfig.apiKey
+            apiKey = _apiKey.value, // 使用 Elvis 操作符提供默认值
+            generationConfig = generationConfig {
+                responseMimeType = "application/json"
+            }
         )
     }
 
@@ -358,6 +365,9 @@ class EmotionViewModel @Inject constructor(
         updateFilterCriteria()
     }
 
+    fun setApiKey(key: String) {
+        _apiKey.value = key
+    }
 
     // 筛选条件的数据类
     data class FilterCriteria(
