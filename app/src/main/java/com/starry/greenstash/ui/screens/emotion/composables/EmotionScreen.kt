@@ -104,7 +104,7 @@ fun EmotionScreen(
 
 
     LaunchedEffect(Unit) {
-        emotionViewModel.setApiKey(settingsViewModel. getApiKey()?:"")
+//        emotionViewModel.setApiKey(settingsViewModel. getApiKey()?:"")
         emotionViewModel.loadGoals ()
     }
 

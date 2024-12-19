@@ -68,7 +68,6 @@ import java.util.Locale
 @Composable
 fun RecognitionScreen(
     recognitionViewModel: RecognitionViewModel = hiltViewModel(),
-    settingsViewModel: SettingsViewModel = hiltViewModel(),
     navController: NavController,
     goalId: Long,
     snackbarHostState: SnackbarHostState
@@ -136,10 +135,6 @@ fun RecognitionScreen(
     var note by remember { mutableStateOf("") }
     val isAnalyzing by recognitionViewModel.isAnalyzing.collectAsState()
     val isAnalysisSuccessful by recognitionViewModel.isAnalysisSuccessful.collectAsState()
-
-    LaunchedEffect(Unit) {
-        recognitionViewModel.setApiKey(settingsViewModel.getApiKey() ?: "")
-    }
 
     LazyColumn(
         modifier = Modifier
