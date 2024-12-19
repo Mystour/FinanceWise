@@ -200,9 +200,4 @@ class RecognitionViewModel @Inject constructor(
             )
         }
     }
-
-    fun setApiKey(key: String) {
-        _apiKey.value = key
-        preferenceUtil.putString(PreferenceUtil.API_KEY, key)
-    }
 }

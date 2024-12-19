@@ -372,11 +372,6 @@ class EmotionViewModel @Inject constructor(
         updateFilterCriteria()
     }
 
-    fun setApiKey(key: String) {
-        _apiKey.value = key
-        preferenceUtil.putString(PreferenceUtil.API_KEY, key)
-    }
-
 
     // 筛选条件的数据类
     data class FilterCriteria(
