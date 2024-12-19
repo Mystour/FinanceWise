@@ -92,6 +92,7 @@ fun SettingsItem(
             )
         }
 
+
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -111,9 +112,9 @@ fun SettingsItem(
                 fontFamily = greenstashFont
             )
         }
-        Spacer(modifier = Modifier.width(8.dp))
 
         if (switchState != null && onCheckChange != null) {
+            Spacer(modifier = Modifier.width(8.dp))
             Switch(
                 checked = switchState.value,
                 onCheckedChange = {
@@ -134,74 +135,10 @@ fun SettingsItem(
                 modifier = Modifier.padding(start = 12.dp, end = 12.dp)
             )
         } else {
-            content()
-            Spacer(modifier = Modifier.width(8.dp))
             action()
-        }
-    }
-}
+            Spacer(modifier = Modifier.width(8.dp))
+            content()
 
-
-@Composable
-fun SettingsItem(
-    title: String,
-    description: String,
-    icon: ImageVector,
-    switchState: MutableState<Boolean>,
-    onCheckChange: (Boolean) -> Unit,
-) {
-    val view = LocalView.current
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp, 20.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            modifier = Modifier
-                .padding(start = 14.dp, end = 16.dp)
-                .size(26.dp),
-            tint = MaterialTheme.colorScheme.secondary
-        )
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = 12.dp, end = 8.dp)
-        ) {
-            Text(
-                text = title,
-                maxLines = 1,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontFamily = greenstashFont
-            )
-            Text(
-                text = description,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodySmall,
-                fontFamily = greenstashFont
-            )
         }
-        Switch(
-            checked = switchState.value,
-            onCheckedChange = {
-                view.weakHapticFeedback()
-                onCheckChange(it)
-            },
-            thumbContent = if (switchState.value) {
-                {
-                    Icon(
-                        imageVector = Icons.Filled.Check,
-                        contentDescription = null,
-                        modifier = Modifier.size(SwitchDefaults.IconSize),
-                    )
-                }
-            } else {
-                null
-            },
-            modifier = Modifier.padding(start = 12.dp, end = 12.dp)
-        )
     }
 }

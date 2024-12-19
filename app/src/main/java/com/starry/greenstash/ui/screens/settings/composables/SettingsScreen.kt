@@ -39,6 +39,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -571,37 +572,54 @@ private fun ApiSettings(viewModel: SettingsViewModel, snackbarHostState: Snackba
             title = stringResource(id = R.string.api_key_setting),
             description = stringResource(id = R.string.api_key_setting_desc),
             icon = ImageVector.vectorResource(id = R.drawable.api_key_icon),
-//            icon = null,
             content = {
-                OutlinedTextField(
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    value = apiKey,
-                    onValueChange = { apiKey = it },
-                    singleLine = true,
-                    visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                )
-            },
-            action =  {
-                FilledTonalButton(
-                    onClick = {
-                        viewModel.setApiKey(apiKey)
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar(
-                                message = "API Key Saved",
-                                duration = SnackbarDuration.Short
-                            )
-                        }
-                    },
-                    colors = ButtonDefaults.filledTonalButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
+                        .fillMaxWidth()
+                        .padding(0.dp)
                 ) {
-                    Text(
-                        text =  stringResource(id = R.string.api_key_save_button), fontFamily = greenstashFont
+                    OutlinedTextField(
+                        modifier = Modifier.weight(1f),
+                        value = apiKey,
+                        onValueChange = {
+                            apiKey = it // 更新 apiKey 状态变量
+                            println("OnValueChange: 输入的API Key: $it")
+                        },
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
                     )
+                }
+            },
+            action = {
+                Column(
+                    modifier = Modifier
+                        .wrapContentWidth(align = Alignment.End)
+                        .padding(0.dp),
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    FilledTonalButton(
+                        onClick = {
+                            println("保存的API Key: $apiKey")
+                            viewModel.setApiKey(apiKey) // 将 apiKey 传递给 ViewModel
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = "API Key Saved",
+                                    duration = SnackbarDuration.Short
+                                )
+                            }
+                        },
+                        colors = ButtonDefaults.filledTonalButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.api_key_save_button),
+                            fontFamily = greenstashFont
+                        )
+                    }
                 }
             }
         )
