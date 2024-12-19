@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -47,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.starry.greenstash.ui.theme.greenstashFont
 import com.starry.greenstash.utils.weakHapticFeedback
@@ -61,14 +63,16 @@ fun SettingsItem(
     switchState: MutableState<Boolean>? = null,
     onCheckChange: ((Boolean) -> Unit)? = null,
     content: @Composable () -> Unit = {},
-    action: @Composable () -> Unit = {}
+    action: @Composable () -> Unit = {},
+    height: Dp = 60.dp // 添加高度参数，并设置默认值
 ) {
     val view = LocalView.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .height(height) // 设置高度
             .clickable(enabled = onCheckChange == null) { onClick() }
-            .padding(horizontal = 8.dp, vertical = 14.dp),
+            .padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (icon != null) {
@@ -135,10 +139,8 @@ fun SettingsItem(
                 modifier = Modifier.padding(start = 12.dp, end = 12.dp)
             )
         } else {
-            action()
-            Spacer(modifier = Modifier.width(8.dp))
             content()
-
+            action()
         }
     }
 }

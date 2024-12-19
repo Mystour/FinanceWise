@@ -39,6 +39,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
@@ -572,36 +573,30 @@ private fun ApiSettings(viewModel: SettingsViewModel, snackbarHostState: Snackba
             title = stringResource(id = R.string.api_key_setting),
             description = stringResource(id = R.string.api_key_setting_desc),
             icon = ImageVector.vectorResource(id = R.drawable.api_key_icon),
+            height = 70.dp,
             content = {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(0.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
                 ) {
                     OutlinedTextField(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .widthIn(max = 250.dp),
                         value = apiKey,
                         onValueChange = {
-                            apiKey = it // 更新 apiKey 状态变量
+                            apiKey = it
+                            println("OnValueChange: 输入的API Key: $it")
                         },
                         singleLine = true,
                         visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
                     )
-                }
-            },
-            action = {
-                Column(
-                    modifier = Modifier
-                        .wrapContentWidth(align = Alignment.End)
-                        .padding(0.dp),
-                    verticalArrangement = Arrangement.Center,
-                ) {
                     FilledTonalButton(
                         onClick = {
                             println("保存的API Key: $apiKey")
-                            viewModel.setApiKey(apiKey) // 将 apiKey 传递给 ViewModel
+                            viewModel.setApiKey(apiKey)
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar(
                                     message = "API Key Saved",
@@ -610,9 +605,11 @@ private fun ApiSettings(viewModel: SettingsViewModel, snackbarHostState: Snackba
                             }
                         },
                         colors = ButtonDefaults.filledTonalButtonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
-                        )
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                        ),
+                        modifier = Modifier.padding(start = 8.dp)
+                            .wrapContentWidth(align = Alignment.End) // 让按钮宽度自适应
                     ) {
                         Text(
                             text = stringResource(id = R.string.api_key_save_button),
