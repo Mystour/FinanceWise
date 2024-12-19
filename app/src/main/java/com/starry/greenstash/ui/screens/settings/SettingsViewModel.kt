@@ -122,7 +122,7 @@ class SettingsViewModel @Inject constructor(
     // 新增 API 密钥的 setter
     fun setApiKey(newApiKey: String) {
         _apiKey.postValue(newApiKey)
-        preferenceUtil.putString(PreferenceUtil.API_KEY_STR, newApiKey)
+        preferenceUtil.putString(PreferenceUtil.API_KEY, newApiKey)
     }
 
     // Getters for preferences --------------------------------------------
@@ -156,7 +156,7 @@ class SettingsViewModel @Inject constructor(
 
     // 新增 API 密钥的 getter
     fun getApiKey() = preferenceUtil.getString(
-        PreferenceUtil.API_KEY_STR, "" // Default value empty string.
+        PreferenceUtil.API_KEY, "" // Default value empty string.
     )
 
     /**

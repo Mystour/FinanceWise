@@ -13,7 +13,7 @@ import com.google.gson.JsonSyntaxException
 import com.starry.greenstash.BuildConfig
 import com.starry.greenstash.R
 import com.starry.greenstash.database.core.GoalWithTransactions
-import com.starry.greenstash.database.goal.GoalDao // 导入正确的 DAO
+import com.starry.greenstash.database.goal.GoalDao
 import com.starry.greenstash.database.goal.GoalPriority
 import com.starry.greenstash.ui.screens.settings.DateStyle
 import com.starry.greenstash.utils.PreferenceUtil
@@ -32,6 +32,19 @@ class EmotionViewModel @Inject constructor(
 ) : ViewModel() {
 
     private  var _apiKey = MutableStateFlow("")
+
+    // 使用 backing property 安全地声明 _goals
+    private val _goals = MutableStateFlow(emptyList<GoalWithTransactions>())
+    // 确保 goals 是 StateFlow
+    val goals: StateFlow<List<GoalWithTransactions>> = _goals
+
+
+    init {
+        _apiKey.value = preferenceUtil.getString(PreferenceUtil.API_KEY, "") ?: ""
+        println("API Key: ${_apiKey.value}")
+        loadGoals()
+    }
+
 
     private val generativeModel by lazy {
         GenerativeModel(
@@ -85,14 +98,6 @@ class EmotionViewModel @Inject constructor(
 
     // 将筛选条件存储在一个列表中
     private val appliedFilters = mutableStateListOf<FilterType>()
-
-    // 声明为 MutableStateFlow
-    private val _goals = MutableStateFlow(emptyList<GoalWithTransactions>())
-    val goals: StateFlow<List<GoalWithTransactions>> = _goals
-
-    init {
-        loadGoals()
-    }
 
     fun setBillText(text: String) {
         _billText.value = text
@@ -244,7 +249,9 @@ class EmotionViewModel @Inject constructor(
 
     fun loadGoals() {
         viewModelScope.launch {
-            _goals.value = goalDao.getAllGoalsAsLiveData().asFlow().first()
+            // 使用 getOrNull() 确保即使数据库返回 null 也不会崩溃
+            val initialGoals = goalDao.getAllGoalsAsLiveData().asFlow().firstOrNull() ?: emptyList()
+            _goals.value = initialGoals
         }
     }
 
@@ -367,7 +374,9 @@ class EmotionViewModel @Inject constructor(
 
     fun setApiKey(key: String) {
         _apiKey.value = key
+        preferenceUtil.putString(PreferenceUtil.API_KEY, key)
     }
+
 
     // 筛选条件的数据类
     data class FilterCriteria(

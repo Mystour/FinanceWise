@@ -584,7 +584,6 @@ private fun ApiSettings(viewModel: SettingsViewModel, snackbarHostState: Snackba
                         value = apiKey,
                         onValueChange = {
                             apiKey = it // 更新 apiKey 状态变量
-                            println("OnValueChange: 输入的API Key: $it")
                         },
                         singleLine = true,
                         visualTransformation = PasswordVisualTransformation(),

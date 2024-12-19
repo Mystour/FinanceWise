@@ -57,7 +57,7 @@ class PreferenceUtil(context: Context) {
         const val INPUT_REMOVE_DEADLINE_TIP_BOOL = "input_remove_deadline_tip"
         const val INFO_TRANSACTION_SWIPE_TIP_BOOL = "info_transaction_swipe_tip"
 
-        const val API_KEY_STR = "api_key_str"
+        const val API_KEY = "api_key"
     }
 
     // Shared preferences instance
