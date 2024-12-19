@@ -1,7 +1,6 @@
 package com.starry.greenstash.ui.screens.recognition
 
 
-//import com.google.ai.client.generativeai
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.material3.SnackbarDuration
@@ -20,9 +19,9 @@ import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonSyntaxException
-import com.starry.greenstash.BuildConfig
 import com.starry.greenstash.R
 import com.starry.greenstash.database.transaction.TransactionType
+import com.starry.greenstash.utils.PreferenceUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,10 +32,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RecognitionViewModel @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val preferenceUtil: PreferenceUtil,
 ) : ViewModel() {
 
     private  var _apiKey = MutableStateFlow("")
+    init {
+        _apiKey.value = preferenceUtil.getString(PreferenceUtil.API_KEY, "") ?: ""
+    }
 
     private val generativeModel by lazy {
         GenerativeModel(
@@ -136,7 +139,6 @@ class RecognitionViewModel @Inject constructor(
                 is com.google.gson.JsonPrimitive -> {
                     if (amountJson.isNumber) amountJson.asNumber.toString() else amountJson.asString
                 }
-
                 else -> ""
             }
             val note = jsonObject.get("note")?.asString ?: ""
@@ -144,14 +146,12 @@ class RecognitionViewModel @Inject constructor(
             return Triple(type, amount, note)
 
         } catch (e: JsonSyntaxException) {
-            println(e.message)
             Timber.e(e, "JSON 解析错误: $analysisResult")
-            println("JSON 解析错误: $analysisResult")
+            println("JSON 解析错误: $analysisResult, ${e.message}")
             return Triple(TransactionType.Invalid, "", "") // 解析失败，返回默认值
-        } catch (e: Exception) {
-            println(e.message)
+        }   catch (e: Exception) {
             Timber.e(e, "其他错误: $analysisResult")
-            println("其他错误: $analysisResult")
+            println("其他错误: $analysisResult, ${e.message}")
             return Triple(TransactionType.Invalid, "", "") // 其他错误，返回默认值
         }
     }
@@ -203,6 +203,6 @@ class RecognitionViewModel @Inject constructor(
 
     fun setApiKey(key: String) {
         _apiKey.value = key
+        preferenceUtil.putString(PreferenceUtil.API_KEY, key)
     }
 }
-
