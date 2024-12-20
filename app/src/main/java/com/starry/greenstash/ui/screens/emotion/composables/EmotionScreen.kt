@@ -82,13 +82,13 @@ import java.time.format.DateTimeFormatter
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.StyleSpan
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmotionScreen(
     emotionViewModel: EmotionViewModel = hiltViewModel(),
-    settingsViewModel: SettingsViewModel = hiltViewModel(),
     navController: NavController
 ) {
     val context = LocalContext.current
@@ -423,52 +423,39 @@ fun formatAnalysisResult(jsonResult: String): Spanned {
             return spannableStringBuilder.toSpanned()
         }
 
-        val summary = jsonObject.get("summary")?.asString?.trim() ?: ""
-        val consumptionAnalysis = jsonObject.get("consumption_analysis")?.asString?.trim() ?: ""
-        val emotionalInference = jsonObject.get("emotional_inference")?.asString?.trim() ?: ""
-        val suggestions = jsonObject.get("suggestions")?.asString?.trim() ?: ""
-        val plan = jsonObject.get("plan")?.asString?.trim() ?: ""
+        for ((key, value) in jsonObject.entrySet()) {
+            val title = key.replace("_", " ").capitalizeWords()
+            val content = value.asString.trim()
 
-        if (summary.isNotBlank()) {
-            appendWithMarkdown(spannableStringBuilder,"### 消费概述\n",true)
-            spannableStringBuilder.append(summary)
-            spannableStringBuilder.append("\n\n")
+            if (content.isNotBlank()) {
+                appendWithMarkdown(spannableStringBuilder, "$title\n")
+                spannableStringBuilder.append(content)
+                spannableStringBuilder.append("\n\n")
+            }
         }
-        if (consumptionAnalysis.isNotBlank()) {
-            appendWithMarkdown(spannableStringBuilder,"### 消费分析\n",true)
-            spannableStringBuilder.append(consumptionAnalysis)
-            spannableStringBuilder.append("\n\n")
-        }
-        if (emotionalInference.isNotBlank()) {
-            appendWithMarkdown(spannableStringBuilder,"### 情绪推断\n",true)
-            spannableStringBuilder.append(emotionalInference)
-            spannableStringBuilder.append("\n\n")
-        }
-        if (suggestions.isNotBlank()) {
-            appendWithMarkdown(spannableStringBuilder,"### 建议\n",true)
-            spannableStringBuilder.append(suggestions)
-            spannableStringBuilder.append("\n\n")
-        }
-        if (plan.isNotBlank()) {
-            appendWithMarkdown(spannableStringBuilder,"### 消费规划\n",true)
-            spannableStringBuilder.append(plan)
-            spannableStringBuilder.append("\n")
-        }
-
 
     } catch (e: JsonSyntaxException) {
-        spannableStringBuilder.append( "JSON 解析错误，请稍后重试")
+        spannableStringBuilder.append("JSON 解析错误，请稍后重试")
     } catch (e: Exception) {
-        spannableStringBuilder.append( "发生未知错误，请稍后重试")
+        spannableStringBuilder.append("发生未知错误，请稍后重试")
     }
     return spannableStringBuilder.toSpanned()
 }
 
-private fun appendWithMarkdown(spannableStringBuilder: SpannableStringBuilder, text: String, isTitle: Boolean){
+private fun appendWithMarkdown(spannableStringBuilder: SpannableStringBuilder, text: String) {
     val startIndex = spannableStringBuilder.length
     spannableStringBuilder.append(text)
-    if (isTitle){
-        val styleSpan = StyleSpan(android.graphics.Typeface.BOLD)
-        spannableStringBuilder.setSpan(styleSpan, startIndex, startIndex+text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-    }
+    val styleSpan = StyleSpan(android.graphics.Typeface.BOLD)
+    spannableStringBuilder.setSpan(styleSpan, startIndex, startIndex + text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+
 }
+
+private fun String.capitalizeWords(): String {
+    return this.split(" ").joinToString(" ") { it ->
+        it.replaceFirstChar {
+        if (it.isLowerCase()) it.titlecase(
+            Locale.getDefault()
+        ) else it.toString()
+    } }
+}
+
