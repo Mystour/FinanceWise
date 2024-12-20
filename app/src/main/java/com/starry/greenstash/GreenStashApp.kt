@@ -54,7 +54,7 @@ class GreenStashApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // 初始化 SpeechUtility
+        // init SpeechUtility
         SpeechUtility.createUtility(this, SpeechConstant.APPID + "=119f6b60")
 
         createNotificationChannel()
