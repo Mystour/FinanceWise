@@ -55,7 +55,7 @@ class GreenStashApp : Application() {
         super.onCreate()
 
         // init SpeechUtility
-        SpeechUtility.createUtility(this, SpeechConstant.APPID + "=119f6b60")
+        SpeechUtility.createUtility(this, SpeechConstant.APPID + "=Your own APPID")
 
         createNotificationChannel()
         CaocConfig.Builder.create().restartActivity(MainActivity::class.java).apply()
